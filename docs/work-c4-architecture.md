@@ -23,6 +23,7 @@ System_Ext(github, "GitHub", "Issues & Projects")
 System_Ext(linear, "Linear", "Product management")
 System_Ext(ado, "Azure DevOps", "Work item tracking")
 System_Ext(fs, "Local Filesystem", "local-fs backend (.work directory)")
+System_Ext(notifications, "Notification Channels", "Slack, Email, Webhooks for work notify")
 
 Rel(user, work, "Uses", "CLI")
 Rel(work, jira, "Reads/Writes work items", "REST API")
@@ -30,6 +31,7 @@ Rel(work, github, "Reads/Writes work items", "REST / GraphQL")
 Rel(work, linear, "Reads/Writes work items", "GraphQL")
 Rel(work, ado, "Reads/Writes work items", "REST API")
 Rel(work, fs, "Reads/Writes files", "Filesystem")
+Rel(work, notifications, "Sends notifications", "work notify send")
 
 @enduml
 ```
