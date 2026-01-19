@@ -71,55 +71,19 @@ Rules:
 
 ```text
 work get  <wid>
-work list
-  [where <expr>]
-  [order by <field> [asc|desc]]
-  [limit <n>]
-  [@context]
+work list [where <expr>] [@context]
 ```
 
-### Filtering (`where`)
+Filtering by core state:
 
-- Filters work items **inside the current context**
-- Supports attributes and direct relations
-- Never changes scope
-
-Examples:
-
-```bash
-work list where state=active
-work list where kind=task and child_of=EPIC-42
+```text
+state = new | active | closed
 ```
-
----
-
-### Ordering (`order by`)
-
-- Ordering is **always explicit**
-- No implicit sorting is performed
-- Ordering does not filter results
-
-Examples:
-
-```bash
-work list order by priority desc
-work list where state=active order by updated asc
-```
-
-Priority ordering is normalized (`low < medium < high`).
-
----
-
-### Limiting (`limit`)
-
-- Limits the number of returned items
-- Applied **after filtering and ordering**
-- Never implied
 
 Example:
 
 ```bash
-work list where priority=high order by priority desc limit 5
+work list where state=active
 ```
 
 ---
@@ -217,7 +181,253 @@ work schema relations
 
 ---
 
-## 12. Work Item ID Rules
+## 12. Editing Work Items
+
+### 12.1 Purpose
+
+This chapter defines how existing work items can be **edited in a controlled, explicit, and adapter-compatible way**.
+
+Editing commands are **mutating operations** and always apply to **exactly one work item**.
+
+Bulk edits, implicit mutations, or query-based updates are explicitly out of scope.
+
+### 12.2 Command: `work edit`
+
+#### 12.2.1 Synopsis
+
+```text
+work edit <wid> [--field <value>]...
+```
+
+#### 12.2.2 Description
+
+Edits one or more **attributes** of a single work item identified by `<wid>`.
+
+Each invocation:
+- targets exactly one work item
+- performs atomic updates per field
+- fails if the adapter does not support the requested change
+
+The command is **non-interactive by default** and fully scriptable.
+
+#### 12.2.3 Supported Fields
+
+The following fields are defined at the CLI level. Adapters may support a subset.
+
+| Field | Description |
+|----|----|
+| `title` | Short summary |
+| `description` | Long-form text |
+| `priority` | `low | medium | high` |
+| `assignee` | User identifier or `unassigned` |
+
+State transitions are **not** handled by `work edit`.  
+They must use lifecycle commands (`start`, `close`, `reopen`).
+
+#### 12.2.4 Examples
+
+```bash
+work edit ABC-123 --title "Fix login bug"
+work edit ABC-123 --priority high
+work edit ABC-123 --assignee unassigned
+work edit ABC-123 --description "Updated problem analysis"
+```
+
+Multiple fields may be updated in a single command:
+
+```bash
+work edit ABC-123 --priority high --assignee alice
+```
+
+#### 12.2.5 Optional Interactive Editing
+
+```text
+work edit <wid> --editor
+```
+
+When `--editor` is specified:
+- the user’s `$EDITOR` is opened
+- only the `description` field is edited
+- adapters may reject this mode if unsupported
+
+Interactive editing is **explicit opt-in** and never the default.
+
+#### 12.2.6 Error Handling
+
+The command fails if:
+- `<wid>` does not exist
+- the adapter does not support editing a field
+- the update violates adapter constraints
+
+Partial updates are **not allowed**. Either all requested fields are updated, or none are.
+
+#### 12.2.7 Non-Goals
+
+The following are intentionally not supported:
+- editing multiple work items at once
+- editing via `where` clauses
+- implicit editors
+- adapter-specific hidden fields
+
+### 12.3 Command: `work unset`
+
+#### 12.3.1 Synopsis
+
+```text
+work unset <wid> <field>
+```
+
+#### 12.3.2 Description
+
+Clears the value of an optional field on a work item.
+
+This command exists to avoid ambiguous empty values (e.g. `--assignee ""`).
+
+#### 12.3.3 Examples
+
+```bash
+work unset ABC-123 assignee
+work unset ABC-123 priority
+```
+
+---
+
+## 13. Notifications
+
+### 13.1 Purpose
+
+This chapter defines a **stateless notification mechanism** for reporting work items that match a query.
+
+Notifications reuse the **existing query model** (`where`, `order by`, `limit`) and send results to **named notification targets**.
+
+Notifications are **explicit actions**, not background automation.
+
+### 13.2 Conceptual Model
+
+A notification consists of:
+1. a query (`where` clause)
+2. a target (identified by a user-defined name)
+3. a one-time execution
+
+No polling, scheduling, or real-time subscriptions are implied.
+
+### 13.3 Command: `work notify send`
+
+#### 13.3.1 Synopsis
+
+```text
+work notify send where <expr> to <target>
+```
+
+#### 13.3.2 Description
+
+Executes a query and sends the resulting work items to the specified notification target.
+
+The command:
+- evaluates the query in the active context
+- formats the result set
+- delivers it to the target
+- exits
+
+#### 13.3.3 Examples
+
+```bash
+work notify send   where kind=task and priority=high   to slack-team
+```
+
+```bash
+work notify send   where state=new   order by priority desc   limit 10   to email-me
+```
+
+#### 13.3.4 Failure Semantics
+
+The command fails if:
+- the target does not exist
+- the adapter does not support the target type
+- delivery fails
+
+Query evaluation and delivery are treated as a single operation.
+
+### 13.4 Notification Targets
+
+#### 13.4.1 Definition
+
+A notification target is:
+- identified by a **user-defined name**
+- scoped to a **context**
+- bound to a **target type** (e.g. slack, email, local)
+
+Targets are configuration, not runtime state.
+
+### 13.5 Command: `work notify target add`
+
+#### 13.5.1 Synopsis
+
+```text
+work notify target add <name> --type <type> [options]
+```
+
+#### 13.5.2 Description
+
+Registers a new notification target under the given name.
+
+Targets are:
+- stored per user
+- scoped to the active context
+- referenced by name in `work notify send`
+
+#### 13.5.3 Example
+
+```bash
+work notify target add slack-team   --type slack   --channel "#alerts"
+```
+
+### 13.6 Command: `work notify target list`
+
+```text
+work notify target list
+```
+
+Lists all configured notification targets for the current context.
+
+### 13.7 Command: `work notify target remove`
+
+```text
+work notify target remove <name>
+```
+
+Removes a previously configured notification target.
+
+### 13.8 Adapter Responsibilities
+
+Adapters must explicitly declare:
+- supported notification target types
+- formatting constraints
+- delivery guarantees
+
+Adapters must not:
+- introduce background execution
+- schedule notifications
+- persist query results
+
+### 13.9 Non-Goals
+
+The following are intentionally out of scope:
+- scheduled notifications
+- watchers or subscriptions
+- triggers or automation rules
+- real-time updates
+
+### 13.10 Design Invariants
+
+- Editing mutates **one work item explicitly**
+- Notifications report **query results explicitly**
+- All operations are **synchronous and stateless**
+- No hidden automation or background state is introduced
+
+---
+
+## 14. Work Item ID Rules
 
 Valid ID forms:
 
@@ -234,7 +444,7 @@ Rules:
 
 ---
 
-## 13. UX & Grammar Rules
+## 15. UX & Grammar Rules
 
 - verb always in position 1
 - `@context` always last
@@ -244,7 +454,7 @@ Rules:
 
 ---
 
-## 14. Command Overview (Flat)
+## 16. Command Overview (Flat)
 
 ```text
 work
@@ -255,11 +465,14 @@ work
 ├── get
 ├── list
 ├── set
+├── edit
+├── unset
 ├── link
 ├── unlink
 ├── move
 ├── comment
 ├── delete
+├── notify
 ├── context
 │   ├── add
 │   ├── set
@@ -279,7 +492,7 @@ work
 
 ---
 
-## 15. Mental Model
+## 17. Mental Model
 
 > Contexts define the boundary  
 > Create creates existence  
