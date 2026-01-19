@@ -13,7 +13,7 @@ The work CLI is a unified, stateless command-line tool that bridges the gap betw
 
 ## Key Features
 - **Multi-Backend Support**: Unified interface for Jira, GitHub, Linear, Azure DevOps, and local filesystem ([docs/work-adapter-architecture.md](../docs/work-adapter-architecture.md))
-- **Context-Based Scoping**: Explicit backend selection with isolated credentials and project boundaries ([docs/work-user-journey-context-and-query.md](../docs/work-user-journey-context-and-query.md))
+- **Context-Based Scoping**: Explicit backend selection with isolated credentials and project boundaries ([docs/work-user-journey-context-and-query.md](../docs/work-user-journey-context-and-query.md), [docs/work-configuration-overview.md](../docs/work-configuration-overview.md))
 - **Stateless Execution**: No daemon, no caching, predictable command-by-command execution ([docs/work-graph-ontology-and-runtime.md](../docs/work-graph-ontology-and-runtime.md))
 - **Graph-Based Relations**: Explicit work item relationships (parent/child, blocks, duplicates, etc.)
 - **Offline-First Capability**: Full functionality via local filesystem backend

@@ -54,7 +54,7 @@
 Detailed requirements in [docs/work-nonfunctional-requirements.md](../docs/work-nonfunctional-requirements.md)
 
 ## Security Considerations
-- **Credential Isolation**: Per-context authentication with secure storage
+- **Credential Isolation**: Per-context authentication with secure storage ([docs/work-configuration-overview.md](../docs/work-configuration-overview.md))
 - **Input Validation**: Sanitization and validation for all user inputs
 - **API Security**: Proper OAuth 2.0 implementation for remote backends
 - **Data Protection**: No sensitive data in logs or temporary files

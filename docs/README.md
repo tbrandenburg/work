@@ -47,6 +47,13 @@ This folder contains comprehensive documentation for the `work` CLI - a unified,
 - Component diagram: detailed internal execution flow
 - Runtime graph slice visualization
 
+### [work-configuration-overview.md](work-configuration-overview.md)
+**Configuration system and credential management**
+- Two-stage configuration lookup (project-local and user-global)
+- Security rules for credential isolation
+- Context and notification target management
+- Safe version control practices
+
 ### [work-nonfunctional-requirements.md](work-nonfunctional-requirements.md)
 **Quality attributes and performance requirements**
 - Performance targets: response times, startup, memory usage

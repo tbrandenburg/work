@@ -47,6 +47,7 @@ work-cli/
 - **eslint.config.js**: Code linting rules
 - **.prettierrc**: Code formatting configuration
 - **Makefile**: Development workflow commands
+- **.work/**: Project-local configuration ([docs/work-configuration-overview.md](../docs/work-configuration-overview.md))
 
 ## Documentation Structure
 - **README.md**: Project overview and quick start
@@ -56,6 +57,7 @@ work-cli/
   - **work-graph-ontology-and-runtime.md**: Internal graph model and stateless execution
   - **work-local-fs-execution-flow.md**: Detailed execution flow for local filesystem backend
   - **work-c4-architecture.md**: C4 architecture diagrams in PlantUML format
+  - **work-configuration-overview.md**: Configuration system and credential management
   - **work-user-journey-context-and-query.md**: Concrete user journey demonstrating context and querying
   - **work-nonfunctional-requirements.md**: Quality attributes and performance requirements
   - **work-cli-tech-selection.md**: CLI technology selection and rationale

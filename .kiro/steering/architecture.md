@@ -25,7 +25,7 @@ The work CLI is built on three foundational principles that ensure scalability, 
 
 ## Context-Based Scoping
 - **Explicit Selection**: No implicit tool guessing or global configuration
-- **Credential Isolation**: Authentication scoped per context, never shared
+- **Credential Isolation**: Authentication scoped per context, never shared ([docs/work-configuration-overview.md](../docs/work-configuration-overview.md))
 - **Project Boundaries**: Clear separation between different work environments
 - **Mental Model**: "Contexts define scope, queries filter within scope"
 
