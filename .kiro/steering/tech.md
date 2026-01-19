@@ -10,16 +10,16 @@
 - **CI/CD**: GitHub Actions for automated testing and releases
 
 ## Architecture Overview
-- **Adapter Pattern**: Multi-backend support via uniform adapter interface
-- **Stateless Execution**: No daemon, no caching, ephemeral graph slices per command
-- **Property Graph Model**: WorkItem nodes with typed relation edges
+- **Adapter Pattern**: Multi-backend support via uniform adapter interface ([docs/work-adapter-architecture.md](../docs/work-adapter-architecture.md))
+- **Stateless Execution**: No daemon, no caching, ephemeral graph slices per command ([docs/work-graph-ontology-and-runtime.md](../docs/work-graph-ontology-and-runtime.md))
+- **Property Graph Model**: WorkItem nodes with typed relation edges - minimal, stable ontology
 - **Context-Based Scoping**: Explicit backend selection with isolated credentials
 - **Local-fs Reference**: Filesystem-backed implementation as semantic reference
 
 ## Development Environment
 - **Node.js**: Latest LTS version
 - **TypeScript**: Strict mode with path mapping
-- **CLI Framework**: oclif for command parsing, flag handling, help & completion
+- **CLI Framework**: oclif for command parsing, flag handling, help & completion ([docs/work-cli-tech-selection.md](../docs/work-cli-tech-selection.md))
 - **Development Tools**: Makefile for unified commands, pre-commit hooks
 - **Testing Framework**: Jest with coverage reporting >80%
 - **Documentation**: TypeDoc generation, built-in CLI help with oclif
@@ -50,6 +50,8 @@
 - **CLI Startup**: < 500ms for immediate productivity
 - **Memory Usage**: < 100MB per command execution
 - **Graph Slices**: < 10MB for typical queries
+
+Detailed requirements in [docs/work-nonfunctional-requirements.md](../docs/work-nonfunctional-requirements.md)
 
 ## Security Considerations
 - **Credential Isolation**: Per-context authentication with secure storage

@@ -50,8 +50,7 @@ work-cli/
 
 ## Documentation Structure
 - **README.md**: Project overview and quick start
-- **docs/**: Comprehensive documentation
-  - **README.md**: Documentation index and overview
+- **docs/**: Comprehensive documentation ([docs/README.md](../docs/README.md) provides complete index)
   - **work-cli-spec.md**: Complete CLI specification and command reference
   - **work-adapter-architecture.md**: Multi-backend support via adapter pattern
   - **work-graph-ontology-and-runtime.md**: Internal graph model and stateless execution
