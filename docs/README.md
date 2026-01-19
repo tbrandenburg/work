@@ -55,7 +55,12 @@ This folder contains comprehensive documentation for the `work` CLI - a unified,
 - Security: credential management, data protection
 - Usability, compatibility, and maintainability standards
 
-### [work-poc.md](work-poc.md)
+### [work-cli-tech-selection.md](work-cli-tech-selection.md)
+**CLI technology selection and rationale**
+- Records the technology choice for the CLI layer (oclif framework)
+- Explains rationale for TypeScript/Node.js selection
+- Documents alternatives considered and future TUI considerations
+- Defines CLI layer scope and explicit non-goals
 **Proof of concept implementation plan**
 - Phase 1: Project scaffolding with modern TypeScript development workflow
 - Phase 2: MVP implementation with complete local-fs adapter
