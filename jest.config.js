@@ -1,5 +1,6 @@
 module.exports = {
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/default-esm',
+  extensionsToTreatAsEsm: ['.ts'],
   testEnvironment: 'node',
   roots: ['<rootDir>/src', '<rootDir>/tests'],
   testMatch: [
@@ -7,7 +8,9 @@ module.exports = {
     '<rootDir>/tests/**/*.spec.ts'
   ],
   transform: {
-    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.ts$': ['ts-jest', {
+      useESM: true
+    }],
   },
   collectCoverageFrom: [
     'src/**/*.ts',
@@ -19,12 +22,10 @@ module.exports = {
   coverageReporters: ['text', 'lcov', 'html'],
   coverageThreshold: {
     global: {
-      // TODO: Restore to 80% when real implementation exists (see issue #7)
-      // Temporarily set to 0% to allow scaffolding merge with placeholder tests
-      branches: 0,    // Was 80
-      functions: 0,   // Was 80
-      lines: 0,       // Was 80
-      statements: 0,  // Was 80
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
     },
   },
   moduleNameMapper: {

@@ -1,0 +1,110 @@
+/**
+ * Unit tests for graph operations
+ */
+
+import { validateRelation, detectCycles } from '@/core/graph';
+import { WorkItem, Relation, RelationError } from '@/types/index';
+
+describe.skip('Graph Operations', () => {
+  const mockWorkItems: WorkItem[] = [
+    {
+      id: 'TASK-001',
+      kind: 'task',
+      title: 'Task 1',
+      state: 'new',
+      priority: 'medium',
+      labels: [],
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+    },
+    {
+      id: 'EPIC-001',
+      kind: 'epic',
+      title: 'Epic 1',
+      state: 'new',
+      priority: 'high',
+      labels: [],
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+    },
+  ];
+
+  describe('validateRelation', () => {
+    it('should validate a valid relation', () => {
+      const relation: Relation = {
+        from: 'EPIC-001',
+        to: 'TASK-001',
+        type: 'parent_of',
+      };
+
+      expect(() => validateRelation(relation, mockWorkItems)).not.toThrow();
+    });
+
+    it('should reject relation with non-existent work item', () => {
+      const relation: Relation = {
+        from: 'TASK-999',
+        to: 'TASK-001',
+        type: 'relates_to',
+      };
+
+      expect(() => validateRelation(relation, mockWorkItems)).toThrow(RelationError);
+    });
+
+    it('should reject self-reference', () => {
+      const relation: Relation = {
+        from: 'TASK-001',
+        to: 'TASK-001',
+        type: 'relates_to',
+      };
+
+      expect(() => validateRelation(relation, mockWorkItems)).toThrow(RelationError);
+    });
+
+    it('should reject task as parent of epic', () => {
+      const relation: Relation = {
+        from: 'TASK-001',
+        to: 'EPIC-001',
+        type: 'parent_of',
+      };
+
+      expect(() => validateRelation(relation, mockWorkItems)).toThrow(RelationError);
+    });
+  });
+
+  describe('detectCycles', () => {
+    it('should detect no cycles in empty relations', () => {
+      expect(detectCycles([])).toBe(false);
+    });
+
+    it('should detect no cycles in simple parent-child relation', () => {
+      const relations: Relation[] = [
+        { from: 'EPIC-001', to: 'TASK-001', type: 'parent_of' },
+      ];
+
+      expect(detectCycles(relations)).toBe(false);
+    });
+
+    it('should detect cycle in parent-child relations', () => {
+      const relations: Relation[] = [
+        { from: 'TASK-001', to: 'TASK-002', type: 'parent_of' },
+        { from: 'TASK-002', to: 'TASK-001', type: 'parent_of' },
+      ];
+
+      expect(detectCycles(relations)).toBe(true);
+    });
+
+    it('should detect cycle when adding new relation', () => {
+      const existingRelations: Relation[] = [
+        { from: 'TASK-001', to: 'TASK-002', type: 'parent_of' },
+      ];
+
+      const newRelation: Relation = {
+        from: 'TASK-002',
+        to: 'TASK-001',
+        type: 'parent_of',
+      };
+
+      expect(detectCycles(existingRelations, newRelation)).toBe(true);
+    });
+  });
+});
