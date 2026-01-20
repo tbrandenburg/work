@@ -563,6 +563,8 @@ Execute in order. Each task is atomic and independently verifiable.
 
 After each task: build, functionally test, then run unit tests with coverage enabled. Prefer Makefile targets or package scripts when available (e.g., `make test`, `npm run test:coverage`).
 
+**Coverage Targets**: PoC 20%, MVP 40%, Extensions 60%, OSS 75%, Mature 85%
+
 ### Task 1: CREATE `src/core/database/schema.ts` (update)
 
 - **ACTION**: ADD table definition to schema
@@ -696,7 +698,7 @@ After each task: build, functionally test, then run unit tests with coverage ena
 # Examples: make test-coverage, npm test -- --coverage, pytest --cov=., cargo test, go test ./...
 ```
 
-**EXPECT**: All tests pass, coverage >= 80%
+**EXPECT**: All tests pass, coverage >= {target}% (PoC 20%, MVP 40%, Extensions 60%, OSS 75%, Mature 85%)
 
 ### Level 4: FULL_SUITE
 
