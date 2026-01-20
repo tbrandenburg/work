@@ -561,7 +561,7 @@ Explicit exclusions to prevent scope creep:
 
 Execute in order. Each task is atomic and independently verifiable.
 
-After each task: build, functionally test, then run unit tests.
+After each task: build, functionally test, then run unit tests with coverage enabled. Prefer Makefile targets or package scripts when available (e.g., `make test`, `npm run test:coverage`).
 
 ### Task 1: CREATE `src/core/database/schema.ts` (update)
 
@@ -573,7 +573,7 @@ After each task: build, functionally test, then run unit tests.
 - **CURRENT**: {Reference to verified current documentation}
 - **CONFIG_CONFLICTS**: {Any known tool configuration conflicts, e.g., "ESLint projectService conflicts with explicit project setting"}
 - **GENERATED_FILES**: {How to handle build artifacts in tooling, e.g., "exclude dist/ from linting scope"}
-- **VALIDATE**: `{type-check-cmd} && {build-cmd} && {functional-test-cmd}`
+- **VALIDATE**: `{type-check-cmd} && {build-cmd} && {functional-test-cmd} && {test-with-coverage-cmd}`
 - **FUNCTIONAL**: `{actual-usage-command}` - verify component works
 
 ### Task 2: CREATE `src/features/new/models.ts`
@@ -632,7 +632,7 @@ After each task: build, functionally test, then run unit tests.
 - **IMPLEMENT**: Export types, schemas, errors, service functions
 - **MIRROR**: `{source-dir}/features/{example}/index.ts:1-20`
 - **PATTERN**: Named exports only, hide repository (internal)
-- **VALIDATE**: `{type-check-cmd} && {build-cmd} && {functional-test-cmd}`
+- **VALIDATE**: `{type-check-cmd} && {build-cmd} && {functional-test-cmd} && {test-with-coverage-cmd}`
 - **FUNCTIONAL**: `{actual-usage-command}` - verify component works
 
 ### Task 8: CREATE `{source-dir}/features/new/tests/service.test.ts`
