@@ -7,6 +7,8 @@ export * from './list.js';
 export * from './start.js';
 export * from './close.js';
 export * from './get.js';
+export * from './set.js';
+export * from './link.js';
 export * from './context/add.js';
 export * from './context/list.js';
 export * from './context/set.js';

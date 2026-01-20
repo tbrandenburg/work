@@ -130,6 +130,7 @@ export class WorkEngine {
    * Update a work item
    */
   async updateWorkItem(id: string, request: UpdateWorkItemRequest): Promise<WorkItem> {
+    await this.ensureDefaultContext();
     const adapter = this.getActiveAdapter();
     return adapter.updateWorkItem(id, request);
   }
@@ -165,6 +166,7 @@ export class WorkEngine {
    * Create a relation between work items
    */
   async createRelation(relation: Relation): Promise<void> {
+    await this.ensureDefaultContext();
     const adapter = this.getActiveAdapter();
     
     // Get all work items and relations for validation
@@ -186,6 +188,7 @@ export class WorkEngine {
    * Get relations for a work item
    */
   async getRelations(workItemId: string): Promise<Relation[]> {
+    await this.ensureDefaultContext();
     const adapter = this.getActiveAdapter();
     return adapter.getRelations(workItemId);
   }
@@ -194,6 +197,7 @@ export class WorkEngine {
    * Delete a relation
    */
   async deleteRelation(from: string, to: string, type: Relation['type']): Promise<void> {
+    await this.ensureDefaultContext();
     const adapter = this.getActiveAdapter();
     await adapter.deleteRelation(from, to, type);
   }
