@@ -66,6 +66,9 @@ Locate and understand:
 - **Files to Change** - CREATE/UPDATE list
 - **Step-by-Step Tasks** - Implementation order
 - **Validation Commands** - How to verify (USE THESE, not hardcoded commands)
+- **FUNCTIONAL verification commands** - How to test actual functionality (not just unit tests)
+- **Coverage targets** - Staged coverage expectations based on project maturity
+- **Enhanced validation pattern** - The type-check && lint && build && functional-test && test-with-coverage sequence
 - **Acceptance Criteria** - Definition of done
 
 ### 1.2.5 Plan Currency Verification (Context7 MCP)
@@ -190,9 +193,12 @@ Quick web search for:
 
 ### 3.3 Validate Immediately
 
-**After EVERY file change, run the type-check command from the plan's Validation Commands section.**
+**After EVERY file change, run the validation commands from the plan's task specifications.**
 
-Common patterns:
+Enhanced validation pattern (from plan):
+- `{type-check-cmd} && {lint-cmd} && {build-cmd} && {functional-test-cmd} && {test-with-coverage-cmd}`
+
+Common type-check patterns:
 - `{runner} run type-check` (JS/TS projects)
 - `mypy .` (Python)
 - `cargo check` (Rust)
@@ -204,6 +210,13 @@ Common patterns:
 2. Fix the issue
 3. Re-run type-check
 4. Only proceed when passing
+
+**If functional tests specified in task:**
+
+1. Run the FUNCTIONAL command from the task
+2. Verify actual functionality works
+3. Fix any integration issues
+4. Re-run until passing
 
 ### 3.4 Track Progress
 
@@ -305,6 +318,25 @@ Use Context7 MCP to verify implementation follows current best practices:
 
 **Must align with current industry standards.**
 
+### 4.1.5 Functional Testing
+
+**Run functional test commands from the plan's task FUNCTIONAL lines.**
+
+Common patterns:
+- CLI tools: `./bin/cli test-command`
+- Web apps: `curl -s http://localhost:3000/health`
+- APIs: Test actual endpoints with sample data
+- Libraries: Import and call key functions
+
+**Must verify actual functionality works, not just types.**
+
+**If functional tests fail:**
+
+1. Check if dependencies are running (servers, databases)
+2. Verify configuration is correct
+3. Fix implementation issues
+4. Re-run until passing
+
 ### 4.2 Unit Tests
 
 **You MUST write or update tests for new code.** This is not optional.
@@ -315,13 +347,20 @@ Use Context7 MCP to verify implementation follows current best practices:
 2. Edge cases identified in the plan need tests
 3. Update existing tests if behavior changed
 
-**Write tests**, then run the test command from the plan.
+**Write tests**, then run the test command from the plan with coverage.
+
+**Use staged coverage targets from plan:**
+- PoC: 20%
+- MVP: 40% 
+- Extensions: 60%
+- OSS: 75%
+- Mature: 85%
 
 Common patterns:
-- JS/TS: `{runner} test` or `{runner} run test`
-- Python: `pytest` or `uv run pytest`
-- Rust: `cargo test`
-- Go: `go test ./...`
+- JS/TS: `{runner} test -- --coverage` or `{runner} run test:coverage`
+- Python: `pytest --cov=.` or `uv run pytest --cov=.`
+- Rust: `cargo test` (with tarpaulin for coverage)
+- Go: `go test -cover ./...`
 
 **If tests fail:**
 
@@ -369,7 +408,9 @@ Run any edge case tests specified in the plan.
 
 - [ ] Type-check passes (command from plan)
 - [ ] Lint passes (0 errors)
+- [ ] Functional tests pass (if applicable)
 - [ ] Tests pass (all green)
+- [ ] Coverage meets staged target (PoC 20%, MVP 40%, Extensions 60%, OSS 75%, Mature 85%)
 - [ ] Build succeeds
 - [ ] Integration tests pass (if applicable)
 - [ ] **Current standards validation passes**
@@ -673,7 +714,9 @@ To continue: `/prp-plan {prd-path}`
 - **TASKS_COMPLETE**: All plan tasks executed
 - **TYPES_PASS**: Type-check command exits 0
 - **LINT_PASS**: Lint command exits 0 (warnings OK)
+- **FUNCTIONAL_PASS**: Functional test commands succeed (if applicable)
 - **TESTS_PASS**: Test command all green
+- **COVERAGE_TARGET**: Tests meet staged coverage requirements (PoC 20%, MVP 40%, Extensions 60%, OSS 75%, Mature 85%)
 - **BUILD_PASS**: Build command succeeds
 - **REPORT_CREATED**: Implementation report exists
 - **PLAN_ARCHIVED**: Original plan moved to completed
