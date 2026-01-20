@@ -1,20 +1,24 @@
 ---
 description: Analyze implementation against plan for process improvements
-argument-hint: <plan> <execution-report>
+argument-hint: <plan> <execution-report> <focus-notes>
 ---
 
 # System Review
 
 ## Analysis Inputs
 
-**Plan file:** $1
-**Execution report:** $2
+**Plan file:** $1  
+**Execution report:** $2  
+**Focus notes (optional):** $3
+
+If focus notes are provided, treat them as **review directives** that highlight specific concerns, questions, or areas of emphasis for this system review.  
+They do NOT replace standard analysis steps, but should influence prioritization, depth, and examples.
 
 Perform a meta-level analysis of how well the implementation followed the plan and identify process improvements.
 
 ## Purpose
 
-**System review is NOT code review.** You're not looking for bugs in the code - you're looking for bugs in the process.
+**System review is NOT code review.** You're not looking for bugs in the code – you're looking for bugs in the process.
 
 **Your job:**
 
@@ -22,6 +26,7 @@ Perform a meta-level analysis of how well the implementation followed the plan a
 - Identify which divergences were justified vs problematic
 - Surface process improvements that prevent future issues
 - Suggest updates to steering documents, plan templates, commands
+- Explicitly address any items raised in **Focus notes**, if provided
 
 **Philosophy:**
 
@@ -33,27 +38,34 @@ Perform a meta-level analysis of how well the implementation followed the plan a
 
 You will analyze four key artifacts:
 
-**Plan Command:**
-Read this to understand the planning process and what instructions guide plan creation.
-.kiro/prompts/prp-plan-ctx7.md
+**Plan Command:**  
+Read this to understand the planning process and what instructions guide plan creation.  
+`.kiro/prompts/prp-plan-ctx7.md`
 
-**Generated Plan:**
-Read this to understand what the agent was SUPPOSED to do.
-Plan file: [User's plan file]
+**Generated Plan:**  
+Read this to understand what the agent was SUPPOSED to do.  
+Plan file: `$1`
 
-**Execute Command:**
-Read this to understand the execution process and what instructions guide implementation.
-.kiro/prompts/prp-implement-ctx7.md
+**Execute Command:**  
+Read this to understand the execution process and what instructions guide implementation.  
+`.kiro/prompts/prp-implement-ctx7.md`
 
-**Execution Report:**
-Read this to understand what the agent ACTUALLY did and why.
-Execution report: [User's execution report]
+**Execution Report:**  
+Read this to understand what the agent ACTUALLY did and why.  
+Execution report: `$2`
+
+**Focus Notes (Optional):**  
+If provided, read `$3` and use it to:
+- Prioritize certain divergences
+- Examine specific decisions more deeply
+- Validate or refute stated concerns
+- Ensure requested topics are explicitly discussed in findings
 
 ## Analysis Workflow
 
 ### Step 1: Understand the Planned Approach
 
-Read the generated plan ([User's plan file]) and extract:
+Read the generated plan (`$1`) and extract:
 
 - What features were planned?
 - What architecture was specified?
@@ -62,7 +74,7 @@ Read the generated plan ([User's plan file]) and extract:
 
 ### Step 2: Understand the Actual Implementation
 
-Read the execution report ([User's execution report]) and extract:
+Read the execution report (`$2`) and extract:
 
 - What was implemented?
 - What diverged from the plan?
@@ -91,14 +103,14 @@ For each divergence identified in the execution report, classify as:
 
 For each problematic divergence, identify the root cause:
 
-- Was the plan unclear, where, why?
-- Was context missing, where, why?
-- Was validation missing, where, why?
-- Was manual step repeated, where, why?
+- Was the plan unclear? Where and why?
+- Was context missing? Where and why?
+- Was validation missing? Where and why?
+- Was a manual step repeated? Where and why?
 
 ### Step 5: Generate Process Improvements
 
-Based on patterns across divergences, suggest:
+Based on patterns across divergences **and any Focus notes**, suggest:
 
 - **Steering document updates:** Universal patterns or anti-patterns to document
 - **Plan command updates:** Instructions that need clarification or missing steps
@@ -107,24 +119,26 @@ Based on patterns across divergences, suggest:
 
 ## Output Format
 
-Save your analysis to: `.agents/system-reviews/[feature-name]-review.md`
+Save your analysis to:  
+`.agents/system-reviews/[feature-name]-review.md`
 
 ### Report Structure:
 
 #### Meta Information
 
-- Plan reviewed: [User's plan file]
-- Execution report: [User's execution report]
+- Plan reviewed: `$1`
+- Execution report: `$2`
+- Focus notes: `$3` (if provided)
 - Date: [current date]
 
-#### Overall Alignment Score: \_\_/10
+#### Overall Alignment Score: __/10
 
 Scoring guide:
 
 - 10: Perfect adherence, all divergences justified
-- 7-9: Minor justified divergences
-- 4-6: Mix of justified and problematic divergences
-- 1-3: Major problematic divergences
+- 7–9: Minor justified divergences
+- 4–6: Mix of justified and problematic divergences
+- 1–3: Major problematic divergences
 
 #### Divergence Analysis
 
@@ -138,58 +152,3 @@ reason: [agent's stated reason from report]
 classification: good ✅ | bad ❌
 justified: yes/no
 root_cause: [unclear plan | missing context | etc]
-```
-
-#### Pattern Compliance
-
-Assess adherence to documented patterns:
-
-- [ ] Followed codebase architecture
-- [ ] Used documented patterns from steering documents
-- [ ] Applied testing patterns correctly
-- [ ] Met validation requirements
-
-#### System Improvement Actions
-
-Based on analysis, recommend specific actions:
-
-**Update Steering Documents:**
-
-- [ ] Document [pattern X] discovered during implementation
-- [ ] Add anti-pattern warning for [Y]
-- [ ] Clarify [technology constraint Z]
-
-**Update Plan Command ([User's plan file]):**
-
-- [ ] Add instruction for [missing step]
-- [ ] Clarify [ambiguous instruction]
-- [ ] Add validation requirement for [X]
-
-**Create New Command:**
-
-- [ ] `/[command-name]` for [manual process repeated 3+ times]
-
-**Update Execute Command ([User's execution report]):**
-
-- [ ] Add [validation step] to execution checklist
-
-#### Key Learnings
-
-**What worked well:**
-
-- [specific things that went smoothly]
-
-**What needs improvement:**
-
-- [specific process gaps identified]
-
-**For next implementation:**
-
-- [concrete improvements to try]
-
-## Important
-
-- **Be specific:** Don't say "plan was unclear" - say "plan didn't specify which auth pattern to use"
-- **Focus on patterns:** One-off issues aren't actionable. Look for repeated problems.
-- **Action-oriented:** Every finding should have a concrete asset update suggestion
-- **Suggest improvements:** Don't just analyze - actually suggest specific text to add to steering documents or commands
