@@ -1,6 +1,7 @@
 # Technical Architecture
 
 ## Technology Stack
+
 - **Primary Language**: TypeScript/Node.js
 - **CLI Framework**: oclif (TypeScript-based, widely adopted for serious CLIs)
 - **Testing**: Jest with comprehensive test pyramid (70% unit, 20% integration, 10% e2e)
@@ -10,6 +11,7 @@
 - **CI/CD**: GitHub Actions for automated testing and releases
 
 ## Architecture Overview
+
 - **Adapter Pattern**: Multi-backend support via uniform adapter interface ([docs/work-adapter-architecture.md](../docs/work-adapter-architecture.md))
 - **Stateless Execution**: No daemon, no caching, ephemeral graph slices per command ([docs/work-graph-ontology-and-runtime.md](../docs/work-graph-ontology-and-runtime.md))
 - **Property Graph Model**: WorkItem nodes with typed relation edges - minimal, stable ontology
@@ -17,14 +19,16 @@
 - **Local-fs Reference**: Filesystem-backed implementation as semantic reference
 
 ## Development Environment
+
 - **Node.js**: Latest LTS version
 - **TypeScript**: Strict mode with path mapping
 - **CLI Framework**: oclif for command parsing, flag handling, help & completion ([docs/work-cli-tech-selection.md](../docs/work-cli-tech-selection.md))
 - **Development Tools**: Makefile for unified commands, pre-commit hooks
-- **Testing Framework**: Jest with coverage reporting >80%
+- **Testing Framework**: Jest with staged coverage targets (PoC 20%, MVP 40%, Extensions 60%, OSS 75%, Mature 85%)
 - **Documentation**: TypeDoc generation, built-in CLI help with oclif
 
 ## Code Standards
+
 - **TypeScript**: Strict mode, explicit types, no any
 - **Formatting**: Prettier with consistent configuration
 - **Naming**: camelCase for variables/functions, PascalCase for classes
@@ -32,6 +36,7 @@
 - **Error Handling**: Explicit error types, no silent failures
 
 ## Testing Strategy
+
 - **Testing Pyramid**: 70% unit tests, 20% integration tests, 10% end-to-end tests
 - **Unit Tests**: Core logic, adapters, query evaluation with mocking
 - **Integration Tests**: Adapter-backend interactions, context resolution
@@ -39,6 +44,7 @@
 - **Performance Tests**: Response time validation for NFR compliance
 
 ## Deployment Process
+
 - **Build**: TypeScript compilation with bundling
 - **Testing**: Automated test suite with coverage requirements
 - **Release**: Semantic versioning with automated GitHub releases
@@ -46,6 +52,7 @@
 - **CI/CD**: GitHub Actions with quality gates
 
 ## Performance Requirements
+
 - **List Operations**: < 2s for up to 1,000 items
 - **CLI Startup**: < 500ms for immediate productivity
 - **Memory Usage**: < 100MB per command execution
@@ -54,6 +61,7 @@
 Detailed requirements in [docs/work-nonfunctional-requirements.md](../docs/work-nonfunctional-requirements.md)
 
 ## Security Considerations
+
 - **Credential Isolation**: Per-context authentication with secure storage ([docs/work-configuration-overview.md](../docs/work-configuration-overview.md))
 - **Input Validation**: Sanitization and validation for all user inputs
 - **API Security**: Proper OAuth 2.0 implementation for remote backends
