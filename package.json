@@ -61,10 +61,12 @@
   "oclif": {
     "bin": "work",
     "dirname": "work",
-    "commands": "./dist/cli/commands",
+    "commands": {
+      "strategy": "pattern",
+      "target": "./dist/cli/commands"
+    },
     "plugins": [
-      "@oclif/plugin-help",
-      "@oclif/plugin-plugins"
+      "@oclif/plugin-help"
     ],
     "topicSeparator": " "
   }

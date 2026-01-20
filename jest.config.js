@@ -22,10 +22,10 @@ export default {
   coverageReporters: ['text', 'lcov', 'html'],
   coverageThreshold: {
     global: {
-      branches: 1,
-      functions: 5,
-      lines: 5,
-      statements: 5,
+      branches: 20,
+      functions: 20,
+      lines: 20,
+      statements: 20,
     },
   },
   moduleNameMapper: {
@@ -34,7 +34,8 @@ export default {
     '^@/core/(.*)$': '<rootDir>/src/core/$1',
     '^@/adapters/(.*)$': '<rootDir>/src/adapters/$1',
     '^@/types/(.*)$': '<rootDir>/src/types/$1',
-    '^@/utils/(.*)$': '<rootDir>/src/utils/$1'
+    '^@/utils/(.*)$': '<rootDir>/src/utils/$1',
+    '^(\\.{1,2}/.*)\\.js$': '$1'
   },
   setupFilesAfterEnv: [],
   testTimeout: 10000,
