@@ -22,6 +22,7 @@ The work CLI is built on three foundational principles that ensure scalability, 
 - **Typed Relations**: Explicit edges (parent_of, blocks, duplicates, relates_to)
 - **Graph Invariants**: Cycle detection, relation validation, consistency enforcement
 - **Tool-Agnostic**: Same mental model works across all supported backends
+- **Standards Alignment**: Core concepts align with [OSLC CM vocabulary](https://docs.oasis-open.org/oslc-domains/cm/v3.0/cm-v3.0.html) while exceeding it with graph-based relationships
 
 ## Context-Based Scoping
 - **Explicit Selection**: No implicit tool guessing or global configuration
