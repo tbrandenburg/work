@@ -131,7 +131,7 @@ Phase 2: Complete local-fs adapter with all core work commands (create, start, c
 
 | # | Phase | Description | Status | Parallel | Depends | PRP Plan |
 |---|-------|-------------|--------|----------|---------|----------|
-| 1 | Project Scaffolding | Modern TypeScript development workflow, testing framework, CI/CD | pending | - | - | - |
+| 1 | Project Scaffolding | Modern TypeScript development workflow, testing framework, CI/CD | in-progress | - | - | [project-scaffolding.plan.md](.claude/PRPs/plans/project-scaffolding.plan.md) |
 | 2 | Core Engine & Local-fs MVP | Complete work CLI with local-fs adapter and all core commands | pending | - | 1 | - |
 | 3 | Notification System | Telegram integration for human-in-the-loop workflows | pending | with 4 | 2 | - |
 | 4 | GitHub Integration | GitHub Projects adapter for developer workflow integration | pending | with 3 | 2 | - |
