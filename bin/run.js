@@ -1,7 +1,15 @@
 #!/usr/bin/env node
 
-import { run } from '@oclif/core';
+// Suppress oclif MODULE_NOT_FOUND warnings
+process.removeAllListeners('warning');
+process.on('warning', (warning) => {
+  if (warning.code !== 'MODULE_NOT_FOUND') {
+    console.warn(warning.stack);
+  }
+});
 
-run(void 0, import.meta.url)
-  .then(require('@oclif/core/flush'))
-  .catch(require('@oclif/core/handle'));
+import { run, flush, handle } from '@oclif/core';
+
+run(process.argv.slice(2), import.meta.url)
+  .then(flush)
+  .catch(handle);

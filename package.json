@@ -1,6 +1,7 @@
 {
   "name": "work-cli",
   "version": "0.1.0",
+  "type": "module",
   "description": "Unified, stateless command-line tool that bridges AI agents and task management systems",
   "main": "dist/index.js",
   "bin": {
@@ -60,10 +61,12 @@
   "oclif": {
     "bin": "work",
     "dirname": "work",
-    "commands": "./dist/cli/commands",
+    "commands": {
+      "strategy": "pattern",
+      "target": "./dist/cli/commands"
+    },
     "plugins": [
-      "@oclif/plugin-help",
-      "@oclif/plugin-plugins"
+      "@oclif/plugin-help"
     ],
     "topicSeparator": " "
   }
