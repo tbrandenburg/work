@@ -24,6 +24,8 @@ At its core, `work` models task management as a **property graph**:
 
 This ontology is deliberately small and stable.
 
+**Standards Alignment**: `work` aligns its core concepts with [OSLC CM vocabulary](https://docs.oasis-open.org/oslc-domains/cm/v3.0/cm-v3.0.html) where possible, while deliberately exceeding it with a graph-based internal model that supports explicit relationships and cross-tool workflows.
+
 ---
 
 ### 1.2 Node: `WorkItem`
