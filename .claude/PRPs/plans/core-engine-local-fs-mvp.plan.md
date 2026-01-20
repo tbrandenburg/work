@@ -248,7 +248,7 @@ Execute in order. Each task is atomic and independently verifiable.
 
 After each task, run `npm test -- --coverage` in addition to any task-specific validation steps.
 
-### Task 19: RESTORE test coverage requirements
+### Task 0: RESTORE test coverage requirements
 
 - **ACTION**: UPDATE jest.config.js to restore PoC coverage thresholds
 - **IMPLEMENT**: Change coverageThreshold values from 0 to 20
@@ -384,7 +384,27 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **CURRENT**: Follow lifecycle semantics from CLI spec
 - **VALIDATE**: `npm run type-check && npm test -- --coverage`
 
-### Task 14: CREATE `src/cli/commands/context/add.ts`
+### Task 14: CREATE `src/cli/commands/close.ts`
+
+- **ACTION**: CREATE work close command
+- **IMPLEMENT**: Close command with work item ID argument
+- **MIRROR**: oclif Command pattern from hello.ts
+- **IMPORTS**: `import { Args, Command } from '@oclif/core'`
+- **PATTERN**: Validate work item ID, change state to closed
+- **CURRENT**: Follow lifecycle semantics from CLI spec
+- **VALIDATE**: `npm run type-check && npm test -- --coverage`
+
+### Task 15: CREATE `src/cli/commands/get.ts`
+
+- **ACTION**: CREATE work get command
+- **IMPLEMENT**: Get command with work item ID argument
+- **MIRROR**: oclif Command pattern from hello.ts
+- **IMPORTS**: `import { Args, Command } from '@oclif/core'`
+- **PATTERN**: Validate work item ID
+- **CURRENT**: Follow lifecycle semantics from CLI spec
+- **VALIDATE**: `npm run type-check && npm test -- --coverage`
+
+### Task 16: CREATE `src/cli/commands/context/add.ts`
 
 - **ACTION**: CREATE work context add command
 - **IMPLEMENT**: Context add command with name and tool options
@@ -394,7 +414,7 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **CURRENT**: Follow context management specification
 - **VALIDATE**: `npm run type-check && npm test -- --coverage`
 
-### Task 15: UPDATE `src/cli/commands/index.ts`
+### Task 17: UPDATE `src/cli/commands/index.ts`
 
 - **ACTION**: UPDATE command exports
 - **IMPLEMENT**: Export all new command classes
@@ -402,7 +422,7 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **PATTERN**: Named exports for all commands
 - **VALIDATE**: `npm run type-check`
 
-### Task 16: CREATE unit tests
+### Task 18: CREATE unit tests
 
 - **ACTION**: CREATE all unit test files from testing strategy
 - **IMPLEMENT**: work-item.test.ts, id-generator.test.ts, storage.test.ts, graph.test.ts, query.test.ts, create.test.ts, list.test.ts
@@ -410,7 +430,7 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **PATTERN**: Mock dependencies, test individual functions/classes
 - **VALIDATE**: `npm test -- --coverage tests/unit/` - all unit tests pass
 
-### Task 17: CREATE integration tests
+### Task 19: CREATE integration tests
 
 - **ACTION**: CREATE integration test files
 - **IMPLEMENT**: local-fs-adapter.test.ts, core-engine.test.ts, cli-commands.test.ts
