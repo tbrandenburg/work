@@ -15,7 +15,7 @@ install:
 	npm install
 
 test:
-	npm test
+	npm test -- --coverage
 
 build:
 	npm run build

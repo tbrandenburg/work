@@ -17,11 +17,14 @@ Transform "$ARGUMENTS" into a battle-tested implementation plan through systemat
 CLAUDE.md rules: @CLAUDE.md
 
 **Directory Discovery** (run these to understand project structure):
+
 - List root contents: `ls -la`
 - Find main source directories: `ls -la */ 2>/dev/null | head -50`
 - Identify project type from config files (package.json, pyproject.toml, Cargo.toml, go.mod, etc.)
+- Check governed commands: Makefile targets and package scripts for lint/test/build
 
 **IMPORTANT**: Do NOT assume `src/` exists. Common alternatives include:
+
 - `app/` (Next.js, Rails, Laravel)
 - `lib/` (Ruby gems, Elixir)
 - `packages/` (monorepos)
@@ -37,13 +40,13 @@ Discover the actual structure before proceeding.
 
 **Determine input type:**
 
-| Input Pattern | Type | Action |
-|---------------|------|--------|
-| Ends with `.prd.md` | PRD file | Parse PRD, select next phase |
-| Ends with `.md` and contains "Implementation Phases" | PRD file | Parse PRD, select next phase |
-| File path that exists | Document | Read and extract feature description |
-| Free-form text | Description | Use directly as feature input |
-| Empty/blank | Conversation | Use conversation context as input |
+| Input Pattern                                        | Type         | Action                               |
+| ---------------------------------------------------- | ------------ | ------------------------------------ |
+| Ends with `.prd.md`                                  | PRD file     | Parse PRD, select next phase         |
+| Ends with `.md` and contains "Implementation Phases" | PRD file     | Parse PRD, select next phase         |
+| File path that exists                                | Document     | Read and extract feature description |
+| Free-form text                                       | Description  | Use directly as feature input        |
+| Empty/blank                                          | Conversation | Use conversation context as input    |
 
 ### If PRD File Detected:
 
@@ -54,7 +57,8 @@ Discover the actual structure before proceeding.
    - First pending phase with all dependencies complete
    - If multiple candidates with same dependencies, note parallelism opportunity
 
-4. **Extract phase context:**
+5. **Extract phase context:**
+
    ```
    PHASE: {phase number and name}
    GOAL: {from phase details}
@@ -63,7 +67,8 @@ Discover the actual structure before proceeding.
    PRD CONTEXT: {problem statement, user, hypothesis from PRD}
    ```
 
-5. **Report selection to user:**
+6. **Report selection to user:**
+
    ```
    PRD: {prd file path}
    Selected Phase: #{number} - {name}
@@ -79,6 +84,7 @@ Discover the actual structure before proceeding.
 - Proceed directly to Phase 1 with the input as feature description
 
 **PHASE_0_CHECKPOINT:**
+
 - [ ] Input type determined
 - [ ] If PRD: next phase selected and dependencies verified
 - [ ] Feature description ready for Phase 1
@@ -133,6 +139,7 @@ DISCOVER:
 6. Test patterns - test file structure, assertion styles
 7. Integration points - where new code connects to existing
 8. Dependencies - relevant libraries already in use
+9. Governed commands - Makefile targets and package scripts for lint/test/build
 
 Return ACTUAL code snippets from codebase, not generic examples.
 ```
@@ -150,6 +157,7 @@ Return ACTUAL code snippets from codebase, not generic examples.
 ### 2.5 Pattern Currency Verification (Context7 MCP)
 
 After codebase exploration, verify discovered patterns against current standards:
+
 - Check if discovered libraries have newer recommended patterns
 - Validate security practices are still current
 - Confirm performance patterns haven't been superseded
@@ -158,6 +166,7 @@ After codebase exploration, verify discovered patterns against current standards
 ### 2.6 Dependency Version Verification
 
 **CRITICAL**: Before specifying exact package versions in plans, verify they exist:
+
 - Use Context7 MCP to check npm registry for specified versions
 - For new dependencies, verify latest stable versions
 - Document version constraints (minimum vs exact)
@@ -184,12 +193,14 @@ After codebase exploration, verify discovered patterns against current standards
 **ONLY AFTER Phase 2 is complete** - solutions must fit existing codebase patterns first.
 
 **Context7 MCP Documentation Access:**
+
 - Query live API documentation for exact current signatures
-- Access version-specific implementation guides  
+- Access version-specific implementation guides
 - Retrieve current security best practices
 - Verify compatibility matrices and breaking changes
 
 **Web Intelligence Gathering:**
+
 - Recent Stack Overflow solutions and community discussions
 - Framework-specific forums and maintainer recommendations
 - Current performance benchmarks and optimization techniques
@@ -220,20 +231,25 @@ After codebase exploration, verify discovered patterns against current standards
 ## Phase 3.5: VALIDATE - Research Currency Check
 
 ### Real-time Verification
+
 Use Context7 MCP to validate research findings:
+
 - Confirm all documentation is current (not cached/outdated)
 - Verify library recommendations haven't changed
 - Check for recent security updates or advisories
 - Validate performance assumptions against current benchmarks
 
 ### Community Intelligence Cross-check
+
 Use web search to verify:
+
 - Recent community consensus aligns with research
 - No major issues discovered since documentation was written
 - Current maintainer recommendations match findings
 - Recent blog posts or discussions don't contradict approach
 
 **PHASE_3.5_CHECKPOINT:**
+
 - [ ] All documentation verified as current
 - [ ] No conflicting community intelligence found
 - [ ] Security recommendations up-to-date
@@ -310,8 +326,9 @@ Use web search to verify:
 - MAINTAINABILITY: Will future devs understand this code?
 
 **Real-time Best Practices Validation (Context7 MCP + Web Search):**
+
 - SECURITY: Query current OWASP recommendations and recent CVEs
-- PERFORMANCE: Check for recent optimization techniques and benchmarks  
+- PERFORMANCE: Check for recent optimization techniques and benchmarks
 - ARCHITECTURE: Validate against current framework recommendations
 - COMPLIANCE: Verify against latest regulatory requirements
 
@@ -353,12 +370,14 @@ Create directory if needed: `mkdir -p .claude/PRPs/plans`
 ### 6.5 Plan Currency Validation
 
 Before finalizing plan, use Context7 MCP to verify:
+
 - All documentation links are current and accessible
 - Library versions match latest stable releases
 - Security recommendations haven't changed
 - No deprecated patterns are being recommended
 
 **If issues found:**
+
 - Update plan with current information
 - Document deviations from original research
 - Re-verify critical dependencies
@@ -388,14 +407,14 @@ So that {benefit}
 
 ## Metadata
 
-| Field            | Value                                             |
-| ---------------- | ------------------------------------------------- |
-| Type             | NEW_CAPABILITY / ENHANCEMENT / REFACTOR / BUG_FIX |
-| Complexity       | LOW / MEDIUM / HIGH                               |
-| Systems Affected | {comma-separated list}                            |
-| Dependencies     | {external libs/services with versions}            |
-| Estimated Tasks  | {count}                                           |
-| **Research Timestamp** | **{Current date/time for context freshness}** |
+| Field                  | Value                                             |
+| ---------------------- | ------------------------------------------------- |
+| Type                   | NEW_CAPABILITY / ENHANCEMENT / REFACTOR / BUG_FIX |
+| Complexity             | LOW / MEDIUM / HIGH                               |
+| Systems Affected       | {comma-separated list}                            |
+| Dependencies           | {external libs/services with versions}            |
+| Estimated Tasks        | {count}                                           |
+| **Research Timestamp** | **{Current date/time for context freshness}**     |
 
 ---
 
@@ -413,7 +432,7 @@ So that {benefit}
 
 {ASCII diagram - new user experience with data flows}
 
-```
+````
 
 ### Interaction Changes
 | Location | Before | After | User Impact |
@@ -446,9 +465,10 @@ So that {benefit}
 // SOURCE: src/features/example/service.ts:10-15
 // COPY THIS PATTERN:
 {actual code snippet from codebase}
-```
+````
 
 **ERROR_HANDLING:**
+
 ```typescript
 // SOURCE: src/features/example/errors.ts:5-20
 // COPY THIS PATTERN:
@@ -456,6 +476,7 @@ So that {benefit}
 ```
 
 **LOGGING_PATTERN:**
+
 ```typescript
 // SOURCE: src/features/example/service.ts:25-30
 // COPY THIS PATTERN:
@@ -463,6 +484,7 @@ So that {benefit}
 ```
 
 **REPOSITORY_PATTERN:**
+
 ```typescript
 // SOURCE: src/features/example/repository.ts:10-40
 // COPY THIS PATTERN:
@@ -470,6 +492,7 @@ So that {benefit}
 ```
 
 **SERVICE_PATTERN:**
+
 ```typescript
 // SOURCE: src/features/example/service.ts:40-80
 // COPY THIS PATTERN:
@@ -477,6 +500,7 @@ So that {benefit}
 ```
 
 **TEST_STRUCTURE:**
+
 ```typescript
 // SOURCE: src/features/example/tests/service.test.ts:1-25
 // COPY THIS PATTERN:
@@ -488,18 +512,21 @@ So that {benefit}
 ## Current Best Practices Validation
 
 **Security (Context7 MCP Verified):**
+
 - [ ] Current OWASP recommendations followed
 - [ ] Recent CVE advisories checked
 - [ ] Authentication patterns up-to-date
 - [ ] Data validation follows current standards
 
 **Performance (Web Intelligence Verified):**
+
 - [ ] Current optimization techniques applied
 - [ ] Recent benchmarks considered
 - [ ] Database patterns follow current best practices
 - [ ] Caching strategies align with current recommendations
 
 **Community Intelligence:**
+
 - [ ] Recent Stack Overflow solutions reviewed
 - [ ] Framework maintainer recommendations followed
 - [ ] No deprecated patterns detected in community discussions
@@ -533,6 +560,8 @@ Explicit exclusions to prevent scope creep:
 ## Step-by-Step Tasks
 
 Execute in order. Each task is atomic and independently verifiable.
+
+After each task, run tests with coverage enabled. Prefer Makefile targets or package scripts when available (e.g., `make test-coverage`, `npm run test:coverage`).
 
 ### Task 1: CREATE `src/core/database/schema.ts` (update)
 
@@ -638,13 +667,13 @@ Execute in order. Each task is atomic and independently verifiable.
 
 ## Validation Commands
 
-**IMPORTANT**: Replace these placeholders with actual commands from the project's package.json/config.
+**IMPORTANT**: Replace these placeholders with actual governed commands from the project's Makefile or package.json/config. Prefer Makefile targets when they exist.
 
 ### Level 1: STATIC_ANALYSIS
 
 ```bash
 {runner} run lint && {runner} run type-check
-# Examples: npm run lint, pnpm lint, ruff check . && mypy ., cargo clippy
+# Examples: make lint && make type-check, npm run lint && npm run type-check, ruff check . && mypy ., cargo clippy
 ```
 
 **EXPECT**: Exit 0, no errors or warnings
@@ -652,8 +681,8 @@ Execute in order. Each task is atomic and independently verifiable.
 ### Level 2: UNIT_TESTS
 
 ```bash
-{runner} test {path/to/feature/tests}
-# Examples: npm test, pytest tests/, cargo test, go test ./...
+{runner} test -- --coverage {path/to/feature/tests}
+# Examples: make test-coverage, npm test -- --coverage, pytest --cov=., cargo test, go test ./...
 ```
 
 **EXPECT**: All tests pass, coverage >= 80%
@@ -661,8 +690,8 @@ Execute in order. Each task is atomic and independently verifiable.
 ### Level 3: FULL_SUITE
 
 ```bash
-{runner} test && {runner} run build
-# Examples: npm test && npm run build, cargo test && cargo build
+{runner} test -- --coverage && {runner} run build
+# Examples: make test-coverage && make build, npm test -- --coverage && npm run build, cargo test && cargo build
 ```
 
 **EXPECT**: All tests pass, build succeeds
@@ -738,11 +767,11 @@ Use Context7 MCP to verify:
 
 ## Risks and Mitigations
 
-| Risk               | Likelihood   | Impact       | Mitigation                              |
-| ------------------ | ------------ | ------------ | --------------------------------------- |
-| {Risk description} | LOW/MED/HIGH | LOW/MED/HIGH | {Specific prevention/handling strategy} |
-| Documentation changes during implementation | LOW | MEDIUM | Context7 MCP re-verification during execution |
-| Security vulnerabilities in dependencies | MEDIUM | HIGH | Real-time security advisory monitoring |
+| Risk                                        | Likelihood   | Impact       | Mitigation                                    |
+| ------------------------------------------- | ------------ | ------------ | --------------------------------------------- |
+| {Risk description}                          | LOW/MED/HIGH | LOW/MED/HIGH | {Specific prevention/handling strategy}       |
+| Documentation changes during implementation | LOW          | MEDIUM       | Context7 MCP re-verification during execution |
+| Security vulnerabilities in dependencies    | MEDIUM       | HIGH         | Real-time security advisory monitoring        |
 
 ---
 
@@ -753,7 +782,8 @@ Use Context7 MCP to verify:
 ### Current Intelligence Considerations
 
 {Document any recent library updates, security patches, or community recommendations that influenced the plan}
-```
+
+````
 
 </process>
 
@@ -820,7 +850,7 @@ To start: `git worktree add -b phase-{X} ../project-phase-{X} && cd ../project-p
 - {Rationale for score, including currency of information}
 
 **Next Step**: To execute, run: `/prp-implement .claude/PRPs/plans/{feature-name}.plan.md`
-```
+````
 
 </output>
 
@@ -834,6 +864,7 @@ To start: `git worktree add -b phase-{X} ../project-phase-{X} && cd ../project-p
 - [ ] Integration points mapped with specific file paths
 - [ ] Gotchas captured with mitigation strategies
 - [ ] Every task has at least one executable validation command
+- [ ] Validation commands use governed targets and coverage where available
 - [ ] **Real-time documentation verification completed**
 
 **IMPLEMENTATION_READINESS:**
