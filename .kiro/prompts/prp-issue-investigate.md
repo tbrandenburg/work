@@ -46,6 +46,18 @@ gh issue view {number} --json title,body,labels,comments,state,url,author
 - Comments: Additional context from discussion
 - State: Is it still open?
 
+**If GitHub PR with CI failures:**
+
+```bash
+# Check PR status and failing checks
+gh pr checks {number}
+# Get detailed CI logs for failing jobs
+gh run view {run-id} --log
+# Look for actual error messages, not just exit codes
+```
+
+**CRITICAL**: Always examine actual error messages in CI logs, not just exit codes. Tests might pass while other checks (coverage, linting, security) fail.
+
 **If free-form:**
 
 - Parse as problem description
@@ -175,6 +187,21 @@ WHY 2: Why does [cause A] happen?
 ROOT CAUSE: [the specific code/logic to change]
 Evidence: `source.ts:456` - {the problematic code}
 ```
+
+**For CI/PR Issues - Examine Actual Logs:**
+
+```bash
+# Get failing job details
+gh pr checks {number}
+# Examine actual error messages in logs
+gh run view {run-id} --log | grep -A5 -B5 "error\|fail\|Error\|FAIL"
+```
+
+**CRITICAL**: Don't assume test failures mean tests aren't running. Check for:
+- Coverage threshold violations (tests pass, coverage fails)
+- Linting errors (code works, style fails)  
+- Security audit failures (functionality works, dependencies vulnerable)
+- Build failures (tests pass, compilation fails)
 
 **Check git history:**
 
