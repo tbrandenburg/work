@@ -246,6 +246,16 @@ Explicit exclusions to prevent scope creep:
 
 Execute in order. Each task is atomic and independently verifiable.
 
+After each task, run `npm test -- --coverage` in addition to any task-specific validation steps.
+
+### Task 19: RESTORE test coverage requirements
+
+- **ACTION**: UPDATE jest.config.js to restore PoC coverage thresholds
+- **IMPLEMENT**: Change coverageThreshold values from 0 to 20
+- **RATIONALE**: Early implementation focuses on prototyping while maintaining a minimal quality gate
+- **GOTCHA**: This will fail CI until all code has proper test coverage
+- **VALIDATE**: `npm test -- --coverage` - must pass with 20% coverage
+
 ### Task 1: CREATE `src/types/work-item.ts`
 
 - **ACTION**: CREATE core WorkItem type definitions
@@ -292,7 +302,7 @@ Execute in order. Each task is atomic and independently verifiable.
 - **IMPORTS**: `import { promises as fs } from 'fs'`
 - **GOTCHA**: Use fs/promises for async operations, handle ENOENT gracefully
 - **CURRENT**: Follow 2024 Node.js filesystem best practices
-- **VALIDATE**: `npm run type-check && npm test src/adapters/local-fs/tests/id-generator.test.ts`
+- **VALIDATE**: `npm run type-check && npm test -- --coverage src/adapters/local-fs/tests/id-generator.test.ts`
 
 ### Task 6: CREATE `src/adapters/local-fs/storage.ts`
 
@@ -352,7 +362,7 @@ Execute in order. Each task is atomic and independently verifiable.
 - **IMPORTS**: `import { Args, Command, Flags } from '@oclif/core'`
 - **GOTCHA**: Commands timeout after 10 seconds if promises aren't awaited
 - **CURRENT**: Follow oclif v4.0 command structure exactly
-- **VALIDATE**: `npm run type-check && npm test`
+- **VALIDATE**: `npm run type-check && npm test -- --coverage`
 
 ### Task 12: CREATE `src/cli/commands/list.ts`
 
@@ -362,7 +372,7 @@ Execute in order. Each task is atomic and independently verifiable.
 - **IMPORTS**: `import { Command, Flags } from '@oclif/core'`
 - **PATTERN**: Parse where clause, support context selection
 - **CURRENT**: Follow CLI specification for list command
-- **VALIDATE**: `npm run type-check && npm test`
+- **VALIDATE**: `npm run type-check && npm test -- --coverage`
 
 ### Task 13: CREATE `src/cli/commands/start.ts`
 
@@ -372,7 +382,7 @@ Execute in order. Each task is atomic and independently verifiable.
 - **IMPORTS**: `import { Args, Command } from '@oclif/core'`
 - **PATTERN**: Validate work item ID, change state to active
 - **CURRENT**: Follow lifecycle semantics from CLI spec
-- **VALIDATE**: `npm run type-check && npm test`
+- **VALIDATE**: `npm run type-check && npm test -- --coverage`
 
 ### Task 14: CREATE `src/cli/commands/context/add.ts`
 
@@ -382,7 +392,7 @@ Execute in order. Each task is atomic and independently verifiable.
 - **IMPORTS**: `import { Args, Command, Flags } from '@oclif/core'`
 - **PATTERN**: Support tool selection, path configuration
 - **CURRENT**: Follow context management specification
-- **VALIDATE**: `npm run type-check && npm test`
+- **VALIDATE**: `npm run type-check && npm test -- --coverage`
 
 ### Task 15: UPDATE `src/cli/commands/index.ts`
 
@@ -398,7 +408,7 @@ Execute in order. Each task is atomic and independently verifiable.
 - **IMPLEMENT**: work-item.test.ts, id-generator.test.ts, storage.test.ts, graph.test.ts, query.test.ts, create.test.ts, list.test.ts
 - **MIRROR**: `tests/unit/example.test.ts:1-10` - Jest describe/it pattern
 - **PATTERN**: Mock dependencies, test individual functions/classes
-- **VALIDATE**: `npm test tests/unit/` - all unit tests pass
+- **VALIDATE**: `npm test -- --coverage tests/unit/` - all unit tests pass
 
 ### Task 17: CREATE integration tests
 
@@ -407,15 +417,7 @@ Execute in order. Each task is atomic and independently verifiable.
 - **MIRROR**: Jest testing patterns from unit tests
 - **PATTERN**: Test component interactions, use real file system with temp directories
 - **GOTCHA**: Clean up temp directories after each test
-- **VALIDATE**: `npm test tests/integration/`
-
-### Task 19: RESTORE test coverage requirements
-
-- **ACTION**: UPDATE jest.config.js to restore PoC coverage thresholds
-- **IMPLEMENT**: Change coverageThreshold values from 0 to 20
-- **RATIONALE**: Early implementation focuses on prototyping while maintaining a minimal quality gate
-- **GOTCHA**: This will fail CI until all code has proper test coverage
-- **VALIDATE**: `npm test` - must pass with 20% coverage
+- **VALIDATE**: `npm test -- --coverage tests/integration/`
 
 ---
 
@@ -474,7 +476,7 @@ npm run lint && npm run type-check
 ### Level 2: UNIT_TESTS
 
 ```bash
-npm test
+npm test -- --coverage
 ```
 
 **EXPECT**: All tests pass, coverage >= 20%
@@ -482,7 +484,7 @@ npm test
 ### Level 3: FULL_SUITE
 
 ```bash
-npm test && npm run build
+npm test -- --coverage && npm run build
 ```
 
 **EXPECT**: All tests pass, build succeeds
