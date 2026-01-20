@@ -439,6 +439,14 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **GOTCHA**: Clean up temp directories after each test
 - **VALIDATE**: `npm test -- --coverage tests/integration/`
 
+### Task 20: ADD pre-push hook for CI
+
+- **ACTION**: ADD pre-push hook
+- **IMPLEMENT**: Execute `make ci` on pre-push
+- **MIRROR**: Existing hook patterns or tooling conventions
+- **GOTCHA**: Ensure hook setup is documented for local dev environments
+- **VALIDATE**: `make ci` - must pass locally and on hook execution
+
 ---
 
 ## Testing Strategy
