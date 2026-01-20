@@ -1,5 +1,6 @@
 import { Args, Command, Flags } from '@oclif/core';
 import { WorkEngine } from '../../core/engine.js';
+import { RelationType } from '../../types/work-item.js';
 
 export default class Link extends Command {
   static override args = {
@@ -37,7 +38,7 @@ export default class Link extends Command {
       const relation = {
         from: args.from,
         to: args.to,
-        type: flags.type as any,
+        type: flags.type as RelationType,
       };
 
       await engine.createRelation(relation);

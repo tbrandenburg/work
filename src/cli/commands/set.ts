@@ -1,5 +1,6 @@
 import { Args, Command, Flags } from '@oclif/core';
 import { WorkEngine } from '../../core/engine.js';
+import { Priority } from '../../types/work-item.js';
 
 export default class Set extends Command {
   static override args = {
@@ -44,10 +45,16 @@ export default class Set extends Command {
       const engine = new WorkEngine();
 
       // Build update request from flags
-      const updateRequest: any = {};
+      const updateRequest: {
+        title?: string;
+        description?: string;
+        priority?: Priority;
+        assignee?: string;
+        labels?: string[];
+      } = {};
       if (flags.title) updateRequest.title = flags.title;
       if (flags.description) updateRequest.description = flags.description;
-      if (flags.priority) updateRequest.priority = flags.priority;
+      if (flags.priority) updateRequest.priority = flags.priority as Priority;
       if (flags.assignee) updateRequest.assignee = flags.assignee;
       if (flags.labels) updateRequest.labels = flags.labels.split(',').map(l => l.trim());
 
