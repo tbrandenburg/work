@@ -26,7 +26,7 @@ Implement the complete work CLI architecture with core engine, local-fs adapter,
 | Complexity             | HIGH                                                                              |
 | Systems Affected       | Core engine, local-fs adapter, CLI commands, context management, graph operations |
 | Dependencies           | @oclif/core ^4.0.0, Node.js fs/promises                                           |
-| Estimated Tasks        | 16                                                                                |
+| Estimated Tasks        | 22                                                                                |
 | **Research Timestamp** | **2026-01-20T13:33:09.833+01:00**                                                 |
 
 ---
@@ -246,7 +246,7 @@ Explicit exclusions to prevent scope creep:
 
 Execute in order. Each task is atomic and independently verifiable.
 
-After each task, run `npm test -- --coverage` in addition to any task-specific validation steps.
+After each task: build, functionally test, then run unit tests.
 
 ### Task 0: RESTORE test coverage requirements
 
@@ -264,7 +264,8 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **IMPORTS**: None (base types)
 - **GOTCHA**: Use string literal unions for enums to match CLI spec
 - **CURRENT**: Based on docs/work-graph-ontology-and-runtime.md specification
-- **VALIDATE**: `npm run type-check`
+- **VALIDATE**: `npm run type-check && npm run build && npm test -- --coverage`
+- **FUNCTIONAL**: `import { WorkItem } from './work-item'` - verify types load
 
 ### Task 2: CREATE `src/types/context.ts`
 
@@ -274,7 +275,8 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **IMPORTS**: `import { WorkItem } from './work-item.js'`
 - **GOTCHA**: Use .js extensions in imports for ESM compatibility
 - **CURRENT**: Based on docs/work-adapter-architecture.md specification
-- **VALIDATE**: `npm run type-check`
+- **VALIDATE**: `npm run type-check && npm run build && npm test -- --coverage`
+- **FUNCTIONAL**: `import { Context } from './context'` - verify types load
 
 ### Task 3: CREATE `src/types/errors.ts`
 
@@ -284,7 +286,8 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **PATTERN**: Extend Error, include code and statusCode properties
 - **CURRENT**: Follow 2024 TypeScript error handling patterns
 - **GOTCHA**: Call Object.setPrototypeOf(this, CustomError.prototype) in constructor
-- **VALIDATE**: `npm run type-check`
+- **VALIDATE**: `npm run type-check && npm run build && npm test -- --coverage`
+- **FUNCTIONAL**: `new WorkError('test')` - verify error instantiation
 
 ### Task 4: CREATE `src/types/index.ts`
 
@@ -292,7 +295,8 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **IMPLEMENT**: Export all types from work-item, context, errors
 - **MIRROR**: Barrel export pattern from existing codebase
 - **PATTERN**: Named exports only, no default exports
-- **VALIDATE**: `npm run type-check`
+- **VALIDATE**: `npm run type-check && npm run build && npm test -- --coverage`
+- **FUNCTIONAL**: `import * as types from './index'` - verify exports work
 
 ### Task 5: CREATE `src/adapters/local-fs/id-generator.ts`
 
@@ -312,7 +316,8 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **IMPORTS**: `import { promises as fs } from 'fs', import path from 'path'`
 - **GOTCHA**: Create directories recursively, handle file not found errors
 - **CURRENT**: Use fs/promises API exclusively for non-blocking operations
-- **VALIDATE**: `npm run type-check`
+- **VALIDATE**: `npm run type-check && npm run build && npm test -- --coverage`
+- **FUNCTIONAL**: `saveWorkItem(testItem)` - verify file operations work
 
 ### Task 7: CREATE `src/adapters/local-fs/index.ts`
 
@@ -322,7 +327,8 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **IMPORTS**: `import { WorkAdapter, WorkItem, Context } from '@/types'`
 - **PATTERN**: Implement all required methods, delegate to storage module
 - **CURRENT**: Follow adapter contract specification exactly
-- **VALIDATE**: `npm run type-check`
+- **VALIDATE**: `npm run type-check && npm run build && npm test -- --coverage`
+- **FUNCTIONAL**: `new LocalFsAdapter().list()` - verify adapter methods work
 
 ### Task 8: CREATE `src/core/graph.ts`
 
@@ -332,7 +338,8 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **IMPORTS**: `import { WorkItem, Relation } from '@/types'`
 - **GOTCHA**: Prevent cycles in parent_of and precedes relations
 - **CURRENT**: Follow documented graph invariants exactly
-- **VALIDATE**: `npm run type-check`
+- **VALIDATE**: `npm run type-check && npm run build && npm test -- --coverage`
+- **FUNCTIONAL**: `validateRelation('parent_of', item1, item2)` - verify graph operations
 
 ### Task 9: CREATE `src/core/query.ts`
 
@@ -342,7 +349,8 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **IMPORTS**: `import { WorkItem } from '@/types'`
 - **PATTERN**: Support where clauses, order by, limit
 - **CURRENT**: Follow CLI specification query syntax
-- **VALIDATE**: `npm run type-check`
+- **VALIDATE**: `npm run type-check && npm run build && npm test -- --coverage`
+- **FUNCTIONAL**: `parseQuery('where state=active')` - verify query parsing
 
 ### Task 10: CREATE `src/core/engine.ts`
 
@@ -352,7 +360,8 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **IMPORTS**: `import { WorkAdapter, Context } from '@/types'`
 - **PATTERN**: Resolve context, validate operations, delegate to adapter
 - **CURRENT**: Follow stateless execution model
-- **VALIDATE**: `npm run type-check`
+- **VALIDATE**: `npm run type-check && npm run build && npm test -- --coverage`
+- **FUNCTIONAL**: `new WorkEngine().resolveContext('default')` - verify engine works
 
 ### Task 11: CREATE `src/cli/commands/create.ts`
 
@@ -362,7 +371,8 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **IMPORTS**: `import { Args, Command, Flags } from '@oclif/core'`
 - **GOTCHA**: Commands timeout after 10 seconds if promises aren't awaited
 - **CURRENT**: Follow oclif v4.0 command structure exactly
-- **VALIDATE**: `npm run type-check && npm test -- --coverage`
+- **VALIDATE**: `npm run type-check && npm test -- --coverage && npm run build`
+- **CLI_TEST**: `./bin/run.js create "Test task" --kind task && ./bin/run.js list`
 
 ### Task 12: CREATE `src/cli/commands/list.ts`
 
@@ -372,7 +382,8 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **IMPORTS**: `import { Command, Flags } from '@oclif/core'`
 - **PATTERN**: Parse where clause, support context selection
 - **CURRENT**: Follow CLI specification for list command
-- **VALIDATE**: `npm run type-check && npm test -- --coverage`
+- **VALIDATE**: `npm run type-check && npm test -- --coverage && npm run build`
+- **CLI_TEST**: `./bin/run.js list && ./bin/run.js list where state=new`
 
 ### Task 13: CREATE `src/cli/commands/start.ts`
 
@@ -382,7 +393,8 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **IMPORTS**: `import { Args, Command } from '@oclif/core'`
 - **PATTERN**: Validate work item ID, change state to active
 - **CURRENT**: Follow lifecycle semantics from CLI spec
-- **VALIDATE**: `npm run type-check && npm test -- --coverage`
+- **VALIDATE**: `npm run type-check && npm test -- --coverage && npm run build`
+- **CLI_TEST**: `./bin/run.js start TASK-001 && ./bin/run.js get TASK-001`
 
 ### Task 14: CREATE `src/cli/commands/close.ts`
 
@@ -392,7 +404,8 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **IMPORTS**: `import { Args, Command } from '@oclif/core'`
 - **PATTERN**: Validate work item ID, change state to closed
 - **CURRENT**: Follow lifecycle semantics from CLI spec
-- **VALIDATE**: `npm run type-check && npm test -- --coverage`
+- **VALIDATE**: `npm run type-check && npm test -- --coverage && npm run build`
+- **CLI_TEST**: `./bin/run.js close TASK-001 && ./bin/run.js get TASK-001`
 
 ### Task 15: CREATE `src/cli/commands/get.ts`
 
@@ -402,7 +415,8 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **IMPORTS**: `import { Args, Command } from '@oclif/core'`
 - **PATTERN**: Validate work item ID
 - **CURRENT**: Follow lifecycle semantics from CLI spec
-- **VALIDATE**: `npm run type-check && npm test -- --coverage`
+- **VALIDATE**: `npm run type-check && npm test -- --coverage && npm run build`
+- **CLI_TEST**: `./bin/run.js get TASK-001`
 
 ### Task 16: CREATE `src/cli/commands/context/add.ts`
 
@@ -412,7 +426,8 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **IMPORTS**: `import { Args, Command, Flags } from '@oclif/core'`
 - **PATTERN**: Support tool selection, path configuration
 - **CURRENT**: Follow context management specification
-- **VALIDATE**: `npm run type-check && npm test -- --coverage`
+- **VALIDATE**: `npm run type-check && npm test -- --coverage && npm run build`
+- **CLI_TEST**: `./bin/run.js context add local --tool local-fs --path ./tasks && ./bin/run.js context list`
 
 ### Task 17: UPDATE `src/cli/commands/index.ts`
 
@@ -420,7 +435,8 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **IMPLEMENT**: Export all new command classes
 - **MIRROR**: Existing export pattern from hello command
 - **PATTERN**: Named exports for all commands
-- **VALIDATE**: `npm run type-check`
+- **VALIDATE**: `npm run type-check && npm run build && npm test -- --coverage`
+- **FUNCTIONAL**: `import { CreateCommand } from './commands'` - verify command exports
 
 ### Task 18: CREATE unit tests
 
@@ -446,6 +462,38 @@ After each task, run `npm test -- --coverage` in addition to any task-specific v
 - **MIRROR**: Existing hook patterns or tooling conventions
 - **GOTCHA**: Ensure hook setup is documented for local dev environments
 - **VALIDATE**: `make ci` - must pass locally and on hook execution
+
+### Task 21: CREATE core workflow validation
+
+- **ACTION**: CREATE complete user journey test
+- **IMPLEMENT**: End-to-end workflow testing via actual CLI binary
+- **PATTERN**: Context setup → create → start → close workflow
+- **CLI_TEST**: 
+  ```bash
+  ./bin/run.js context add test-project --tool local-fs --path ./test-tasks
+  ./bin/run.js context set test-project
+  ./bin/run.js create "Test workflow task" --kind task --priority high
+  ./bin/run.js start TASK-001
+  ./bin/run.js close TASK-001
+  ./bin/run.js list where state=closed
+  ```
+- **VALIDATE**: Verify `.work/` directory structure and file contents after each step
+- **GOTCHA**: Clean up test directories after validation
+
+### Task 22: CREATE CLI integration testing
+
+- **ACTION**: CREATE error scenario and edge case testing
+- **IMPLEMENT**: Test CLI error handling and user experience
+- **PATTERN**: Invalid commands, missing contexts, malformed IDs
+- **CLI_TEST**:
+  ```bash
+  ./bin/run.js get INVALID-ID  # Should show clear error
+  ./bin/run.js start TASK-999  # Should handle missing work item
+  ./bin/run.js list where invalid=syntax  # Should handle query errors
+  ./bin/run.js context set nonexistent  # Should handle missing context
+  ```
+- **VALIDATE**: Ensure error messages are user-friendly and actionable
+- **GOTCHA**: Test both success and failure scenarios
 
 ---
 
@@ -501,7 +549,15 @@ npm run lint && npm run type-check
 
 **EXPECT**: Exit 0, no errors or warnings
 
-### Level 2: UNIT_TESTS
+### Level 2: BUILD_AND_FUNCTIONAL
+
+```bash
+npm run build && ./bin/run.js --help
+```
+
+**EXPECT**: Build succeeds, CLI shows help
+
+### Level 3: UNIT_TESTS
 
 ```bash
 npm test -- --coverage
@@ -509,7 +565,7 @@ npm test -- --coverage
 
 **EXPECT**: All tests pass, coverage >= 20%
 
-### Level 3: FULL_SUITE
+### Level 4: FULL_SUITE
 
 ```bash
 npm test -- --coverage && npm run build
@@ -576,15 +632,19 @@ Verify .work directory structure:
 
 ## Completion Checklist
 
-- [ ] All 16 tasks completed in dependency order
+- [ ] All 22 tasks completed in dependency order
 - [ ] Each task validated immediately after completion
+- [ ] **Each command (11-16) tested via actual CLI binary**
 - [ ] Level 1: Static analysis (lint + type-check) passes
-- [ ] Level 2: Unit tests pass with >= 20% coverage
-- [ ] Level 3: Full test suite + build succeeds
+- [ ] Level 2: Build and functional validation passes
+- [ ] Level 3: Unit tests pass with >= 20% coverage
+- [ ] Level 4: Full test suite + build succeeds
 - [ ] Level 4: CLI commands execute successfully
 - [ ] Level 5: Filesystem structure validated
 - [ ] Level 6: Current standards validation passes
 - [ ] Level 7: Manual user journey completed
+- [ ] **Task 21: Core workflow validation passes**
+- [ ] **Task 22: CLI integration testing passes**
 - [ ] All acceptance criteria met
 
 ---

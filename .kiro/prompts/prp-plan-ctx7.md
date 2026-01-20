@@ -561,7 +561,7 @@ Explicit exclusions to prevent scope creep:
 
 Execute in order. Each task is atomic and independently verifiable.
 
-After each task, run tests with coverage enabled. Prefer Makefile targets or package scripts when available (e.g., `make test-coverage`, `npm run test:coverage`).
+After each task: build, functionally test, then run unit tests.
 
 ### Task 1: CREATE `src/core/database/schema.ts` (update)
 
@@ -573,7 +573,8 @@ After each task, run tests with coverage enabled. Prefer Makefile targets or pac
 - **CURRENT**: {Reference to verified current documentation}
 - **CONFIG_CONFLICTS**: {Any known tool configuration conflicts, e.g., "ESLint projectService conflicts with explicit project setting"}
 - **GENERATED_FILES**: {How to handle build artifacts in tooling, e.g., "exclude dist/ from linting scope"}
-- **VALIDATE**: `npx tsc --noEmit` - types must compile
+- **VALIDATE**: `{type-check-cmd} && {build-cmd} && {functional-test-cmd}`
+- **FUNCTIONAL**: `{actual-usage-command}` - verify component works
 
 ### Task 2: CREATE `src/features/new/models.ts`
 
@@ -631,7 +632,8 @@ After each task, run tests with coverage enabled. Prefer Makefile targets or pac
 - **IMPLEMENT**: Export types, schemas, errors, service functions
 - **MIRROR**: `{source-dir}/features/{example}/index.ts:1-20`
 - **PATTERN**: Named exports only, hide repository (internal)
-- **VALIDATE**: `{type-check-cmd}`
+- **VALIDATE**: `{type-check-cmd} && {build-cmd} && {functional-test-cmd}`
+- **FUNCTIONAL**: `{actual-usage-command}` - verify component works
 
 ### Task 8: CREATE `{source-dir}/features/new/tests/service.test.ts`
 
@@ -678,7 +680,16 @@ After each task, run tests with coverage enabled. Prefer Makefile targets or pac
 
 **EXPECT**: Exit 0, no errors or warnings
 
-### Level 2: UNIT_TESTS
+### Level 2: BUILD_AND_FUNCTIONAL
+
+```bash
+{runner} run build && {functional-test-command}
+# Examples: make build && ./bin/cli test-command, npm run build && npm start, cargo build && ./target/debug/app --version
+```
+
+**EXPECT**: Build succeeds, basic functionality works
+
+### Level 3: UNIT_TESTS
 
 ```bash
 {runner} test -- --coverage {path/to/feature/tests}
@@ -687,7 +698,7 @@ After each task, run tests with coverage enabled. Prefer Makefile targets or pac
 
 **EXPECT**: All tests pass, coverage >= 80%
 
-### Level 3: FULL_SUITE
+### Level 4: FULL_SUITE
 
 ```bash
 {runner} test -- --coverage && {runner} run build
@@ -746,8 +757,9 @@ Use Context7 MCP to verify:
 - [ ] All tasks completed in dependency order
 - [ ] Each task validated immediately after completion
 - [ ] Level 1: Static analysis (lint + type-check) passes
-- [ ] Level 2: Unit tests pass
-- [ ] Level 3: Full test suite + build succeeds
+- [ ] Level 2: Build and functional validation passes
+- [ ] Level 3: Unit tests pass
+- [ ] Level 4: Full test suite + build succeeds
 - [ ] Level 4: Database validation passes (if applicable)
 - [ ] Level 5: Browser validation passes (if applicable)
 - [ ] Level 6: Current standards validation passes
