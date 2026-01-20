@@ -8,13 +8,13 @@ This document defines the quality attributes and performance requirements for th
 
 ### 1.1 Response Time Targets
 
-| Operation | Backend | Target | Measurement |
-|-----------|---------|--------|-------------|
-| List high-priority open tasks | local-fs | < 2s | Up to 1,000 items |
-| List operations | Remote (Jira/GitHub/Linear/ADO) | < 5s | Typical project size |
-| Single item retrieval | Any backend | < 1s | Individual work item |
-| Create work item | Any backend | < 3s | Including validation |
-| State transitions | Any backend | < 2s | start/close/reopen |
+| Operation                     | Backend                         | Target | Measurement          |
+| ----------------------------- | ------------------------------- | ------ | -------------------- |
+| List high-priority open tasks | local-fs                        | < 2s   | Up to 1,000 items    |
+| List operations               | Remote (Jira/GitHub/Linear/ADO) | < 5s   | Typical project size |
+| Single item retrieval         | Any backend                     | < 1s   | Individual work item |
+| Create work item              | Any backend                     | < 3s   | Including validation |
+| State transitions             | Any backend                     | < 2s   | start/close/reopen   |
 
 ### 1.2 Startup Performance
 
@@ -34,13 +34,13 @@ This document defines the quality attributes and performance requirements for th
 
 ### 2.1 Data Volume Limits
 
-| Backend | Max Work Items | Max Relations | Notes |
-|---------|---------------|---------------|-------|
-| local-fs | 10,000 | 50,000 | Filesystem performance dependent |
-| Jira | Project-limited | N/A | Respects Jira API limits |
-| GitHub | Repository-limited | N/A | Respects GitHub API limits |
-| Linear | Team-limited | N/A | Respects Linear API limits |
-| ADO | Project-limited | N/A | Respects ADO API limits |
+| Backend  | Max Work Items     | Max Relations | Notes                            |
+| -------- | ------------------ | ------------- | -------------------------------- |
+| local-fs | 10,000             | 50,000        | Filesystem performance dependent |
+| Jira     | Project-limited    | N/A           | Respects Jira API limits         |
+| GitHub   | Repository-limited | N/A           | Respects GitHub API limits       |
+| Linear   | Team-limited       | N/A           | Respects Linear API limits       |
+| ADO      | Project-limited    | N/A           | Respects ADO API limits          |
 
 ### 2.2 Concurrent Usage
 
@@ -131,7 +131,16 @@ This document defines the quality attributes and performance requirements for th
 
 ### 7.1 Code Quality
 
-- Test coverage > 80%
+- Test coverage follows staged targets by project maturity.
+
+| Stage            | Coverage Target |
+| ---------------- | --------------- |
+| PoC              | >20%            |
+| MVP              | >40%            |
+| First extensions | >60%            |
+| Growing OSS      | >75%            |
+| Mature project   | >85%            |
+
 - Adapter isolation for independent testing
 - Clear separation of concerns
 - Comprehensive error logging

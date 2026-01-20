@@ -20,20 +20,21 @@ Implement the complete work CLI architecture with core engine, local-fs adapter,
 
 ## Metadata
 
-| Field            | Value                                             |
-| ---------------- | ------------------------------------------------- |
-| Type             | NEW_CAPABILITY                                    |
-| Complexity       | HIGH                                              |
-| Systems Affected | Core engine, local-fs adapter, CLI commands, context management, graph operations |
-| Dependencies     | @oclif/core ^4.0.0, Node.js fs/promises          |
-| Estimated Tasks  | 16                                                |
-| **Research Timestamp** | **2026-01-20T13:33:09.833+01:00** |
+| Field                  | Value                                                                             |
+| ---------------------- | --------------------------------------------------------------------------------- |
+| Type                   | NEW_CAPABILITY                                                                    |
+| Complexity             | HIGH                                                                              |
+| Systems Affected       | Core engine, local-fs adapter, CLI commands, context management, graph operations |
+| Dependencies           | @oclif/core ^4.0.0, Node.js fs/promises                                           |
+| Estimated Tasks        | 16                                                                                |
+| **Research Timestamp** | **2026-01-20T13:33:09.833+01:00**                                                 |
 
 ---
 
 ## UX Design
 
 ### Before State
+
 ```
 ╔═══════════════════════════════════════════════════════════════════════════════╗
 ║                              BEFORE STATE                                      ║
@@ -52,6 +53,7 @@ Implement the complete work CLI architecture with core engine, local-fs adapter,
 ```
 
 ### After State
+
 ```
 ╔═══════════════════════════════════════════════════════════════════════════════╗
 ║                               AFTER STATE                                      ║
@@ -83,13 +85,14 @@ Implement the complete work CLI architecture with core engine, local-fs adapter,
 ```
 
 ### Interaction Changes
-| Location | Before | After | User Impact |
-|----------|--------|-------|-------------|
-| `work create` | Command not found | Creates work item with ID | Can create tasks, bugs, epics |
-| `work list` | Command not found | Shows filtered work items | Can query and filter tasks |
-| `work context` | Command not found | Manages backend contexts | Can switch between projects |
-| `work start/close` | Command not found | Changes work item state | Can track task lifecycle |
-| `.work/` directory | Does not exist | Contains structured task data | Offline-first task storage |
+
+| Location           | Before            | After                         | User Impact                   |
+| ------------------ | ----------------- | ----------------------------- | ----------------------------- |
+| `work create`      | Command not found | Creates work item with ID     | Can create tasks, bugs, epics |
+| `work list`        | Command not found | Shows filtered work items     | Can query and filter tasks    |
+| `work context`     | Command not found | Manages backend contexts      | Can switch between projects   |
+| `work start/close` | Command not found | Changes work item state       | Can track task lifecycle      |
+| `.work/` directory | Does not exist    | Contains structured task data | Offline-first task storage    |
 
 ---
 
@@ -97,15 +100,15 @@ Implement the complete work CLI architecture with core engine, local-fs adapter,
 
 **CRITICAL: Implementation agent MUST read these files before starting any task:**
 
-| Priority | File | Lines | Why Read This |
-|----------|------|-------|---------------|
-| P0 | `src/cli/commands/hello.ts` | 1-25 | oclif Command pattern to MIRROR exactly |
-| P0 | `docs/work-cli-spec.md` | 1-200 | Complete CLI interface specification |
-| P0 | `docs/work-adapter-architecture.md` | 50-100 | Adapter interface contract |
-| P1 | `docs/work-graph-ontology-and-runtime.md` | 1-80 | WorkItem properties and relations |
-| P1 | `docs/work-local-fs-execution-flow.md` | 1-150 | Local filesystem implementation details |
-| P2 | `package.json` | 32-40 | Dependencies and oclif configuration |
-| P2 | `tsconfig.json` | 20-40 | TypeScript strict mode configuration |
+| Priority | File                                      | Lines  | Why Read This                           |
+| -------- | ----------------------------------------- | ------ | --------------------------------------- |
+| P0       | `src/cli/commands/hello.ts`               | 1-25   | oclif Command pattern to MIRROR exactly |
+| P0       | `docs/work-cli-spec.md`                   | 1-200  | Complete CLI interface specification    |
+| P0       | `docs/work-adapter-architecture.md`       | 50-100 | Adapter interface contract              |
+| P1       | `docs/work-graph-ontology-and-runtime.md` | 1-80   | WorkItem properties and relations       |
+| P1       | `docs/work-local-fs-execution-flow.md`    | 1-150  | Local filesystem implementation details |
+| P2       | `package.json`                            | 32-40  | Dependencies and oclif configuration    |
+| P2       | `tsconfig.json`                           | 20-40  | TypeScript strict mode configuration    |
 
 **Current External Documentation (Verified Live):**
 | Source | Section | Why Needed | Last Verified |
@@ -119,6 +122,7 @@ Implement the complete work CLI architecture with core engine, local-fs adapter,
 ## Patterns to Mirror
 
 **NAMING_CONVENTION:**
+
 ```typescript
 // SOURCE: src/cli/commands/hello.ts:3
 // COPY THIS PATTERN:
@@ -126,6 +130,7 @@ export default class Hello extends Command {
 ```
 
 **COMMAND_STRUCTURE:**
+
 ```typescript
 // SOURCE: src/cli/commands/hello.ts:4-8
 // COPY THIS PATTERN:
@@ -135,6 +140,7 @@ static override args = {
 ```
 
 **ASYNC_RUN_METHOD:**
+
 ```typescript
 // SOURCE: src/cli/commands/hello.ts:20-25
 // COPY THIS PATTERN:
@@ -145,6 +151,7 @@ public async run(): Promise<void> {
 ```
 
 **TEST_STRUCTURE:**
+
 ```typescript
 // SOURCE: tests/unit/example.test.ts:1-10
 // COPY THIS PATTERN:
@@ -156,6 +163,7 @@ describe('Example Unit Test', () => {
 ```
 
 **TYPESCRIPT_STRICT:**
+
 ```typescript
 // SOURCE: tsconfig.json:20-30
 // COPY THIS PATTERN:
@@ -169,18 +177,21 @@ describe('Example Unit Test', () => {
 ## Current Best Practices Validation
 
 **Security (Context7 MCP Verified):**
+
 - [x] File system access limited to .work directory
 - [x] No external network calls in local-fs adapter
 - [x] Input validation for all user inputs
 - [x] No sensitive data in logs
 
 **Performance (Web Intelligence Verified):**
+
 - [x] Async fs operations to avoid blocking
 - [x] Ephemeral graph slices prevent memory leaks
 - [x] Minimal file reads per command
 - [x] No global caching or state
 
 **Community Intelligence:**
+
 - [x] oclif v4.0 patterns followed
 - [x] TypeScript strict mode enabled
 - [x] Jest testing framework standard
@@ -190,31 +201,31 @@ describe('Example Unit Test', () => {
 
 ## Files to Change
 
-| File | Action | Justification |
-|------|--------|---------------|
-| `src/types/index.ts` | CREATE | Core type definitions for WorkItem, Context, etc. |
-| `src/types/work-item.ts` | CREATE | WorkItem interface and related types |
-| `src/types/context.ts` | CREATE | Context and adapter interfaces |
-| `src/types/errors.ts` | CREATE | Custom error class definitions |
-| `src/core/index.ts` | CREATE | Core engine exports |
-| `src/core/engine.ts` | CREATE | Main engine class with context resolution |
-| `src/core/graph.ts` | CREATE | Graph operations and validation |
-| `src/core/query.ts` | CREATE | Query parsing and execution |
-| `src/adapters/index.ts` | CREATE | Adapter exports |
-| `src/adapters/local-fs/index.ts` | CREATE | Local-fs adapter implementation |
-| `src/adapters/local-fs/storage.ts` | CREATE | File system operations |
-| `src/adapters/local-fs/id-generator.ts` | CREATE | Work item ID generation |
-| `src/cli/commands/create.ts` | CREATE | work create command |
-| `src/cli/commands/start.ts` | CREATE | work start command |
-| `src/cli/commands/close.ts` | CREATE | work close command |
-| `src/cli/commands/get.ts` | CREATE | work get command |
-| `src/cli/commands/list.ts` | CREATE | work list command |
-| `src/cli/commands/set.ts` | CREATE | work set command |
-| `src/cli/commands/link.ts` | CREATE | work link command |
-| `src/cli/commands/context/add.ts` | CREATE | work context add command |
-| `src/cli/commands/context/list.ts` | CREATE | work context list command |
-| `src/cli/commands/context/set.ts` | CREATE | work context set command |
-| `src/cli/commands/index.ts` | UPDATE | Export all new commands |
+| File                                    | Action | Justification                                     |
+| --------------------------------------- | ------ | ------------------------------------------------- |
+| `src/types/index.ts`                    | CREATE | Core type definitions for WorkItem, Context, etc. |
+| `src/types/work-item.ts`                | CREATE | WorkItem interface and related types              |
+| `src/types/context.ts`                  | CREATE | Context and adapter interfaces                    |
+| `src/types/errors.ts`                   | CREATE | Custom error class definitions                    |
+| `src/core/index.ts`                     | CREATE | Core engine exports                               |
+| `src/core/engine.ts`                    | CREATE | Main engine class with context resolution         |
+| `src/core/graph.ts`                     | CREATE | Graph operations and validation                   |
+| `src/core/query.ts`                     | CREATE | Query parsing and execution                       |
+| `src/adapters/index.ts`                 | CREATE | Adapter exports                                   |
+| `src/adapters/local-fs/index.ts`        | CREATE | Local-fs adapter implementation                   |
+| `src/adapters/local-fs/storage.ts`      | CREATE | File system operations                            |
+| `src/adapters/local-fs/id-generator.ts` | CREATE | Work item ID generation                           |
+| `src/cli/commands/create.ts`            | CREATE | work create command                               |
+| `src/cli/commands/start.ts`             | CREATE | work start command                                |
+| `src/cli/commands/close.ts`             | CREATE | work close command                                |
+| `src/cli/commands/get.ts`               | CREATE | work get command                                  |
+| `src/cli/commands/list.ts`              | CREATE | work list command                                 |
+| `src/cli/commands/set.ts`               | CREATE | work set command                                  |
+| `src/cli/commands/link.ts`              | CREATE | work link command                                 |
+| `src/cli/commands/context/add.ts`       | CREATE | work context add command                          |
+| `src/cli/commands/context/list.ts`      | CREATE | work context list command                         |
+| `src/cli/commands/context/set.ts`       | CREATE | work context set command                          |
+| `src/cli/commands/index.ts`             | UPDATE | Export all new commands                           |
 
 ---
 
@@ -400,11 +411,11 @@ Execute in order. Each task is atomic and independently verifiable.
 
 ### Task 19: RESTORE test coverage requirements
 
-- **ACTION**: UPDATE jest.config.js to restore 80% coverage thresholds
-- **IMPLEMENT**: Change coverageThreshold values from 0 back to 80
-- **RATIONALE**: Now that real implementation exists, enforce quality standards
+- **ACTION**: UPDATE jest.config.js to restore PoC coverage thresholds
+- **IMPLEMENT**: Change coverageThreshold values from 0 to 20
+- **RATIONALE**: Early implementation focuses on prototyping while maintaining a minimal quality gate
 - **GOTCHA**: This will fail CI until all code has proper test coverage
-- **VALIDATE**: `npm test` - must pass with 80% coverage
+- **VALIDATE**: `npm test` - must pass with 20% coverage
 
 ---
 
@@ -412,30 +423,30 @@ Execute in order. Each task is atomic and independently verifiable.
 
 ### Unit Tests to Write (70%)
 
-| Test File | Test Cases | Validates |
-|-----------|------------|-----------|
-| `tests/unit/types/work-item.test.ts` | Type validation, enum values | WorkItem types |
-| `tests/unit/adapters/local-fs/id-generator.test.ts` | ID generation, sequential numbering | ID generation logic |
-| `tests/unit/adapters/local-fs/storage.test.ts` | File operations, error handling | Storage operations |
-| `tests/unit/core/graph.test.ts` | Cycle detection, relation validation | Graph operations |
-| `tests/unit/core/query.test.ts` | Query parsing, filtering | Query execution |
-| `tests/unit/cli/commands/create.test.ts` | Command parsing, execution | Create command |
-| `tests/unit/cli/commands/list.test.ts` | Query parsing, output formatting | List command |
+| Test File                                           | Test Cases                           | Validates           |
+| --------------------------------------------------- | ------------------------------------ | ------------------- |
+| `tests/unit/types/work-item.test.ts`                | Type validation, enum values         | WorkItem types      |
+| `tests/unit/adapters/local-fs/id-generator.test.ts` | ID generation, sequential numbering  | ID generation logic |
+| `tests/unit/adapters/local-fs/storage.test.ts`      | File operations, error handling      | Storage operations  |
+| `tests/unit/core/graph.test.ts`                     | Cycle detection, relation validation | Graph operations    |
+| `tests/unit/core/query.test.ts`                     | Query parsing, filtering             | Query execution     |
+| `tests/unit/cli/commands/create.test.ts`            | Command parsing, execution           | Create command      |
+| `tests/unit/cli/commands/list.test.ts`              | Query parsing, output formatting     | List command        |
 
 ### Integration Tests to Write (20%)
 
-| Test File | Test Cases | Validates |
-|-----------|------------|-----------|
+| Test File                                    | Test Cases                                     | Validates               |
+| -------------------------------------------- | ---------------------------------------------- | ----------------------- |
 | `tests/integration/local-fs-adapter.test.ts` | Full adapter workflow, file system integration | Adapter + storage layer |
-| `tests/integration/core-engine.test.ts` | Context resolution, command delegation | Core engine + adapters |
-| `tests/integration/cli-commands.test.ts` | Command execution with real file system | CLI + core + adapter |
+| `tests/integration/core-engine.test.ts`      | Context resolution, command delegation         | Core engine + adapters  |
+| `tests/integration/cli-commands.test.ts`     | Command execution with real file system        | CLI + core + adapter    |
 
 ### End-to-End Tests to Write (10%)
 
-| Test File | Test Cases | Validates |
-|-----------|------------|-----------|
-| `tests/e2e/user-journey.test.ts` | Complete user workflow: context setup → create → start → close | Full system integration |
-| `tests/e2e/cli-execution.test.ts` | Actual CLI binary execution with real file system | Production-like usage |
+| Test File                         | Test Cases                                                     | Validates               |
+| --------------------------------- | -------------------------------------------------------------- | ----------------------- |
+| `tests/e2e/user-journey.test.ts`  | Complete user workflow: context setup → create → start → close | Full system integration |
+| `tests/e2e/cli-execution.test.ts` | Actual CLI binary execution with real file system              | Production-like usage   |
 
 ### Edge Cases Checklist
 
@@ -466,7 +477,7 @@ npm run lint && npm run type-check
 npm test
 ```
 
-**EXPECT**: All tests pass, coverage >= 80%
+**EXPECT**: All tests pass, coverage >= 20%
 
 ### Level 3: FULL_SUITE
 
@@ -523,7 +534,7 @@ Verify .work directory structure:
 - [ ] Local filesystem adapter fully functional
 - [ ] Graph operations and query system working
 - [ ] Level 1-3 validation commands pass with exit 0
-- [ ] Unit tests cover >= 80% of new code
+- [ ] Unit tests cover >= 20% of new code
 - [ ] Code mirrors oclif patterns exactly (naming, structure, async methods)
 - [ ] No regressions in existing tests
 - [ ] UX matches "After State" diagram
@@ -538,7 +549,7 @@ Verify .work directory structure:
 - [ ] All 16 tasks completed in dependency order
 - [ ] Each task validated immediately after completion
 - [ ] Level 1: Static analysis (lint + type-check) passes
-- [ ] Level 2: Unit tests pass with >= 80% coverage
+- [ ] Level 2: Unit tests pass with >= 20% coverage
 - [ ] Level 3: Full test suite + build succeeds
 - [ ] Level 4: CLI commands execute successfully
 - [ ] Level 5: Filesystem structure validated
@@ -560,12 +571,12 @@ Verify .work directory structure:
 
 ## Risks and Mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| File system permission errors | MEDIUM | MEDIUM | Graceful error handling, clear error messages |
-| Concurrent file access conflicts | LOW | MEDIUM | Atomic file operations, proper error handling |
-| Large work item datasets performance | LOW | MEDIUM | Ephemeral graph slices, minimal file reads |
-| oclif framework changes during implementation | LOW | LOW | Pin to specific version, follow current docs |
+| Risk                                          | Likelihood | Impact | Mitigation                                    |
+| --------------------------------------------- | ---------- | ------ | --------------------------------------------- |
+| File system permission errors                 | MEDIUM     | MEDIUM | Graceful error handling, clear error messages |
+| Concurrent file access conflicts              | LOW        | MEDIUM | Atomic file operations, proper error handling |
+| Large work item datasets performance          | LOW        | MEDIUM | Ephemeral graph slices, minimal file reads    |
+| oclif framework changes during implementation | LOW        | LOW    | Pin to specific version, follow current docs  |
 
 ---
 
