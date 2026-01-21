@@ -24,6 +24,7 @@ describe('WorkEngine', () => {
       createRelation: jest.fn(),
       getRelations: jest.fn(),
       deleteRelation: jest.fn(),
+      deleteWorkItem: jest.fn(),
     } as any;
 
     // Mock the LocalFsAdapter constructor
@@ -223,6 +224,63 @@ describe('WorkEngine', () => {
 
       expect(mockAdapter.getRelations).toHaveBeenCalledWith('EPIC-001');
       expect(result).toEqual(mockRelations);
+    });
+  });
+
+  describe('removeContext', () => {
+    it('should remove context and handle active context', async () => {
+      // Add a context first
+      await engine.addContext({
+        name: 'test-context',
+        tool: 'local-fs',
+        path: '/test',
+        authState: 'authenticated',
+        isActive: false
+      });
+
+      engine.removeContext('test-context');
+      
+      const contexts = engine.getContexts();
+      expect(contexts.find(c => c.name === 'test-context')).toBeUndefined();
+    });
+  });
+
+  describe('deleteWorkItem', () => {
+    it('should delete work item through adapter', async () => {
+      mockAdapter.deleteWorkItem.mockResolvedValue();
+
+      await engine.deleteWorkItem('TASK-001');
+
+      expect(mockAdapter.deleteWorkItem).toHaveBeenCalledWith('TASK-001');
+    });
+  });
+
+  describe('addComment', () => {
+    it('should log placeholder message', () => {
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+      engine.addComment('TASK-001', 'test comment');
+
+      expect(consoleSpy).toHaveBeenCalledWith('Comment operation not yet implemented: TASK-001 - test comment');
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe('moveWorkItem', () => {
+    it('should log placeholder message', () => {
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+      engine.moveWorkItem('TASK-001', '@other-context');
+
+      expect(consoleSpy).toHaveBeenCalledWith('Move operation not yet implemented: TASK-001 to @other-context');
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe('getContexts', () => {
+    it('should return empty array initially', () => {
+      const contexts = engine.getContexts();
+      expect(contexts).toEqual([]);
     });
   });
 });

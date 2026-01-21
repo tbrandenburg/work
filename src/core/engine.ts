@@ -97,6 +97,23 @@ export class WorkEngine {
   }
 
   /**
+   * Remove a context
+   */
+  removeContext(name: string): void {
+    const context = this.contexts.get(name);
+    if (!context) {
+      throw new ContextNotFoundError(name);
+    }
+
+    // If removing active context, set activeContext to null
+    if (this.activeContext === name) {
+      this.activeContext = null;
+    }
+
+    this.contexts.delete(name);
+  }
+
+  /**
    * Get the adapter for the active context
    */
   private getActiveAdapter(): WorkAdapter {
@@ -200,6 +217,31 @@ export class WorkEngine {
     await this.ensureDefaultContext();
     const adapter = this.getActiveAdapter();
     await adapter.deleteRelation(from, to, type);
+  }
+
+  /**
+   * Delete a work item
+   */
+  async deleteWorkItem(id: string): Promise<void> {
+    await this.ensureDefaultContext();
+    const adapter = this.getActiveAdapter();
+    await adapter.deleteWorkItem(id);
+  }
+
+  /**
+   * Add a comment to a work item (placeholder)
+   */
+  addComment(workItemId: string, text: string): void {
+    // Placeholder implementation for MVP
+    console.log(`Comment operation not yet implemented: ${workItemId} - ${text}`);
+  }
+
+  /**
+   * Move a work item to another context (placeholder)
+   */
+  moveWorkItem(workItemId: string, targetContext: string): void {
+    // Placeholder implementation for MVP
+    console.log(`Move operation not yet implemented: ${workItemId} to ${targetContext}`);
   }
 
   /**
