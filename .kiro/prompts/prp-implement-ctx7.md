@@ -71,6 +71,32 @@ Locate and understand:
 - **Enhanced validation pattern** - The type-check && lint && build && functional-test && test-with-coverage sequence
 - **Acceptance Criteria** - Definition of done
 
+### 1.2.1 Initialize Task Tracking
+
+**CRITICAL**: Use the agent's todo tool to track all tasks and sub-tasks from the plan. This prevents forgetting steps during implementation.
+
+1. Extract all main tasks from the plan's "Step-by-Step Tasks" section
+2. For each main task, identify any sub-tasks or validation steps
+3. Add ALL tasks to the todo system with clear descriptions
+4. Mark tasks as complete only after full validation passes
+
+**Example todo initialization:**
+```
+- [ ] Task 1: CREATE src/features/x/models.ts
+  - [ ] Read MIRROR pattern from existing models
+  - [ ] Implement TypeScript interfaces
+  - [ ] Run type-check validation
+  - [ ] Write unit tests for models
+- [ ] Task 2: CREATE src/features/x/service.ts
+  - [ ] Follow service pattern from MIRROR
+  - [ ] Implement business logic
+  - [ ] Add error handling
+  - [ ] Run functional tests
+  - [ ] Verify integration points
+```
+
+**Never proceed to next task until current task and ALL its sub-tasks are marked complete in the todo system.**
+
 ### 1.2.5 Plan Currency Verification (Context7 MCP)
 
 Before starting implementation, verify plan assumptions are still current:
@@ -102,6 +128,7 @@ Create a plan first: /prp-plan "feature description"
 - [ ] Plan file loaded
 - [ ] Key sections identified
 - [ ] Tasks list extracted
+- [ ] **All tasks and sub-tasks added to todo system**
 - [ ] **Plan assumptions verified as current**
 - [ ] **Documentation links validated**
 - [ ] **Package versions verified to exist**
@@ -220,12 +247,26 @@ Common type-check patterns:
 
 ### 3.4 Track Progress
 
-Log each task as you complete it:
+**Use the todo system to track each task completion:**
 
+1. Mark main task as in-progress when starting
+2. Check off each sub-task as completed and validated
+3. Only mark main task complete when ALL sub-tasks pass validation
+4. Never skip or forget validation steps tracked in todos
+
+**Example progress tracking:**
 ```
-Task 1: CREATE src/features/x/models.ts ✅
-Task 2: CREATE src/features/x/service.ts ✅
-Task 3: UPDATE src/routes/index.ts ✅
+✅ Task 1: CREATE src/features/x/models.ts
+  ✅ Read MIRROR pattern from existing models
+  ✅ Implement TypeScript interfaces  
+  ✅ Run type-check validation
+  ✅ Write unit tests for models
+🔄 Task 2: CREATE src/features/x/service.ts (IN PROGRESS)
+  ✅ Follow service pattern from MIRROR
+  ✅ Implement business logic
+  ⏳ Add error handling
+  ⏳ Run functional tests
+  ⏳ Verify integration points
 ```
 
 **Deviation Handling:**
@@ -236,6 +277,7 @@ If you must deviate from the plan:
 - **Note if deviation was due to current documentation**
 - **Note if deviation was due to package availability**
 - **Note if deviation was due to configuration conflicts**
+- **Update affected todos to reflect the deviation**
 - Continue with the deviation documented
 
 **Configuration Conflict Resolution:**
@@ -248,6 +290,7 @@ If tool configurations conflict (e.g., ESLint projectService vs project settings
 **PHASE_3_CHECKPOINT:**
 
 - [ ] All tasks executed in order
+- [ ] **All todos marked complete with validation**
 - [ ] Each task passed type-check
 - [ ] Deviations documented
 - [ ] **Current patterns verified and applied**
@@ -339,15 +382,27 @@ Common patterns:
 
 ### 4.2 Unit Tests
 
-**You MUST write or update tests for new code.** This is not optional.
+**CRITICAL TEST COVERAGE REQUIREMENTS - LIFE DEPENDS ON IT:**
 
-**Test requirements:**
+**You MUST write or update tests for new code. This is not optional.**
 
-1. Every new function/feature needs at least one test
-2. Edge cases identified in the plan need tests
-3. Update existing tests if behavior changed
+**NEVER REDUCE TEST COVERAGE WITHOUT EXPLICIT REQUEST:**
+- Never ignore test failures or warnings
+- Never hide coverage issues or skip tests
+- Never reduce coverage thresholds to make builds pass
+- If coverage drops, ADD VALUABLE TESTS that test critical functionality
+- Treat test failures as implementation bugs that MUST be fixed
 
-**Write tests**, then run the test command from the plan with coverage.
+**SMART TEST REQUIREMENTS - NO METRIC TRICKS:**
+
+1. **Test what matters most**: Core business logic, error handling, edge cases
+2. **Quality over quantity**: One test that catches real bugs > ten trivial tests
+3. **No coverage gaming**: Don't write meaningless tests just to hit numbers
+4. **Test behavior, not implementation**: Focus on what the code should do, not how
+5. **Critical paths first**: Prioritize testing the most important user flows
+6. **Edge cases from plan**: Test the specific edge cases identified in the plan
+
+**Write valuable tests**, then run the test command from the plan with coverage.
 
 **Use staged coverage targets from plan:**
 - PoC: 20%
@@ -355,6 +410,13 @@ Common patterns:
 - Extensions: 60%
 - OSS: 75%
 - Mature: 85%
+
+**COVERAGE ENFORCEMENT:**
+- If coverage is below target, write SMART TESTS for uncovered critical code
+- Focus on untested business logic, error paths, and edge cases
+- Never ship with coverage warnings or failures
+- Document any uncoverable code with explicit justification
+- **Reject meaningless tests that only boost metrics without adding value**
 
 Common patterns:
 - JS/TS: `{runner} test -- --coverage` or `{runner} run test:coverage`
@@ -366,9 +428,10 @@ Common patterns:
 
 1. Read failure output
 2. Determine: bug in implementation or bug in test?
-3. Fix the actual issue
+3. Fix the actual issue (usually implementation)
 4. Re-run tests
-5. Repeat until green
+5. Repeat until green AND coverage target met
+6. **NEVER ignore or suppress test failures**
 
 ### 4.3 Build Check
 
@@ -410,7 +473,8 @@ Run any edge case tests specified in the plan.
 - [ ] Lint passes (0 errors)
 - [ ] Functional tests pass (if applicable)
 - [ ] Tests pass (all green)
-- [ ] Coverage meets staged target (PoC 20%, MVP 40%, Extensions 60%, OSS 75%, Mature 85%)
+- [ ] **Coverage meets staged target (NO EXCEPTIONS)**
+- [ ] **No test warnings or coverage issues ignored**
 - [ ] Build succeeds
 - [ ] Integration tests pass (if applicable)
 - [ ] **Current standards validation passes**
@@ -656,6 +720,10 @@ To continue: `/prp-plan {prd-path}`
 3. Fix the root cause (usually implementation)
 4. Re-run tests
 5. Repeat until green
+6. **CRITICAL: Never ignore, skip, or suppress failing tests**
+7. **CRITICAL: Never reduce coverage requirements to make builds pass**
+8. **If coverage drops below target, ADD SMART TESTS for critical uncovered code**
+9. **CRITICAL: Reject meaningless tests that only game coverage metrics**
 
 ### Lint Fails
 
@@ -716,7 +784,9 @@ To continue: `/prp-plan {prd-path}`
 - **LINT_PASS**: Lint command exits 0 (warnings OK)
 - **FUNCTIONAL_PASS**: Functional test commands succeed (if applicable)
 - **TESTS_PASS**: Test command all green
-- **COVERAGE_TARGET**: Tests meet staged coverage requirements (PoC 20%, MVP 40%, Extensions 60%, OSS 75%, Mature 85%)
+- **COVERAGE_TARGET**: Tests meet staged coverage requirements (PoC 20%, MVP 40%, Extensions 60%, OSS 75%, Mature 85%) **WITH NO EXCEPTIONS**
+- **NO_COVERAGE_REDUCTION**: Coverage never reduced, warnings never ignored, tests never suppressed
+- **SMART_TESTING**: Tests focus on critical functionality, no metric gaming or meaningless tests
 - **BUILD_PASS**: Build command succeeds
 - **REPORT_CREATED**: Implementation report exists
 - **PLAN_ARCHIVED**: Original plan moved to completed
