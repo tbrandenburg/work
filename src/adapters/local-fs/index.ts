@@ -4,7 +4,7 @@
 
 import path from 'path';
 import { promises as fs } from 'fs';
-import { WorkAdapter, Context, WorkItem, CreateWorkItemRequest, UpdateWorkItemRequest, Relation, WorkItemNotFoundError } from '../../types/index.js';
+import { WorkAdapter, Context, WorkItem, CreateWorkItemRequest, UpdateWorkItemRequest, Relation, WorkItemNotFoundError, AuthStatus, Schema, SchemaAttribute, SchemaRelationType } from '../../types/index.js';
 import { generateId } from './id-generator.js';
 import { saveWorkItem, loadWorkItem, listWorkItems, saveLinks, loadLinks } from './storage.js';
 
@@ -140,5 +140,61 @@ export class LocalFsAdapter implements WorkAdapter {
       }
       throw error;
     }
+  }
+
+  async authenticate(_credentials?: Record<string, string>  ): Promise<AuthStatus> {
+    // Local filesystem adapter - trivial implementation
+    return Promise.resolve({
+      state: 'authenticated' as const,
+      user: 'local-user',
+    });
+  }
+
+  async logout(): Promise<void> {
+    // Local filesystem adapter - trivial implementation
+    return Promise.resolve();
+  }
+
+  async getAuthStatus(): Promise<AuthStatus> {
+    // Local filesystem adapter - always authenticated
+    return Promise.resolve({
+      state: 'authenticated' as const,
+      user: 'local-user',
+    });
+  }
+
+  async getSchema(): Promise<Schema> {
+    // Local filesystem adapter - hardcoded schema
+    return Promise.resolve({
+      kinds: ['task', 'bug', 'feature', 'epic'] as const,
+      attributes: [
+        { name: 'title', type: 'string', required: true, description: 'Work item title' },
+        { name: 'description', type: 'string', required: false, description: 'Work item description' },
+        { name: 'priority', type: 'enum', required: false, description: 'Priority level (low, medium, high, critical)' },
+        { name: 'assignee', type: 'string', required: false, description: 'Assigned user' },
+        { name: 'labels', type: 'array', required: false, description: 'Labels for categorization' },
+      ] as const,
+      relationTypes: [
+        { name: 'blocks', description: 'This item blocks another', allowedFromKinds: ['task', 'bug', 'feature'], allowedToKinds: ['task', 'bug', 'feature'] },
+        { name: 'parent_of', description: 'This item is parent of another', allowedFromKinds: ['epic', 'feature'], allowedToKinds: ['task', 'bug'] },
+        { name: 'duplicates', description: 'This item duplicates another', allowedFromKinds: ['task', 'bug'], allowedToKinds: ['task', 'bug'] },
+        { name: 'relates_to', description: 'This item relates to another', allowedFromKinds: ['task', 'bug', 'feature', 'epic'], allowedToKinds: ['task', 'bug', 'feature', 'epic'] },
+      ] as const,
+    });
+  }
+
+  async getKinds(): Promise<readonly string[]> {
+    const schema = await this.getSchema();
+    return schema.kinds;
+  }
+
+  async getAttributes(): Promise<readonly SchemaAttribute[]> {
+    const schema = await this.getSchema();
+    return schema.attributes;
+  }
+
+  async getRelationTypes(): Promise<readonly SchemaRelationType[]> {
+    const schema = await this.getSchema();
+    return schema.relationTypes;
   }
 }

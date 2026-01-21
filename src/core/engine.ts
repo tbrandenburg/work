@@ -2,7 +2,7 @@
  * Main engine class with context resolution and command delegation
  */
 
-import { WorkAdapter, Context, WorkItem, CreateWorkItemRequest, UpdateWorkItemRequest, Relation, ContextNotFoundError } from '../types/index.js';
+import { WorkAdapter, Context, WorkItem, CreateWorkItemRequest, UpdateWorkItemRequest, Relation, ContextNotFoundError, AuthStatus, Schema, SchemaAttribute, SchemaRelationType } from '../types/index.js';
 import { LocalFsAdapter } from '../adapters/local-fs/index.js';
 import { validateRelation, detectCycles } from './graph.js';
 import { parseQuery, executeQuery } from './query.js';
@@ -265,5 +265,68 @@ export class WorkEngine {
     }
     
     return Array.from(unique.values());
+  }
+
+  /**
+   * Authenticate with the backend
+   */
+  async authenticate(credentials?: Record<string, string>  ): Promise<AuthStatus> {
+    await this.ensureDefaultContext();
+    const adapter = this.getActiveAdapter();
+    return adapter.authenticate(credentials);
+  }
+
+  /**
+   * Logout from the backend
+   */
+  async logout(): Promise<void> {
+    await this.ensureDefaultContext();
+    const adapter = this.getActiveAdapter();
+    return adapter.logout();
+  }
+
+  /**
+   * Get current authentication status
+   */
+  async getAuthStatus(): Promise<AuthStatus> {
+    await this.ensureDefaultContext();
+    const adapter = this.getActiveAdapter();
+    return adapter.getAuthStatus();
+  }
+
+  /**
+   * Get complete schema information
+   */
+  async getSchema(): Promise<Schema> {
+    await this.ensureDefaultContext();
+    const adapter = this.getActiveAdapter();
+    return adapter.getSchema();
+  }
+
+  /**
+   * Get available work item kinds
+   */
+  async getKinds(): Promise<readonly string[]> {
+    await this.ensureDefaultContext();
+    const adapter = this.getActiveAdapter();
+    return adapter.getKinds();
+  }
+
+  /**
+   * Get available attributes
+   */
+  async getAttributes(): Promise<readonly SchemaAttribute[]> {
+    await this.ensureDefaultContext();
+    const adapter = this.getActiveAdapter();
+    return adapter.getAttributes();
+  }
+
+  /**
+   * Get available relation types
+   */
+  async getRelationTypes(): Promise<readonly SchemaRelationType[]> {
+    await this.ensureDefaultContext();
+    const adapter = this.getActiveAdapter();
+    return adapter.getRelationTypes();
   }
 }
