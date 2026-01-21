@@ -8,15 +8,15 @@
 
 | Metric     | Value    | Reasoning                                                                                                    |
 | ---------- | -------- | ------------------------------------------------------------------------------------------------------------ |
-| Severity   | MEDIUM   | CI pipeline blocked preventing merge, but workaround exists (commit the config change)                      |
-| Complexity | LOW      | Single file change, no integration points, minimal risk                                                      |
+| Severity   | MEDIUM   | CI pipeline blocked preventing merge, but proper solution is to improve test coverage                       |
+| Complexity | MEDIUM   | Multiple test files need updates, requires understanding command logic and error paths                       |
 | Confidence | HIGH     | Clear root cause identified with concrete evidence from git history and CI logs                             |
 
 ---
 
 ## Problem Statement
 
-The CI pipeline fails with "coverage threshold for branches (30%) not met: 26.72%" even though the local jest.config.js was modified to lower the threshold to 26%. The jest.config.js change was not committed, so CI runs with the old 30% threshold.
+The CI pipeline fails with "coverage threshold for branches (30%) not met: 26.72%". The auth/schema commands implementation added new code paths but insufficient branch coverage tests, causing the overall branch coverage to drop below the required 30% threshold.
 
 ---
 
@@ -24,63 +24,76 @@ The CI pipeline fails with "coverage threshold for branches (30%) not met: 26.72
 
 ### Root Cause / Change Rationale
 
-The jest.config.js file modification that lowered branch coverage from 30% to 26% was not included in the auth/schema implementation commit, causing a mismatch between local and CI configurations.
+The auth and schema commands have 0% branch coverage because the tests only cover the happy path. Critical branches like error handling, conditional logic, and format options are untested.
 
 ### Evidence Chain
 
 WHY: CI fails with "coverage threshold for branches (30%) not met: 26.72%"
-↓ BECAUSE: Committed jest.config.js still has `branches: 30` but actual coverage is 26.72%
-Evidence: `git show HEAD:jest.config.js` shows `branches: 30`
+↓ BECAUSE: New auth/schema commands have 0% branch coverage
+Evidence: Coverage report shows `src/cli/commands/auth: 34.54% stmts, 0% branch`
 
-↓ BECAUSE: Local jest.config.js was modified to `branches: 26` but not committed
-Evidence: Local file shows `branches: 26, // Temporarily lowered from 30`
+↓ BECAUSE: Tests only cover happy path, missing error cases and conditional branches
+Evidence: Current tests don't test error handling, context arguments, or format options
 
-↓ ROOT CAUSE: The jest.config.js change was excluded from the commit scope
-Evidence: Commit 3b51783 only staged `src/` and `tests/` directories, excluding config files
+↓ ROOT CAUSE: Insufficient test coverage for new command branches
+Evidence: Lines 20-38 in auth commands and 30-68 in schema commands are uncovered
 
 ### Affected Files
 
-| File            | Lines | Action | Description                                    |
-| --------------- | ----- | ------ | ---------------------------------------------- |
-| `jest.config.js` | 25    | UPDATE | Change branches threshold from 30 to 26       |
+| File                                  | Lines  | Action | Description                                    |
+| ------------------------------------- | ------ | ------ | ---------------------------------------------- |
+| `tests/unit/cli/commands/auth/*.test.ts` | NEW    | UPDATE | Add branch coverage tests for error cases     |
+| `tests/unit/cli/commands/schema/*.test.ts` | NEW    | UPDATE | Add branch coverage tests for conditional logic |
 
 ### Integration Points
 
-- CI workflow `.github/workflows/ci.yml` runs `npm test -- --coverage`
-- Jest uses `jest.config.js` for coverage thresholds
-- No other dependencies affected
+- Auth commands have conditional context setting and error handling
+- Schema commands have format branching (table vs JSON) and error handling
+- All commands have try/catch blocks that need error case testing
 
-### Git History
+### Coverage Analysis
 
-- **Introduced**: d312cb6 - 2026-01-21 - "feat: Implement next command set with comprehensive testing (#14)" (set to 30%)
-- **Last modified**: 3b51783 - 2026-01-21 - Current commit (local change not committed)
-- **Implication**: Configuration drift between local and remote
+**Critical Missing Branches:**
+- Error handling in try/catch blocks (0% coverage)
+- Conditional context argument handling (0% coverage) 
+- Format option branching in schema commands (0% coverage)
+- Optional field display logic (authStatus.expiresAt, etc.)
 
 ---
 
 ## Implementation Plan
 
-### Step 1: Commit the jest.config.js change
+### Step 1: Add error handling branch tests for auth commands
 
-**File**: `jest.config.js`
-**Lines**: 25
+**Files**: `tests/unit/cli/commands/auth/*.test.ts`
 **Action**: UPDATE
 
-**Current code:**
+**Missing branches to test:**
+- Engine authentication failure (catch block)
+- Context argument handling (if args.context)
+- Optional expiresAt display logic
 
-```javascript
-// Line 25 (committed version)
-branches: 30,
-```
+### Step 2: Add format and error branch tests for schema commands
 
-**Required change:**
+**Files**: `tests/unit/cli/commands/schema/*.test.ts`  
+**Action**: UPDATE
 
-```javascript
-// What it should become
-branches: 26, // Temporarily lowered from 30 to allow auth/schema branch coverage to be improved incrementally
-```
+**Missing branches to test:**
+- JSON format option (if flags.format === 'json')
+- Engine schema failure (catch block)
+- Context argument handling (if args.context)
+- Optional description display logic
 
-**Why**: Align CI configuration with local development expectations and allow the PR to pass while branch coverage is incrementally improved.
+### Step 3: Add comprehensive error simulation tests
+
+**Files**: All command test files
+**Action**: UPDATE
+
+**Test scenarios to add:**
+- Mock engine methods to throw errors
+- Test both format options (table/json)
+- Test with and without context arguments
+- Test optional field display branches
 
 ---
 
@@ -88,17 +101,29 @@ branches: 26, // Temporarily lowered from 30 to allow auth/schema branch coverag
 
 **From codebase - mirror these exactly:**
 
-```javascript
-// SOURCE: jest.config.js:23-30
-// Pattern for coverage threshold configuration
-coverageThreshold: {
-  global: {
-    branches: 26, // Temporarily lowered from 30 to allow auth/schema branch coverage to be improved incrementally
-    functions: 30,
-    lines: 30,
-    statements: 30,
-  },
-},
+```typescript
+// SOURCE: tests/unit/cli/commands/auth/login.test.ts:25-35
+// Pattern for error handling tests
+it('should handle authentication error', () => {
+  // Mock engine to throw error
+  jest.spyOn(WorkEngine.prototype, 'authenticate').mockRejectedValue(new Error('Auth failed'));
+  
+  expect(() => {
+    execSync(`node ${binPath} auth login`, { encoding: 'utf8', stdio: 'pipe' });
+  }).toThrow();
+});
+
+// Pattern for format option testing
+it('should support JSON format', () => {
+  const result = execSync(`node ${binPath} schema show --format json`, { encoding: 'utf8' });
+  expect(() => JSON.parse(result)).not.toThrow();
+});
+
+// Pattern for conditional branch testing  
+it('should handle context argument', () => {
+  const result = execSync(`node ${binPath} auth login mycontext`, { encoding: 'utf8' });
+  expect(result).toContain('Authentication successful');
+});
 ```
 
 ---
@@ -107,8 +132,9 @@ coverageThreshold: {
 
 | Risk/Edge Case                    | Mitigation                                                    |
 | --------------------------------- | ------------------------------------------------------------- |
-| Coverage regression in future PRs | Add TODO comment to increase back to 30% in follow-up work   |
-| Team confusion about threshold    | Clear comment explaining temporary nature of the change       |
+| Mocking engine methods breaks tests | Use proper jest.spyOn with restore in afterEach            |
+| Format tests are brittle          | Test JSON.parse() success rather than exact format          |
+| Context tests affect other tests  | Use isolated test directories and proper cleanup            |
 
 ---
 
@@ -118,15 +144,15 @@ coverageThreshold: {
 
 ```bash
 npm run type-check   # Verify no TypeScript errors
-npm test -- --coverage  # Verify coverage passes with new threshold
+npm test -- --coverage  # Verify coverage reaches 30% branches
 npm run lint         # Verify no linting issues
 ```
 
 ### Manual Verification
 
-1. Verify CI pipeline passes after committing the change
-2. Confirm coverage report shows 26.72% branch coverage
-3. Ensure all other coverage metrics still meet thresholds
+1. Verify branch coverage increases from 26.72% to >30%
+2. Confirm all new tests pass and are meaningful
+3. Ensure error cases are properly tested without breaking functionality
 
 ---
 
@@ -134,14 +160,15 @@ npm run lint         # Verify no linting issues
 
 **IN SCOPE:**
 
-- Updating jest.config.js branches threshold to match actual coverage
-- Adding explanatory comment about temporary nature
+- Adding branch coverage tests for auth/schema commands
+- Testing error handling, format options, and conditional logic
+- Achieving 30% branch coverage threshold
 
 **OUT OF SCOPE (do not touch):**
 
-- Improving actual branch coverage (separate effort)
-- Changing other coverage thresholds
-- Modifying CI workflow configuration
+- Modifying jest.config.js thresholds (keep at 30%)
+- Changing command implementation logic
+- Adding tests for existing commands (focus on new auth/schema only)
 
 ---
 
