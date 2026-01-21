@@ -72,6 +72,7 @@ All other files must be organized into appropriate subdirectories.
 - Maintain >80% test coverage
 - Mock external dependencies in unit tests
 - Test files: `*.test.ts` or `*.spec.ts`
+- Hard rule: after a coding session, before reporting back to the user run `make ci` to test the changes and fix issues until the test suite passes.
 
 ### Security Practices
 - Validate and sanitize all user inputs
