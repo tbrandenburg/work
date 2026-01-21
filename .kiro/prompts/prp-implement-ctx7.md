@@ -17,6 +17,10 @@ Execute the plan end-to-end with rigorous self-validation and real-time verifica
 
 **Golden Rule**: If a validation fails, fix it before moving on. Never accumulate broken state. Always prioritize current documentation over plan assumptions when conflicts arise.
 
+**Validation Gate Lock**: If any planned validation command fails, STOP immediately, mark the phase FAILED, and remediate only that gate until it passes with exit code 0.
+
+**Stagnation & Strategy Shift Rule**: If the same class of fix is attempted more than twice without meeting the target, pause to diagnose the failing metric (statements/branches/functions/lines) and explicitly choose a new strategy.
+
 ---
 
 ## Phase 0: DETECT - Project Environment

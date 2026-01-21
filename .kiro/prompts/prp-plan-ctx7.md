@@ -334,6 +334,8 @@ Use web search to verify:
 
 **DECIDE and document:**
 
+**DECLARE architecture invariants (persistent vs ephemeral state, entities surviving across invocations, idempotent operations) and reference them in tests and acceptance criteria.**
+
 ```markdown
 APPROACH_CHOSEN: [description]
 RATIONALE: [why this over alternatives - reference codebase patterns and current best practices]
