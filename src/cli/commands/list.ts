@@ -1,4 +1,4 @@
-import { Command, Flags } from '@oclif/core';
+import { Command, Flags, Args } from '@oclif/core';
 import { WorkEngine } from '../../core/index.js';
 
 export default class List extends Command {
@@ -6,14 +6,25 @@ export default class List extends Command {
 
   static override examples = [
     '<%= config.bin %> <%= command.id %>',
-    '<%= config.bin %> <%= command.id %> --where state=new',
-    '<%= config.bin %> <%= command.id %> --where kind=task,priority=high',
+    '<%= config.bin %> <%= command.id %> where state=new',
+    '<%= config.bin %> <%= command.id %> where priority=high AND state=active',
   ];
+
+  static override args = {
+    subcommand: Args.string({
+      description: 'subcommand (where)',
+      required: false,
+    }),
+    query: Args.string({
+      description: 'query expression for where clause',
+      required: false,
+    }),
+  };
 
   static override flags = {
     where: Flags.string({
       char: 'w',
-      description: 'filter work items (e.g., state=new, kind=task)',
+      description: 'filter work items (e.g., state=new, kind=task) - deprecated, use positional args',
     }),
     format: Flags.string({
       char: 'f',
@@ -24,12 +35,28 @@ export default class List extends Command {
   };
 
   public async run(): Promise<void> {
-    const { flags } = await this.parse(List);
+    const { args, flags } = await this.parse(List);
 
     const engine = new WorkEngine();
     
     try {
-      const workItems = await engine.listWorkItems(flags.where);
+      let whereClause: string | undefined;
+      
+      // Handle new positional syntax: work list where "query"
+      if (args.subcommand === 'where') {
+        if (!args.query) {
+          this.error('Query expression required after "where"');
+        }
+        whereClause = args.query;
+      } else if (args.subcommand && !args.query) {
+        // Handle case where query is provided as first arg without "where"
+        whereClause = args.subcommand;
+      } else if (flags.where) {
+        // Backward compatibility with --where flag
+        whereClause = flags.where;
+      }
+
+      const workItems = await engine.listWorkItems(whereClause);
 
       if (flags.format === 'json') {
         this.log(JSON.stringify(workItems, null, 2));

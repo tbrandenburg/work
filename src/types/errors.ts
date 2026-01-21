@@ -48,3 +48,27 @@ export class RelationError extends WorkError {
     Object.setPrototypeOf(this, RelationError.prototype);
   }
 }
+
+export class QuerySyntaxError extends WorkError {
+  constructor(query: string, reason: string) {
+    super(`Query syntax error in "${query}": ${reason}`, 'QUERY_SYNTAX_ERROR', 400);
+    this.name = 'QuerySyntaxError';
+    Object.setPrototypeOf(this, QuerySyntaxError.prototype);
+  }
+}
+
+export class UnsupportedOperatorError extends WorkError {
+  constructor(operator: string) {
+    super(`Unsupported operator: ${operator}`, 'UNSUPPORTED_OPERATOR', 400);
+    this.name = 'UnsupportedOperatorError';
+    Object.setPrototypeOf(this, UnsupportedOperatorError.prototype);
+  }
+}
+
+export class InvalidDateError extends WorkError {
+  constructor(dateString: string) {
+    super(`Invalid date format: ${dateString}. Expected ISO 8601 format (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss)`, 'INVALID_DATE', 400);
+    this.name = 'InvalidDateError';
+    Object.setPrototypeOf(this, InvalidDateError.prototype);
+  }
+}
