@@ -16,6 +16,10 @@ export type {
 export type {
   Context,
   AuthState,
+  AuthStatus,
+  Schema,
+  SchemaAttribute,
+  SchemaRelationType,
   WorkAdapter,
 } from './context.js';
 

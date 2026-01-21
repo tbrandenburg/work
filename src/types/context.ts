@@ -6,6 +6,32 @@ import { WorkItem, CreateWorkItemRequest, UpdateWorkItemRequest, Relation } from
 
 export type AuthState = 'authenticated' | 'unauthenticated' | 'expired';
 
+export interface AuthStatus {
+  readonly state: AuthState;
+  readonly user?: string | undefined;
+  readonly expiresAt?: Date | undefined;
+}
+
+export interface SchemaAttribute {
+  readonly name: string;
+  readonly type: string;
+  readonly required: boolean;
+  readonly description?: string | undefined;
+}
+
+export interface SchemaRelationType {
+  readonly name: string;
+  readonly description?: string | undefined;
+  readonly allowedFromKinds: readonly string[];
+  readonly allowedToKinds: readonly string[];
+}
+
+export interface Schema {
+  readonly kinds: readonly string[];
+  readonly attributes: readonly SchemaAttribute[];
+  readonly relationTypes: readonly SchemaRelationType[];
+}
+
 export interface Context {
   readonly name: string;
   readonly tool: string;
@@ -65,4 +91,39 @@ export interface WorkAdapter {
    * Delete a work item
    */
   deleteWorkItem(id: string): Promise<void>;
+
+  /**
+   * Authenticate with the backend
+   */
+  authenticate(credentials?: Record<string, string>  ): Promise<AuthStatus>;
+
+  /**
+   * Logout from the backend
+   */
+  logout(): Promise<void>;
+
+  /**
+   * Get current authentication status
+   */
+  getAuthStatus(): Promise<AuthStatus>;
+
+  /**
+   * Get complete schema information
+   */
+  getSchema(): Promise<Schema>;
+
+  /**
+   * Get available work item kinds
+   */
+  getKinds(): Promise<readonly string[]>;
+
+  /**
+   * Get available attributes
+   */
+  getAttributes(): Promise<readonly SchemaAttribute[]>;
+
+  /**
+   * Get available relation types
+   */
+  getRelationTypes(): Promise<readonly SchemaRelationType[]>;
 }
