@@ -577,6 +577,7 @@ After each task: build, functionally test, then run unit tests with coverage ena
 - **GENERATED_FILES**: {How to handle build artifacts in tooling, e.g., "exclude dist/ from linting scope"}
 - **VALIDATE**: `{type-check-cmd} && {build-cmd} && {functional-test-cmd} && {test-with-coverage-cmd}`
 - **FUNCTIONAL**: `{actual-usage-command}` - verify component works
+- **TEST_PYRAMID**: {Add integration test for: ..., and/or Add E2E test for: ..., and/or Add critical user journey test for: ... OR No additional tests needed - {reason}}
 
 ### Task 2: CREATE `src/features/new/models.ts`
 
@@ -588,6 +589,7 @@ After each task: build, functionally test, then run unit tests with coverage ena
 - **GOTCHA**: Use `$inferSelect` for read types, `$inferInsert` for write
 - **CURRENT**: {Reference to verified current Drizzle documentation}
 - **VALIDATE**: `npx tsc --noEmit`
+- **TEST_PYRAMID**: No additional tests needed - type definitions only
 
 ### Task 3: CREATE `src/features/new/schemas.ts`
 
@@ -598,6 +600,7 @@ After each task: build, functionally test, then run unit tests with coverage ena
 - **GOTCHA**: z.record requires two args in v4
 - **CURRENT**: {Reference to verified current Zod v4 documentation}
 - **VALIDATE**: `npx tsc --noEmit`
+- **TEST_PYRAMID**: Add integration test for: schema validation with edge cases and error messages
 
 ### Task 4: CREATE `src/features/new/errors.ts`
 
@@ -607,6 +610,7 @@ After each task: build, functionally test, then run unit tests with coverage ena
 - **PATTERN**: Extend base Error, include code and statusCode
 - **CURRENT**: {Reference to current error handling best practices}
 - **VALIDATE**: `npx tsc --noEmit`
+- **TEST_PYRAMID**: No additional tests needed - simple error class definitions
 
 ### Task 5: CREATE `src/features/new/repository.ts`
 
@@ -617,6 +621,7 @@ After each task: build, functionally test, then run unit tests with coverage ena
 - **GOTCHA**: Use `results[0]` pattern, not `.first()` - check noUncheckedIndexedAccess
 - **CURRENT**: {Reference to current Drizzle query patterns}
 - **VALIDATE**: `npx tsc --noEmit`
+- **TEST_PYRAMID**: Add integration test for: database operations with transaction handling and error scenarios
 
 ### Task 6: CREATE `src/features/new/service.ts`
 
@@ -627,6 +632,7 @@ After each task: build, functionally test, then run unit tests with coverage ena
 - **IMPORTS**: `import { getLogger } from "@/core/logging"`
 - **CURRENT**: {Reference to current service layer best practices}
 - **VALIDATE**: `{type-check-cmd} && {lint-cmd}`
+- **TEST_PYRAMID**: Add E2E test for: complete service workflow with authentication and authorization
 
 ### Task 7: CREATE `{source-dir}/features/new/index.ts`
 
@@ -636,6 +642,7 @@ After each task: build, functionally test, then run unit tests with coverage ena
 - **PATTERN**: Named exports only, hide repository (internal)
 - **VALIDATE**: `{type-check-cmd} && {build-cmd} && {functional-test-cmd} && {test-with-coverage-cmd}`
 - **FUNCTIONAL**: `{actual-usage-command}` - verify component works
+- **TEST_PYRAMID**: No additional tests needed - export file only
 
 ### Task 8: CREATE `{source-dir}/features/new/tests/service.test.ts`
 
@@ -645,6 +652,7 @@ After each task: build, functionally test, then run unit tests with coverage ena
 - **PATTERN**: Use project's test framework (jest, vitest, bun:test, pytest, etc.)
 - **CURRENT**: {Reference to current testing best practices}
 - **VALIDATE**: `{test-cmd} {path-to-tests}`
+- **TEST_PYRAMID**: Add critical user journey test for: end-to-end feature usage covering all major user paths
 
 ---
 
