@@ -33,11 +33,11 @@ jobs:
     - name: Run linting
       run: npm run lint
       
-    - name: Run tests
-      run: npm test -- --coverage
-      
     - name: Build project
       run: npm run build
+      
+    - name: Run tests
+      run: npm test -- --coverage
       
     - name: Upload coverage to Codecov
       if: matrix.node-version == '20.x'
