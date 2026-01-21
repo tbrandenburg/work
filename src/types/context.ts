@@ -60,4 +60,9 @@ export interface WorkAdapter {
    * Delete a relation
    */
   deleteRelation(from: string, to: string, type: Relation['type']): Promise<void>;
+
+  /**
+   * Delete a work item
+   */
+  deleteWorkItem(id: string): Promise<void>;
 }

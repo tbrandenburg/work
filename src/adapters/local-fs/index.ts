@@ -3,6 +3,7 @@
  */
 
 import path from 'path';
+import { promises as fs } from 'fs';
 import { WorkAdapter, Context, WorkItem, CreateWorkItemRequest, UpdateWorkItemRequest, Relation, WorkItemNotFoundError } from '../../types/index.js';
 import { generateId } from './id-generator.js';
 import { saveWorkItem, loadWorkItem, listWorkItems, saveLinks, loadLinks } from './storage.js';
@@ -123,5 +124,21 @@ export class LocalFsAdapter implements WorkAdapter {
     );
     
     await saveLinks(filtered, this.workDir);
+  }
+
+  async deleteWorkItem(id: string): Promise<void> {
+    // First check if work item exists
+    await this.getWorkItem(id); // This will throw WorkItemNotFoundError if not found
+    
+    const filePath = path.join(this.workDir, 'work-items', `${id}.md`);
+    
+    try {
+      await fs.unlink(filePath);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        throw new WorkItemNotFoundError(id);
+      }
+      throw error;
+    }
   }
 }
