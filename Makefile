@@ -69,5 +69,5 @@ check: lint test
 validate: check build validate-cli validate-filesystem
 	@echo "Full validation completed!"
 
-ci: install check build
+ci: install lint build test
 	@echo "CI pipeline completed successfully!"
