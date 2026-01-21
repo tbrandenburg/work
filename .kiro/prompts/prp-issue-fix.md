@@ -156,9 +156,13 @@ git status
 │              STOP
 │
 ├─ ON FEATURE/FIX BRANCH?
-│  └─ Use it (assume it's for this work)
-│     If branch name doesn't contain issue number:
-│       Warn: "Branch '{name}' may not be for issue #{number}"
+│  └─ Q: Does branch relate to this issue?
+│     ├─ YES (branch name contains issue number OR this is an existing PR) → Use it
+│     │        Log: "Using existing branch for this issue"
+│     └─ NO → Ask user:
+│              "Current branch '{name}' may not be for issue #{number}.
+│               Use this branch anyway? (y/N)"
+│              If NO: Switch to main and create new branch
 │
 └─ DIRTY STATE?
    └─ Warn and suggest: git stash or git commit
