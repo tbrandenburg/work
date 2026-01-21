@@ -140,6 +140,7 @@ vite.config.ts.timestamp-*
 
 # Development and temporary files
 dev/
+bin/
 
 # Work CLI data directory
 .work/
