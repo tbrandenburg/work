@@ -172,9 +172,10 @@ export class WorkEngine {
       return adapter.listWorkItems();
     }
 
-    // Parse and execute query
-    const query = parseQuery(queryString);
-    const allItems = await adapter.listWorkItems(query.where);
+    // Parse and execute query - parseQuery expects full query format
+    const fullQuery = `where ${queryString}`;
+    const query = parseQuery(fullQuery);
+    const allItems = await adapter.listWorkItems(); // Get all items, filter in executeQuery
     
     return executeQuery(allItems, query);
   }

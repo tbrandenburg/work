@@ -710,6 +710,13 @@ After each task: build, functionally test, then run unit tests with coverage ena
 
 **EXPECT**: All tests pass, coverage >= {target}% (PoC 20%, MVP 40%, Extensions 60%, OSS 75%, Mature 85%)
 
+**COVERAGE NOTE**: When running isolated tests, use module-specific coverage to avoid global threshold failures:
+```bash
+# For isolated module testing:
+{runner} test -- --coverage --collectCoverageFrom="{module-path}" {path/to/feature/tests}
+# For global coverage validation, run full suite instead (Level 4)
+```
+
 ### Level 4: FULL_SUITE
 
 ```bash
