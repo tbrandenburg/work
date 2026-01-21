@@ -5,6 +5,18 @@ The work CLI is a unified, stateless command-line tool that bridges AI agents an
 
 Considerable effort has been invested in planning and designing this system to ensure robust architecture and clear implementation guidelines.
 
+## Core principles
+
+### Keep it simple
+- Do not over engineer
+- Keep it simple
+- Keep core code and principles well tested
+
+### YAGNI
+- Justify every line of code you write
+
+Keep in mind that we are early in development and we do not have any users yet, so do not be afraid of breaking things. We also do not need complicated backwards compatibility since we are building core primitives first.
+
 ## Project Structure
 ```
 work-cli/
