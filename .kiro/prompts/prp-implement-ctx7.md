@@ -77,14 +77,14 @@ Locate and understand:
 
 ### 1.2.1 Initialize Task Tracking
 
-**CRITICAL**: Use the agent's todo tool to track all tasks and sub-tasks from the plan. This prevents forgetting steps during implementation.
+**CRITICAL**: Use the agent's internal todo tool to track all tasks and sub-tasks from the plan. This prevents forgetting steps during implementation.
 
 1. Extract all main tasks from the plan's "Step-by-Step Tasks" section
 2. For each main task, identify any sub-tasks or validation steps
-3. Add ALL tasks to the todo system with clear descriptions
+3. Add ALL tasks to the internal todo tool with clear descriptions
 4. Mark tasks as complete only after full validation passes
 
-**Example todo initialization:**
+**Example internal todo tracking:**
 ```
 - [ ] Task 1: CREATE src/features/x/models.ts
   - [ ] Read MIRROR pattern from existing models
@@ -99,7 +99,7 @@ Locate and understand:
   - [ ] Verify integration points
 ```
 
-**Never proceed to next task until current task and ALL its sub-tasks are marked complete in the todo system.**
+**Never proceed to next task until current task and ALL its sub-tasks are marked complete in the internal todo tool.**
 
 ### 1.2.5 Plan Currency Verification (Context7 MCP)
 
@@ -132,7 +132,7 @@ Create a plan first: /prp-plan "feature description"
 - [ ] Plan file loaded
 - [ ] Key sections identified
 - [ ] Tasks list extracted
-- [ ] **All tasks and sub-tasks added to todo system**
+- [ ] **All tasks and sub-tasks added to internal todo tool**
 - [ ] **Plan assumptions verified as current**
 - [ ] **Documentation links validated**
 - [ ] **Package versions verified to exist**
@@ -251,12 +251,12 @@ Common type-check patterns:
 
 ### 3.4 Track Progress
 
-**Use the todo system to track each task completion:**
+**Use the internal todo tool to track each task completion:**
 
 1. Mark main task as in-progress when starting
 2. Check off each sub-task as completed and validated
 3. Only mark main task complete when ALL sub-tasks pass validation
-4. Never skip or forget validation steps tracked in todos
+4. Never skip or forget validation steps tracked in internal todos
 
 **Example progress tracking:**
 ```
@@ -281,7 +281,7 @@ If you must deviate from the plan:
 - **Note if deviation was due to current documentation**
 - **Note if deviation was due to package availability**
 - **Note if deviation was due to configuration conflicts**
-- **Update affected todos to reflect the deviation**
+- **Update affected internal todos to reflect the deviation**
 - Continue with the deviation documented
 
 **Configuration Conflict Resolution:**
