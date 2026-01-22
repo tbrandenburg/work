@@ -33,8 +33,9 @@ describe('Auth Status Command Integration', () => {
   it('should show auth status in JSON format', () => {
     const result = execSync(`node ${binPath} auth status --format json`, { encoding: 'utf8' });
     const parsed = JSON.parse(result);
-    expect(parsed.state).toBe('authenticated');
-    expect(parsed.user).toBe('local-user');
+    expect(parsed.data.state).toBe('authenticated');
+    expect(parsed.data.user).toBe('local-user');
+    expect(parsed.meta).toHaveProperty('timestamp');
   });
 
   it('should handle error when getting auth status', () => {

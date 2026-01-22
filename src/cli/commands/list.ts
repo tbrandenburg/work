@@ -1,7 +1,9 @@
-import { Command, Flags, Args } from '@oclif/core';
+import { Flags, Args } from '@oclif/core';
 import { WorkEngine } from '../../core/index.js';
+import { BaseCommand } from '../base-command.js';
+import { formatOutput } from '../formatter.js';
 
-export default class List extends Command {
+export default class List extends BaseCommand {
   static override description = 'List work items';
 
   static override examples = [
@@ -22,15 +24,10 @@ export default class List extends Command {
   };
 
   static override flags = {
+    ...BaseCommand.baseFlags,
     where: Flags.string({
       char: 'w',
       description: 'filter work items (e.g., state=new, kind=task) - deprecated, use positional args',
-    }),
-    format: Flags.string({
-      char: 'f',
-      description: 'output format',
-      options: ['table', 'json'],
-      default: 'table',
     }),
   };
 
@@ -58,8 +55,9 @@ export default class List extends Command {
 
       const workItems = await engine.listWorkItems(whereClause);
 
-      if (flags.format === 'json') {
-        this.log(JSON.stringify(workItems, null, 2));
+      const isJsonMode = await this.getJsonMode();
+      if (isJsonMode) {
+        this.log(formatOutput(workItems, 'json', { total: workItems.length, timestamp: new Date().toISOString() }));
         return;
       }
 

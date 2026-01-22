@@ -38,10 +38,11 @@ describe('Schema Show Command Integration', () => {
   it('should show schema in JSON format', () => {
     const result = execSync(`node ${binPath} schema show --format json`, { encoding: 'utf8' });
     const parsed = JSON.parse(result);
-    expect(parsed.kinds).toContain('task');
-    expect(parsed.kinds).toContain('bug');
-    expect(parsed.attributes).toHaveLength(5);
-    expect(parsed.relationTypes).toHaveLength(4);
+    expect(parsed.data.kinds).toContain('task');
+    expect(parsed.data.kinds).toContain('bug');
+    expect(parsed.data.attributes).toHaveLength(5);
+    expect(parsed.data.relationTypes).toHaveLength(4);
+    expect(parsed.meta).toHaveProperty('timestamp');
   });
 
   it('should handle error when getting schema', () => {

@@ -35,9 +35,10 @@ describe('Schema Relations Command Integration', () => {
   it('should list relations in JSON format', () => {
     const result = execSync(`node ${binPath} schema relations --format json`, { encoding: 'utf8' });
     const parsed = JSON.parse(result);
-    expect(parsed).toHaveLength(4);
-    expect(parsed[0].name).toBe('blocks');
-    expect(parsed[0].allowedFromKinds).toContain('task');
+    expect(parsed.data).toHaveLength(4);
+    expect(parsed.data[0].name).toBe('blocks');
+    expect(parsed.data[0].allowedFromKinds).toContain('task');
+    expect(parsed.meta).toHaveProperty('timestamp');
   });
 
   it('should handle error when getting relations', () => {

@@ -24,7 +24,8 @@ describe('Auth Logout Command Branch Coverage', () => {
     
     // Mock parse to return context argument (triggers if (args.context) branch)
     jest.spyOn(command, 'parse' as any).mockResolvedValue({
-      args: { context: 'test-context' }
+      args: { context: 'test-context' },
+      flags: { format: 'table' }
     });
     
     const logSpy = jest.spyOn(command, 'log').mockImplementation();

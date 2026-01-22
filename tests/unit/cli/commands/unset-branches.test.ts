@@ -31,7 +31,8 @@ describe('Unset Command Branch Coverage', () => {
     const command = new Unset([], {} as any);
     
     jest.spyOn(command, 'parse' as any).mockResolvedValue({
-      args: { id: 'TASK-001', field: 'assignee' }
+      args: { id: 'TASK-001', field: 'assignee' },
+      flags: { format: 'table' }
     });
     
     const logSpy = jest.spyOn(command, 'log').mockImplementation();
@@ -62,7 +63,8 @@ describe('Unset Command Branch Coverage', () => {
     const command = new Unset([], {} as any);
     
     jest.spyOn(command, 'parse' as any).mockResolvedValue({
-      args: { id: 'TASK-001', field: 'description' }
+      args: { id: 'TASK-001', field: 'description' },
+      flags: { format: 'table' }
     });
     
     const logSpy = jest.spyOn(command, 'log').mockImplementation();

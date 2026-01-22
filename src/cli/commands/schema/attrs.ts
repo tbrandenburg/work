@@ -1,7 +1,9 @@
-import { Args, Command, Flags } from '@oclif/core';
+import { Args } from '@oclif/core';
 import { WorkEngine } from '../../../core/index.js';
+import { BaseCommand } from '../../base-command.js';
+import { formatOutput } from '../../formatter.js';
 
-export default class SchemaAttrs extends Command {
+export default class SchemaAttrs extends BaseCommand {
   static override args = {
     context: Args.string({ 
       description: 'context name to list attributes (defaults to active context)',
@@ -18,16 +20,11 @@ export default class SchemaAttrs extends Command {
   ];
 
   static override flags = {
-    format: Flags.string({
-      char: 'f',
-      description: 'output format',
-      options: ['table', 'json'],
-      default: 'table',
-    }),
+    ...BaseCommand.baseFlags,
   };
 
   public async run(): Promise<void> {
-    const { args, flags } = await this.parse(SchemaAttrs);
+    const { args } = await this.parse(SchemaAttrs);
 
     const engine = new WorkEngine();
     
@@ -38,8 +35,9 @@ export default class SchemaAttrs extends Command {
 
       const attributes = await engine.getAttributes();
 
-      if (flags.format === 'json') {
-        this.log(JSON.stringify(attributes, null, 2));
+      const isJsonMode = await this.getJsonMode();
+      if (isJsonMode) {
+        this.log(formatOutput(attributes, 'json', { timestamp: new Date().toISOString() }));
         return;
       }
 
@@ -52,7 +50,7 @@ export default class SchemaAttrs extends Command {
         this.log(`  • ${attr.name}: ${attr.type}${required}${desc}`);
       });
     } catch (error) {
-      this.error(`Failed to get attributes: ${(error as Error).message}`);
+      this.handleError(`Failed to get attributes: ${(error as Error).message}`);
     }
   }
 }

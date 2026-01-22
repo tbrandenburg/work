@@ -1,7 +1,9 @@
-import { Args, Command } from '@oclif/core';
+import { Args } from '@oclif/core';
 import { WorkEngine } from '../../core/index.js';
+import { BaseCommand } from '../base-command.js';
+import { formatOutput } from '../formatter.js';
 
-export default class Start extends Command {
+export default class Start extends BaseCommand {
   static override args = {
     id: Args.string({ 
       description: 'work item ID to start',
@@ -16,6 +18,10 @@ export default class Start extends Command {
     '<%= config.bin %> <%= command.id %> BUG-042',
   ];
 
+  static override flags = {
+    ...BaseCommand.baseFlags,
+  };
+
   public async run(): Promise<void> {
     const { args } = await this.parse(Start);
 
@@ -23,7 +29,13 @@ export default class Start extends Command {
     
     try {
       const workItem = await engine.changeState(args.id, 'active');
-      this.log(`Started ${workItem.kind} ${workItem.id}: ${workItem.title}`);
+      
+      const isJsonMode = await this.getJsonMode();
+      if (isJsonMode) {
+        this.log(formatOutput(workItem, 'json', { timestamp: new Date().toISOString() }));
+      } else {
+        this.log(`Started ${workItem.kind} ${workItem.id}: ${workItem.title}`);
+      }
     } catch (error) {
       this.error(`Failed to start work item: ${(error as Error).message}`);
     }

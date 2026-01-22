@@ -60,16 +60,16 @@ describe('Auth and Schema E2E Workflow', () => {
     // Auth status JSON
     const authJson = execSync(`node ${binPath} auth status --format json`, { encoding: 'utf8' });
     const authData = JSON.parse(authJson);
-    expect(authData.state).toBe('authenticated');
+    expect(authData.data.state).toBe('authenticated');
 
     // Schema JSON
     const schemaJson = execSync(`node ${binPath} schema show --format json`, { encoding: 'utf8' });
     const schemaData = JSON.parse(schemaJson);
-    expect(schemaData.kinds).toContain('task');
+    expect(schemaData.data.kinds).toContain('task');
 
     // Kinds JSON
     const kindsJson = execSync(`node ${binPath} schema kinds --format json`, { encoding: 'utf8' });
     const kindsData = JSON.parse(kindsJson);
-    expect(kindsData).toContain('task');
+    expect(kindsData.data).toContain('task');
   });
 });

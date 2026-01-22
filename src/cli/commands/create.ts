@@ -1,8 +1,10 @@
-import { Args, Command, Flags } from '@oclif/core';
+import { Args, Flags } from '@oclif/core';
 import { WorkEngine } from '../../core/index.js';
 import { WorkItemKind, Priority } from '../../types/index.js';
+import { BaseCommand } from '../base-command.js';
+import { formatOutput } from '../formatter.js';
 
-export default class Create extends Command {
+export default class Create extends BaseCommand {
   static override args = {
     title: Args.string({ 
       description: 'title of the work item',
@@ -18,6 +20,7 @@ export default class Create extends Command {
   ];
 
   static override flags = {
+    ...BaseCommand.baseFlags,
     kind: Flags.string({
       char: 'k',
       description: 'kind of work item',
@@ -61,9 +64,14 @@ export default class Create extends Command {
         labels,
       });
 
-      this.log(`Created ${workItem.kind} ${workItem.id}: ${workItem.title}`);
+      const isJsonMode = await this.getJsonMode();
+      if (isJsonMode) {
+        this.log(formatOutput(workItem, 'json', { timestamp: new Date().toISOString() }));
+      } else {
+        this.log(`Created ${workItem.kind} ${workItem.id}: ${workItem.title}`);
+      }
     } catch (error) {
-      this.error(`Failed to create work item: ${(error as Error).message}`);
+      this.handleError(`Failed to create work item: ${(error as Error).message}`);
     }
   }
 }

@@ -32,7 +32,7 @@ describe('Context Show Branch Coverage', () => {
     });
 
     await expect(command.run()).rejects.toThrow('No active context');
-    expect(errorSpy).toHaveBeenCalledWith('No active context found. Use "work context set <name>" to set one.');
+    expect(errorSpy).toHaveBeenCalledWith('No active context found. Use "work context set <name>" to set one.', { exit: 1 });
   });
 
   it('should trigger active-context-found branch', async () => {
@@ -80,6 +80,6 @@ describe('Context Show Branch Coverage', () => {
     });
 
     await expect(command.run()).rejects.toThrow('Context not found');
-    expect(errorSpy).toHaveBeenCalledWith("Context 'nonexistent' not found");
+    expect(errorSpy).toHaveBeenCalledWith("Context 'nonexistent' not found", { exit: 1 });
   });
 });
