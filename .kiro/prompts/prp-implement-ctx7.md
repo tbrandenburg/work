@@ -23,6 +23,15 @@ Execute the plan end-to-end with rigorous self-validation and real-time verifica
 
 ---
 
+## Phase -1: TASK LEDGER INITIALIZATION
+
+Before starting any task:
+- Load task-ledger.json
+- Restate which task IDs are NOT done
+- Select exactly ONE task to work on
+
+---
+
 ## Phase 0: DETECT - Project Environment
 
 ### 0.1 Identify Package Manager
@@ -50,6 +59,21 @@ Check `package.json` (or equivalent) for available scripts:
 - Building: `build`, `compile`
 
 **Use the plan's "Validation Commands" section** - it should specify exact commands for this project.
+
+---
+
+🚨 HARD GATE — DO NOT PROCEED 🚨
+
+If ANY item below is false, STOP immediately:
+- A written artifact exists enumerating ALL remaining tasks by ID
+- Each task has PASS/FAIL status backed by executed evidence
+- No task is marked DONE unless its original failing repro now passes
+- No global claims are made from partial or sampled tool output
+
+If stopping:
+- Explicitly state which condition failed
+- Do NOT summarize
+- Do NOT continue to the next phase
 
 ---
 
@@ -202,6 +226,21 @@ Quick web search for:
 
 ---
 
+🚨 HARD GATE — DO NOT PROCEED 🚨
+
+If ANY item below is false, STOP immediately:
+- A written artifact exists enumerating ALL remaining tasks by ID
+- Each task has PASS/FAIL status backed by executed evidence
+- No task is marked DONE unless its original failing repro now passes
+- No global claims are made from partial or sampled tool output
+
+If stopping:
+- Explicitly state which condition failed
+- Do NOT summarize
+- Do NOT continue to the next phase
+
+---
+
 ## Phase 3: EXECUTE - Implement Tasks
 
 **For each task in the plan's Step-by-Step Tasks section:**
@@ -333,6 +372,21 @@ Check for:
 - [ ] API signatures verified against live docs
 - [ ] No security vulnerabilities detected
 - [ ] Implementation aligns with current community best practices
+
+---
+
+🚨 HARD GATE — DO NOT PROCEED 🚨
+
+If ANY item below is false, STOP immediately:
+- A written artifact exists enumerating ALL remaining tasks by ID
+- Each task has PASS/FAIL status backed by executed evidence
+- No task is marked DONE unless its original failing repro now passes
+- No global claims are made from partial or sampled tool output
+
+If stopping:
+- Explicitly state which condition failed
+- Do NOT summarize
+- Do NOT continue to the next phase
 
 ---
 
