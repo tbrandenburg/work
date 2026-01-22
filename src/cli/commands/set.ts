@@ -1,8 +1,10 @@
-import { Args, Command, Flags } from '@oclif/core';
+import { Args, Flags } from '@oclif/core';
 import { WorkEngine } from '../../core/engine.js';
 import { Priority } from '../../types/work-item.js';
+import { BaseCommand } from '../base-command.js';
+import { formatOutput } from '../formatter.js';
 
-export default class Set extends Command {
+export default class Set extends BaseCommand {
   static override args = {
     id: Args.string({ description: 'work item ID to update', required: true }),
   };
@@ -16,6 +18,7 @@ export default class Set extends Command {
   ];
 
   static override flags = {
+    ...BaseCommand.baseFlags,
     context: Flags.string({
       char: 'c',
       description: 'context to use',
@@ -64,12 +67,17 @@ export default class Set extends Command {
 
       const workItem = await engine.updateWorkItem(args.id, updateRequest);
       
-      this.log(`Updated work item ${workItem.id}`);
-      this.log(`Title: ${workItem.title}`);
-      this.log(`State: ${workItem.state}`);
-      this.log(`Priority: ${workItem.priority}`);
-      if (workItem.assignee) this.log(`Assignee: ${workItem.assignee}`);
-      if (workItem.labels.length > 0) this.log(`Labels: ${workItem.labels.join(', ')}`);
+      const isJsonMode = await this.getJsonMode();
+      if (isJsonMode) {
+        this.log(formatOutput(workItem, 'json', { timestamp: new Date().toISOString() }));
+      } else {
+        this.log(`Updated work item ${workItem.id}`);
+        this.log(`Title: ${workItem.title}`);
+        this.log(`State: ${workItem.state}`);
+        this.log(`Priority: ${workItem.priority}`);
+        if (workItem.assignee) this.log(`Assignee: ${workItem.assignee}`);
+        if (workItem.labels.length > 0) this.log(`Labels: ${workItem.labels.join(', ')}`);
+      }
     } catch (error) {
       this.error(error instanceof Error ? error.message : String(error));
     }

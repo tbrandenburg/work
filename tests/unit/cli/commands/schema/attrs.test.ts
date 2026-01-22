@@ -34,9 +34,10 @@ describe('Schema Attrs Command Integration', () => {
   it('should list attributes in JSON format', () => {
     const result = execSync(`node ${binPath} schema attrs --format json`, { encoding: 'utf8' });
     const parsed = JSON.parse(result);
-    expect(parsed).toHaveLength(5);
-    expect(parsed[0].name).toBe('title');
-    expect(parsed[0].required).toBe(true);
+    expect(parsed.data).toHaveLength(5);
+    expect(parsed.data[0].name).toBe('title');
+    expect(parsed.data[0].required).toBe(true);
+    expect(parsed.meta).toHaveProperty('timestamp');
   });
 
   it('should handle error when getting attributes', () => {

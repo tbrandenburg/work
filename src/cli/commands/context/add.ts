@@ -1,8 +1,10 @@
-import { Args, Command, Flags } from '@oclif/core';
+import { Args, Flags } from '@oclif/core';
 import { WorkEngine } from '../../../core/index.js';
 import { Context } from '../../../types/index.js';
+import { BaseCommand } from '../../base-command.js';
+import { formatOutput } from '../../formatter.js';
 
-export default class ContextAdd extends Command {
+export default class ContextAdd extends BaseCommand {
   static override args = {
     name: Args.string({ 
       description: 'context name',
@@ -18,6 +20,7 @@ export default class ContextAdd extends Command {
   ];
 
   static override flags = {
+    ...BaseCommand.baseFlags,
     tool: Flags.string({
       char: 't',
       description: 'backend tool',
@@ -54,9 +57,20 @@ export default class ContextAdd extends Command {
       };
 
       await engine.addContext(context);
-      this.log(`Added context '${args.name}' using ${flags.tool}`);
+      
+      const result = {
+        message: `Added context '${args.name}' using ${flags.tool}`,
+        context: context
+      };
+      
+      const isJsonMode = await this.getJsonMode();
+      if (isJsonMode) {
+        this.log(formatOutput(result, 'json', { timestamp: new Date().toISOString() }));
+      } else {
+        this.log(`Added context '${args.name}' using ${flags.tool}`);
+      }
     } catch (error) {
-      this.error(`Failed to add context: ${(error as Error).message}`);
+      this.handleError(`Failed to add context: ${(error as Error).message}`);
     }
   }
 }

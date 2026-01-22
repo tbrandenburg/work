@@ -1,6 +1,8 @@
-import { Args, Command, Flags } from '@oclif/core';
+import { Args, Flags } from '@oclif/core';
+import { BaseCommand } from '../base-command.js';
+import { formatOutput } from '../formatter.js';
 
-export default class Hello extends Command {
+export default class Hello extends BaseCommand {
   static override args = {
     person: Args.string({ description: 'person to say hello to' }),
   };
@@ -13,6 +15,7 @@ export default class Hello extends Command {
   ];
 
   static override flags = {
+    ...BaseCommand.baseFlags,
     from: Flags.string({
       char: 'f',
       description: 'whom is saying hello',
@@ -23,8 +26,13 @@ export default class Hello extends Command {
   public async run(): Promise<void> {
     const { args, flags } = await this.parse(Hello);
 
-    this.log(
-      `hello ${args.person ?? 'World'} from ${flags.from}! (./src/commands/hello.ts)`
-    );
+    const message = `hello ${args.person ?? 'World'} from ${flags.from}! (./src/commands/hello.ts)`;
+    
+    const isJsonMode = await this.getJsonMode();
+    if (isJsonMode) {
+      this.log(formatOutput({ message, person: args.person ?? 'World', from: flags.from }, 'json', { timestamp: new Date().toISOString() }));
+    } else {
+      this.log(message);
+    }
   }
 }

@@ -1,7 +1,9 @@
-import { Args, Command, Flags } from '@oclif/core';
+import { Args } from '@oclif/core';
 import { WorkEngine } from '../../../core/index.js';
+import { BaseCommand } from '../../base-command.js';
+import { formatOutput } from '../../formatter.js';
 
-export default class SchemaRelations extends Command {
+export default class SchemaRelations extends BaseCommand {
   static override args = {
     context: Args.string({ 
       description: 'context name to list relations (defaults to active context)',
@@ -18,16 +20,11 @@ export default class SchemaRelations extends Command {
   ];
 
   static override flags = {
-    format: Flags.string({
-      char: 'f',
-      description: 'output format',
-      options: ['table', 'json'],
-      default: 'table',
-    }),
+    ...BaseCommand.baseFlags,
   };
 
   public async run(): Promise<void> {
-    const { args, flags } = await this.parse(SchemaRelations);
+    const { args } = await this.parse(SchemaRelations);
 
     const engine = new WorkEngine();
     
@@ -38,8 +35,9 @@ export default class SchemaRelations extends Command {
 
       const relationTypes = await engine.getRelationTypes();
 
-      if (flags.format === 'json') {
-        this.log(JSON.stringify(relationTypes, null, 2));
+      const isJsonMode = await this.getJsonMode();
+      if (isJsonMode) {
+        this.log(formatOutput(relationTypes, 'json', { timestamp: new Date().toISOString() }));
         return;
       }
 
@@ -53,7 +51,7 @@ export default class SchemaRelations extends Command {
         this.log(`    To: ${rel.allowedToKinds.join(', ')}`);
       });
     } catch (error) {
-      this.error(`Failed to get relation types: ${(error as Error).message}`);
+      this.handleError(`Failed to get relation types: ${(error as Error).message}`);
     }
   }
 }

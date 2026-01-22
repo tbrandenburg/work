@@ -1,7 +1,9 @@
-import { Args, Command } from '@oclif/core';
+import { Args } from '@oclif/core';
 import { WorkEngine } from '../../core/engine.js';
+import { BaseCommand } from '../base-command.js';
+import { formatOutput } from '../formatter.js';
 
-export default class Comment extends Command {
+export default class Comment extends BaseCommand {
   static override args = {
     id: Args.string({ description: 'work item ID', required: true }),
     text: Args.string({ description: 'comment text', required: true }),
@@ -14,6 +16,10 @@ export default class Comment extends Command {
     '<%= config.bin %> <%= command.id %> BUG-042 "Fixed in latest build"',
   ];
 
+  static override flags = {
+    ...BaseCommand.baseFlags,
+  };
+
   public async run(): Promise<void> {
     const { args } = await this.parse(Comment);
 
@@ -23,10 +29,20 @@ export default class Comment extends Command {
       // For MVP, this is a placeholder implementation
       engine.addComment(args.id, args.text);
       
-      this.log(`Comment operation not yet implemented`);
-      this.log(`Would add comment to ${args.id}: "${args.text}"`);
+      const result = {
+        message: `Comment added to ${args.id}`,
+        comment: args.text,
+        workItemId: args.id
+      };
+      
+      const isJsonMode = await this.getJsonMode();
+      if (isJsonMode) {
+        this.log(formatOutput(result, 'json', { timestamp: new Date().toISOString() }));
+      } else {
+        this.log(`Comment added to ${args.id}: "${args.text}"`);
+      }
     } catch (error) {
-      this.error(`Failed to add comment: ${(error as Error).message}`);
+      this.handleError(`Failed to add comment: ${(error as Error).message}`);
     }
   }
 }

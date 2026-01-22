@@ -1,8 +1,10 @@
-import { Args, Command, Flags } from '@oclif/core';
+import { Args, Flags } from '@oclif/core';
 import { WorkEngine } from '../../core/engine.js';
 import { Priority } from '../../types/work-item.js';
+import { BaseCommand } from '../base-command.js';
+import { formatOutput } from '../formatter.js';
 
-export default class Edit extends Command {
+export default class Edit extends BaseCommand {
   static override args = {
     id: Args.string({ description: 'work item ID to edit', required: true }),
   };
@@ -16,6 +18,7 @@ export default class Edit extends Command {
   ];
 
   static override flags = {
+    ...BaseCommand.baseFlags,
     title: Flags.string({
       description: 'update work item title',
     }),
@@ -56,11 +59,16 @@ export default class Edit extends Command {
 
       const workItem = await engine.updateWorkItem(args.id, updateRequest);
       
-      this.log(`Edited ${workItem.kind} ${workItem.id}: ${workItem.title}`);
-      this.log(`State: ${workItem.state}`);
-      this.log(`Priority: ${workItem.priority}`);
-      if (workItem.assignee) this.log(`Assignee: ${workItem.assignee}`);
-      if (workItem.description) this.log(`Description: ${workItem.description}`);
+      const isJsonMode = await this.getJsonMode();
+      if (isJsonMode) {
+        this.log(formatOutput(workItem, 'json', { timestamp: new Date().toISOString() }));
+      } else {
+        this.log(`Edited ${workItem.kind} ${workItem.id}: ${workItem.title}`);
+        this.log(`State: ${workItem.state}`);
+        this.log(`Priority: ${workItem.priority}`);
+        if (workItem.assignee) this.log(`Assignee: ${workItem.assignee}`);
+        if (workItem.description) this.log(`Description: ${workItem.description}`);
+      }
     } catch (error) {
       this.error(`Failed to edit work item: ${(error as Error).message}`);
     }

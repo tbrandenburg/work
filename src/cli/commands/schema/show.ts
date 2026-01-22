@@ -1,7 +1,9 @@
-import { Args, Command, Flags } from '@oclif/core';
+import { Args } from '@oclif/core';
 import { WorkEngine } from '../../../core/index.js';
+import { BaseCommand } from '../../base-command.js';
+import { formatOutput } from '../../formatter.js';
 
-export default class SchemaShow extends Command {
+export default class SchemaShow extends BaseCommand {
   static override args = {
     context: Args.string({ 
       description: 'context name to show schema (defaults to active context)',
@@ -18,12 +20,7 @@ export default class SchemaShow extends Command {
   ];
 
   static override flags = {
-    format: Flags.string({
-      char: 'f',
-      description: 'output format',
-      options: ['table', 'json'],
-      default: 'table',
-    }),
+    ...BaseCommand.baseFlags,
   };
 
   public async run(): Promise<void> {
@@ -39,7 +36,7 @@ export default class SchemaShow extends Command {
       const schema = await engine.getSchema();
 
       if (flags.format === 'json') {
-        this.log(JSON.stringify(schema, null, 2));
+        this.log(formatOutput(schema, flags.format, { timestamp: new Date().toISOString() }));
         return;
       }
 

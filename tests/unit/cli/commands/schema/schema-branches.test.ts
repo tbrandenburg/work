@@ -54,7 +54,15 @@ describe('Schema Commands Branch Coverage', () => {
 
       await command.run();
 
-      expect(logSpy).toHaveBeenCalledWith(JSON.stringify(mockKinds, null, 2));
+      expect(logSpy).toHaveBeenCalledTimes(1);
+      const logCall = logSpy.mock.calls[0]?.[0];
+      expect(logCall).toBeDefined();
+      const parsed = JSON.parse(logCall as string);
+      expect(parsed).toHaveProperty('data');
+      expect(parsed.data).toContain('task');
+      expect(parsed.data).toContain('bug');
+      expect(parsed).toHaveProperty('meta');
+      expect(parsed.meta).toHaveProperty('timestamp');
     });
 
     it('should trigger error handling branch', async () => {
@@ -114,7 +122,15 @@ describe('Schema Commands Branch Coverage', () => {
 
       await command.run();
 
-      expect(logSpy).toHaveBeenCalledWith(JSON.stringify(mockAttrs, null, 2));
+      expect(logSpy).toHaveBeenCalledTimes(1);
+      const logCall = logSpy.mock.calls[0]?.[0];
+      expect(logCall).toBeDefined();
+      const parsed = JSON.parse(logCall as string);
+      expect(parsed).toHaveProperty('data');
+      expect(parsed.data).toHaveLength(1);
+      expect(parsed.data[0].name).toBe('title');
+      expect(parsed).toHaveProperty('meta');
+      expect(parsed.meta).toHaveProperty('timestamp');
     });
 
     it('should trigger error handling branch', async () => {
@@ -174,7 +190,15 @@ describe('Schema Commands Branch Coverage', () => {
 
       await command.run();
 
-      expect(logSpy).toHaveBeenCalledWith(JSON.stringify(mockRelations, null, 2));
+      expect(logSpy).toHaveBeenCalledTimes(1);
+      const logCall = logSpy.mock.calls[0]?.[0];
+      expect(logCall).toBeDefined();
+      const parsed = JSON.parse(logCall as string);
+      expect(parsed).toHaveProperty('data');
+      expect(parsed.data).toHaveLength(1);
+      expect(parsed.data[0].name).toBe('blocks');
+      expect(parsed).toHaveProperty('meta');
+      expect(parsed.meta).toHaveProperty('timestamp');
     });
 
     it('should trigger error handling branch', async () => {

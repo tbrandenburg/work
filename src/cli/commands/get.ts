@@ -1,7 +1,9 @@
-import { Args, Command, Flags } from '@oclif/core';
+import { Args } from '@oclif/core';
 import { WorkEngine } from '../../core/index.js';
+import { BaseCommand } from '../base-command.js';
+import { formatOutput } from '../formatter.js';
 
-export default class Get extends Command {
+export default class Get extends BaseCommand {
   static override args = {
     id: Args.string({ 
       description: 'work item ID to retrieve',
@@ -17,12 +19,7 @@ export default class Get extends Command {
   ];
 
   static override flags = {
-    format: Flags.string({
-      char: 'f',
-      description: 'output format',
-      options: ['table', 'json'],
-      default: 'table',
-    }),
+    ...BaseCommand.baseFlags,
   };
 
   public async run(): Promise<void> {
@@ -34,7 +31,7 @@ export default class Get extends Command {
       const workItem = await engine.getWorkItem(args.id);
 
       if (flags.format === 'json') {
-        this.log(JSON.stringify(workItem, null, 2));
+        this.log(formatOutput(workItem, flags.format, { timestamp: new Date().toISOString() }));
         return;
       }
 
@@ -55,7 +52,7 @@ export default class Get extends Command {
         this.log(`\nDescription:\n${workItem.description}`);
       }
     } catch (error) {
-      this.error(`Failed to get work item: ${(error as Error).message}`);
+      this.handleError(`Failed to get work item: ${(error as Error).message}`);
     }
   }
 }

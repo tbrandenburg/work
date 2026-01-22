@@ -1,7 +1,9 @@
-import { Args, Command, Flags } from '@oclif/core';
+import { Args } from '@oclif/core';
 import { WorkEngine } from '../../../core/index.js';
+import { BaseCommand } from '../../base-command.js';
+import { formatOutput } from '../../formatter.js';
 
-export default class SchemaKinds extends Command {
+export default class SchemaKinds extends BaseCommand {
   static override args = {
     context: Args.string({ 
       description: 'context name to list kinds (defaults to active context)',
@@ -18,16 +20,11 @@ export default class SchemaKinds extends Command {
   ];
 
   static override flags = {
-    format: Flags.string({
-      char: 'f',
-      description: 'output format',
-      options: ['table', 'json'],
-      default: 'table',
-    }),
+    ...BaseCommand.baseFlags,
   };
 
   public async run(): Promise<void> {
-    const { args, flags } = await this.parse(SchemaKinds);
+    const { args } = await this.parse(SchemaKinds);
 
     const engine = new WorkEngine();
     
@@ -38,8 +35,9 @@ export default class SchemaKinds extends Command {
 
       const kinds = await engine.getKinds();
 
-      if (flags.format === 'json') {
-        this.log(JSON.stringify(kinds, null, 2));
+      const isJsonMode = await this.getJsonMode();
+      if (isJsonMode) {
+        this.log(formatOutput(kinds, 'json', { timestamp: new Date().toISOString() }));
         return;
       }
 
@@ -48,7 +46,7 @@ export default class SchemaKinds extends Command {
       this.log('─'.repeat(40));
       kinds.forEach(kind => this.log(`  • ${kind}`));
     } catch (error) {
-      this.error(`Failed to get kinds: ${(error as Error).message}`);
+      this.handleError(`Failed to get kinds: ${(error as Error).message}`);
     }
   }
 }

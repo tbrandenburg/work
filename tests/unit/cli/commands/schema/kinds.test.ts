@@ -35,10 +35,11 @@ describe('Schema Kinds Command Integration', () => {
   it('should list kinds in JSON format', () => {
     const result = execSync(`node ${binPath} schema kinds --format json`, { encoding: 'utf8' });
     const parsed = JSON.parse(result);
-    expect(parsed).toContain('task');
-    expect(parsed).toContain('bug');
-    expect(parsed).toContain('feature');
-    expect(parsed).toContain('epic');
+    expect(parsed.data).toContain('task');
+    expect(parsed.data).toContain('bug');
+    expect(parsed.data).toContain('feature');
+    expect(parsed.data).toContain('epic');
+    expect(parsed.meta).toHaveProperty('timestamp');
   });
 
   it('should handle error when getting kinds', () => {

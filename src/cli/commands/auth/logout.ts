@@ -1,7 +1,9 @@
-import { Args, Command } from '@oclif/core';
+import { Args } from '@oclif/core';
 import { WorkEngine } from '../../../core/index.js';
+import { BaseCommand } from '../../base-command.js';
+import { formatOutput } from '../../formatter.js';
 
-export default class AuthLogout extends Command {
+export default class AuthLogout extends BaseCommand {
   static override args = {
     context: Args.string({ 
       description: 'context name to logout from (defaults to active context)',
@@ -16,6 +18,10 @@ export default class AuthLogout extends Command {
     '<%= config.bin %> auth <%= command.id %> my-project',
   ];
 
+  static override flags = {
+    ...BaseCommand.baseFlags,
+  };
+
   public async run(): Promise<void> {
     const { args } = await this.parse(AuthLogout);
 
@@ -28,7 +34,12 @@ export default class AuthLogout extends Command {
 
       await engine.logout();
       
-      this.log(`✅ Logout successful`);
+      const isJsonMode = await this.getJsonMode();
+      if (isJsonMode) {
+        this.log(formatOutput({ success: true, message: 'Logout successful' }, 'json', { timestamp: new Date().toISOString() }));
+      } else {
+        this.log(`✅ Logout successful`);
+      }
     } catch (error) {
       this.error(`Failed to logout: ${(error as Error).message}`);
     }

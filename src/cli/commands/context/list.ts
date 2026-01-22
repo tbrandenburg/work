@@ -1,7 +1,8 @@
-import { Command, Flags } from '@oclif/core';
 import { WorkEngine } from '../../../core/index.js';
+import { BaseCommand } from '../../base-command.js';
+import { formatOutput } from '../../formatter.js';
 
-export default class ContextList extends Command {
+export default class ContextList extends BaseCommand {
   static override description = 'List all contexts';
 
   static override examples = [
@@ -10,12 +11,7 @@ export default class ContextList extends Command {
   ];
 
   static override flags = {
-    format: Flags.string({
-      char: 'f',
-      description: 'output format',
-      options: ['table', 'json'],
-      default: 'table',
-    }),
+    ...BaseCommand.baseFlags,
   };
 
   public async run(): Promise<void> {
@@ -27,7 +23,10 @@ export default class ContextList extends Command {
       const contexts = engine.getContexts();
 
       if (flags.format === 'json') {
-        this.log(JSON.stringify(contexts, null, 2));
+        this.log(formatOutput(contexts, flags.format, { 
+          total: contexts.length,
+          timestamp: new Date().toISOString() 
+        }));
         return;
       }
 

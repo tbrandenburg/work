@@ -64,7 +64,16 @@ describe('Schema Show Command Branch Coverage', () => {
 
     await command.run();
 
-    expect(logSpy).toHaveBeenCalledWith(JSON.stringify(mockSchema, null, 2));
+    expect(logSpy).toHaveBeenCalledTimes(1);
+    const logCall = logSpy.mock.calls[0]?.[0];
+    expect(logCall).toBeDefined();
+    const parsed = JSON.parse(logCall as string);
+    expect(parsed).toHaveProperty('data');
+    expect(parsed.data).toHaveProperty('kinds');
+    expect(parsed.data.kinds).toContain('task');
+    expect(parsed.data.kinds).toContain('bug');
+    expect(parsed).toHaveProperty('meta');
+    expect(parsed.meta).toHaveProperty('timestamp');
   });
 
   it('should trigger error handling branch', async () => {

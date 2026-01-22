@@ -1,7 +1,9 @@
-import { Args, Command } from '@oclif/core';
+import { Args } from '@oclif/core';
 import { WorkEngine } from '../../core/engine.js';
+import { BaseCommand } from '../base-command.js';
+import { formatOutput } from '../formatter.js';
 
-export default class Delete extends Command {
+export default class Delete extends BaseCommand {
   static override args = {
     id: Args.string({ description: 'work item ID to delete', required: true }),
   };
@@ -13,6 +15,10 @@ export default class Delete extends Command {
     '<%= config.bin %> <%= command.id %> BUG-042',
   ];
 
+  static override flags = {
+    ...BaseCommand.baseFlags,
+  };
+
   public async run(): Promise<void> {
     const { args } = await this.parse(Delete);
 
@@ -21,9 +27,19 @@ export default class Delete extends Command {
 
       await engine.deleteWorkItem(args.id);
       
-      this.log(`Deleted work item ${args.id}`);
+      const result = {
+        message: `Deleted work item ${args.id}`,
+        workItemId: args.id
+      };
+      
+      const isJsonMode = await this.getJsonMode();
+      if (isJsonMode) {
+        this.log(formatOutput(result, 'json', { timestamp: new Date().toISOString() }));
+      } else {
+        this.log(`Deleted work item ${args.id}`);
+      }
     } catch (error) {
-      this.error(`Failed to delete work item: ${(error as Error).message}`);
+      this.handleError(`Failed to delete work item: ${(error as Error).message}`);
     }
   }
 }

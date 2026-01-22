@@ -62,7 +62,10 @@ describe('Auth Status Command Branch Coverage', () => {
 
     await command.run();
 
-    expect(logSpy).toHaveBeenCalledWith(JSON.stringify(mockAuthStatus, null, 2));
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('"state": "authenticated"'));
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('"user": "test-user"'));
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('"data":'));
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('"meta":'));
   });
 
   it('should trigger expiresAt branch', async () => {
@@ -106,6 +109,7 @@ describe('Auth Status Command Branch Coverage', () => {
     });
 
     await expect(command.run()).rejects.toThrow('Failed to get auth status: Status failed');
-    expect(errorSpy).toHaveBeenCalledWith('Failed to get auth status: Status failed');
+    // The error method is called with additional options now
+    expect(errorSpy).toHaveBeenCalledWith('Failed to get auth status: Status failed', expect.any(Object));
   });
 });
