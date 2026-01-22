@@ -1,5 +1,11 @@
 # work CLI - Agent Guidelines
 
+You are not rewarded for progress.
+You are rewarded for correctness under adversarial scrutiny.
+
+Assume earlier conclusions are wrong
+until re‑proven with fresh evidence.
+
 ## Project Overview
 The work CLI is a unified, stateless command-line tool that bridges AI agents and task management systems (Jira, GitHub, Linear, Azure DevOps, local filesystem). It provides a consistent interface for managing work items across multiple backends without vendor lock-in.
 
@@ -68,6 +74,28 @@ All other files must be organized into appropriate subdirectories.
 - No silent failures - always handle or propagate errors
 - Follow Prettier formatting (auto-applied)
 - Use meaningful variable and function names
+
+### Language Constraints
+FORBIDDEN WITHOUT EXHAUSTIVE PROOF:
+- "most"
+- "all"
+- "nearly"
+- "already"
+- "looks complete"
+
+To use these words, you MUST:
+- show a complete enumeration
+- show total count
+- show zero unknowns
+
+### Tool Completeness Rule
+TOOL COMPLETENESS RULE:
+Any tool with limits (max_files, pagination, sampling)
+MUST be looped until exhaustion.
+
+If exhaustion is impossible:
+- Declare the result INCOMPLETE
+- Do NOT draw conclusions
 
 ### Testing Requirements
 - Write tests following 70/20/10 pyramid (unit/integration/e2e)
