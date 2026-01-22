@@ -52,6 +52,8 @@ Keep the root directory clean. Only these files are allowed:
 
 All other files must be organized into appropriate subdirectories.
 
+**Temporary Development Files**: Place todos, notes, scratch files, and other development artifacts in `dev/` (gitignored). This keeps the root clean while preserving work-in-progress materials.
+
 ## Code Quality Standards
 
 ### TypeScript Standards
