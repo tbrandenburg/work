@@ -5,6 +5,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { WorkItemKind } from '../../types/index.js';
+import { ensureWorkDir } from './storage.js';
 
 const ID_COUNTER_FILE = 'id-counter.json';
 
@@ -23,6 +24,9 @@ const DEFAULT_COUNTERS: IdCounters = {
 };
 
 export async function generateId(kind: WorkItemKind, workDir: string): Promise<string> {
+  // Ensure the work directory exists before any file operations
+  await ensureWorkDir(workDir);
+  
   const counterPath = path.join(workDir, ID_COUNTER_FILE);
   
   let counters: IdCounters;
