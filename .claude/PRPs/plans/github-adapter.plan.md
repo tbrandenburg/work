@@ -40,6 +40,8 @@ The PoC proves all core risks are mitigated and implementation can proceed with 
 | **PoC Completed**      | **2026-01-23T15:58:49+01:00**                     |
 | **PoC Location**       | **dev/poc-github-adapter/**                       |
 | **Test Repository**    | **https://github.com/tbrandenburg/playground**    |
+| **Test Environment**   | **GITHUB_TOKEN environment variable required**    |
+| **Testing Focus**      | **Complete task workflow and CRUD operations**    |
 
 ---
 
@@ -419,11 +421,12 @@ import { validateToken } from './auth.js';
 - **PATTERN**: Use real GitHub API with test repository, environment variables for token
 - **IMPORTS**: `import { GitHubAdapter } from '@/adapters/github'`
 - **TEST_REPO**: Use https://github.com/tbrandenburg/playground for integration testing
-- **TOKEN**: GITHUB_TOKEN environment variable (available during execution)
+- **TOKEN**: GITHUB_TOKEN environment variable is already set and MUST be used for authentication
+- **CRUD_FOCUS**: Test complete task workflow - Create, Read, Update, Delete/Close operations
 - **POC_REFERENCE**: See `dev/poc-github-adapter/test.ts` for working CRUD test example
 - **VALIDATE**: `GITHUB_TOKEN=$GITHUB_TOKEN npm test -- tests/integration/adapters/github/github-adapter.test.ts`
-- **FUNCTIONAL**: Create, read, update, delete GitHub Issues through adapter
-- **TEST_PYRAMID**: Add critical user journey test for: end-to-end GitHub workflow covering all major operations
+- **FUNCTIONAL**: Full CRUD cycle - Create issue, Read/List issues, Update issue state, Close issue
+- **TEST_PYRAMID**: Add critical user journey test for: complete task workflow and all CRUD operations
 
 ### Task 13: CREATE `docs/github-adapter-guide.md`
 
@@ -526,11 +529,14 @@ GITHUB_TOKEN=$GITHUB_TOKEN npm test -- tests/integration/adapters/github/
 
 **EXPECT**: Integration tests pass with real GitHub API
 
-**Test Repository**: Use https://github.com/tbrandenburg/playground for integration testing
-**Token Setup**: GITHUB_TOKEN environment variable will be available during execution
-**PoC Reference**: See `dev/poc-github-adapter/` for working CRUD implementation example
+**CRITICAL REQUIREMENTS**:
+- **GITHUB_TOKEN environment variable is already set and MUST be used** - authentication required for all API operations
+- **Test Repository**: https://github.com/tbrandenburg/playground - dedicated testing playground
+- **CRUD Testing Focus**: Complete task workflow validation including Create, Read, Update, Delete/Close operations
+- **Token Scope**: Ensure GITHUB_TOKEN has 'repo' scope for full access to test repository
 
-**Note**: Use `GITHUB_TOKEN` environment variable (available during plan execution)
+**PoC Reference**: See `dev/poc-github-adapter/` for working CRUD implementation example
+**Validation**: All major task operations must be tested against real GitHub Issues API
 
 ### Level 6: CURRENT_STANDARDS_VALIDATION
 
@@ -543,16 +549,23 @@ Use Context7 MCP to verify:
 ### Level 7: MANUAL_VALIDATION
 
 **Test Repository**: https://github.com/tbrandenburg/playground
+**Environment Setup**: GITHUB_TOKEN environment variable is already set with 'repo' scope and MUST be used
 **Reference Implementation**: See `dev/poc-github-adapter/` for working example
 
+**Complete Task Workflow Testing**:
 1. **Context Setup**: `work context add test-github --adapter github --repo tbrandenburg/playground`
-2. **Authentication**: Verify token prompt and validation (GITHUB_TOKEN available)
-3. **Create Issue**: `work create "Test issue" --kind bug`
-4. **List Issues**: `work list` - verify GitHub Issues appear
-5. **Update Issue**: `work start ISSUE-123` - verify GitHub Issue state changes
-6. **Delete Issue**: `work delete ISSUE-123` - verify GitHub Issue closed
+2. **Authentication**: Verify token validation using GITHUB_TOKEN environment variable
+3. **CREATE**: `work create "Test CRUD workflow" --kind bug` - verify GitHub Issue creation
+4. **READ**: `work list` - verify GitHub Issues appear in unified interface
+5. **UPDATE**: `work start ISSUE-123` - verify GitHub Issue state changes to 'open'
+6. **DELETE/CLOSE**: `work close ISSUE-123` - verify GitHub Issue properly closed
 
-**PoC Validation**: All operations have been proven to work in the PoC implementation.
+**CRUD Validation Requirements**:
+- All operations must work seamlessly through work CLI unified interface
+- GitHub API integration must handle authentication, rate limiting, and error cases
+- Complete task workflow from creation to closure must be functional
+
+**PoC Validation**: All CRUD operations have been proven to work in the PoC implementation.
 
 ---
 
