@@ -2,6 +2,7 @@ export default {
   preset: 'ts-jest/presets/default-esm',
   extensionsToTreatAsEsm: ['.ts'],
   testEnvironment: 'node',
+  maxWorkers: '50%',
   roots: ['<rootDir>/src', '<rootDir>/tests'],
   testMatch: [
     '<rootDir>/tests/**/*.test.ts',
@@ -38,6 +39,6 @@ export default {
     '^(\\.{1,2}/.*)\\.js$': '$1'
   },
   setupFilesAfterEnv: [],
-  testTimeout: 10000,
+  testTimeout: 5000,
   verbose: true
 };
