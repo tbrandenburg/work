@@ -1,34 +1,37 @@
+import { vi } from 'vitest';
 import { WorkEngine } from '../../../src/core/engine';
 import { LocalFsAdapter } from '../../../src/adapters/local-fs/index';
 import { WorkItemKind, Priority, WorkItem } from '../../../src/types/index';
 
 // Mock the LocalFsAdapter
-jest.mock('../../../src/adapters/local-fs/index');
+vi.mock('../../../src/adapters/local-fs/index', () => ({
+  LocalFsAdapter: vi.fn()
+}));
 
 describe('WorkEngine', () => {
   let engine: WorkEngine;
-  let mockAdapter: jest.Mocked<LocalFsAdapter>;
+  let mockAdapter: any;
 
   beforeEach(() => {
     // Clear all mocks
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     
     // Create mock adapter
     mockAdapter = {
-      initialize: jest.fn(),
-      createWorkItem: jest.fn(),
-      getWorkItem: jest.fn(),
-      updateWorkItem: jest.fn(),
-      changeState: jest.fn(),
-      listWorkItems: jest.fn(),
-      createRelation: jest.fn(),
-      getRelations: jest.fn(),
-      deleteRelation: jest.fn(),
-      deleteWorkItem: jest.fn(),
-    } as any;
+      initialize: vi.fn(),
+      createWorkItem: vi.fn(),
+      getWorkItem: vi.fn(),
+      updateWorkItem: vi.fn(),
+      changeState: vi.fn(),
+      listWorkItems: vi.fn(),
+      createRelation: vi.fn(),
+      getRelations: vi.fn(),
+      deleteRelation: vi.fn(),
+      deleteWorkItem: vi.fn(),
+    };
 
     // Mock the LocalFsAdapter constructor
-    (LocalFsAdapter as jest.MockedClass<typeof LocalFsAdapter>).mockImplementation(() => mockAdapter);
+    vi.mocked(LocalFsAdapter).mockImplementation(() => mockAdapter);
     
     engine = new WorkEngine();
   });
@@ -257,7 +260,7 @@ describe('WorkEngine', () => {
 
   describe('addComment', () => {
     it('should log placeholder message', () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       engine.addComment('TASK-001', 'test comment');
 
@@ -268,7 +271,7 @@ describe('WorkEngine', () => {
 
   describe('moveWorkItem', () => {
     it('should log placeholder message', () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       engine.moveWorkItem('TASK-001', '@other-context');
 

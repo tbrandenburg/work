@@ -3,19 +3,34 @@
  * Uses mocked engine calls instead of full CLI execution for performance
  */
 
+import { vi } from 'vitest';
 import { WorkEngine } from '../../../src/core/index.js';
 import { WorkItem } from '../../../src/types/index.js';
 import { formatOutput } from '../../../src/cli/formatter.js';
 
 // Mock the WorkEngine
-jest.mock('../../../src/core/index.js');
+vi.mock('../../../src/core/index.js', () => ({
+  WorkEngine: vi.fn()
+}));
 
 describe('Universal JSON Output Support (Optimized)', () => {
-  let mockEngine: jest.Mocked<WorkEngine>;
+  let mockEngine: any;
   
   beforeEach(() => {
-    mockEngine = new WorkEngine() as jest.Mocked<WorkEngine>;
-    jest.clearAllMocks();
+    mockEngine = {
+      createWorkItem: vi.fn(),
+      listWorkItems: vi.fn(),
+      getWorkItem: vi.fn(),
+      updateWorkItem: vi.fn(),
+      changeState: vi.fn(),
+      deleteWorkItem: vi.fn(),
+      createRelation: vi.fn(),
+      getRelations: vi.fn(),
+      deleteRelation: vi.fn(),
+      getAuthStatus: vi.fn(),
+    };
+    vi.mocked(WorkEngine).mockImplementation(() => mockEngine);
+    vi.clearAllMocks();
   });
 
   const mockWorkItem: WorkItem = {

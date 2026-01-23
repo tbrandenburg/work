@@ -1,20 +1,21 @@
+import { vi } from 'vitest';
 import { WorkEngine } from '../../../../../src/core/engine.js';
 
 // Mock the WorkEngine to control branch execution
-jest.mock('../../../../../src/core/engine.js');
+vi.mock('../../../../../src/core/engine.js', () => ({ WorkEngine: vi.fn() }));
 
 describe('Schema Commands Branch Coverage', () => {
-  let mockEngine: jest.Mocked<WorkEngine>;
+  let mockEngine: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockEngine = {
-      setActiveContext: jest.fn(),
-      getKinds: jest.fn(),
-      getAttributes: jest.fn(),
-      getRelationTypes: jest.fn(),
+      setActiveContext: vi.fn(),
+      getKinds: vi.fn(),
+      getAttributes: vi.fn(),
+      getRelationTypes: vi.fn(),
     } as any;
-    (WorkEngine as jest.MockedClass<typeof WorkEngine>).mockImplementation(() => mockEngine);
+    (WorkEngine as anyClass<typeof WorkEngine>).mockImplementation(() => mockEngine);
   });
 
   describe('Schema Kinds Command', () => {
@@ -26,7 +27,7 @@ describe('Schema Commands Branch Coverage', () => {
 
       const command = new SchemaKinds([], {} as any);
       
-      jest.spyOn(command, 'parse' as any).mockResolvedValue({
+      vi.spyOn(command, 'parse' as any).mockResolvedValue({
         args: { context: 'test-context' },
         flags: { format: 'table' }
       });
@@ -45,12 +46,12 @@ describe('Schema Commands Branch Coverage', () => {
 
       const command = new SchemaKinds([], {} as any);
       
-      jest.spyOn(command, 'parse' as any).mockResolvedValue({
+      vi.spyOn(command, 'parse' as any).mockResolvedValue({
         args: {},
         flags: { format: 'json' }
       });
       
-      const logSpy = jest.spyOn(command, 'log').mockImplementation();
+      const logSpy = vi.spyOn(command, 'log').mockImplementation();
 
       await command.run();
 
@@ -72,12 +73,12 @@ describe('Schema Commands Branch Coverage', () => {
 
       const command = new SchemaKinds([], {} as any);
       
-      jest.spyOn(command, 'parse' as any).mockResolvedValue({
+      vi.spyOn(command, 'parse' as any).mockResolvedValue({
         args: {},
         flags: { format: 'table' }
       });
       
-      jest.spyOn(command, 'error').mockImplementation(() => {
+      vi.spyOn(command, 'error').mockImplementation(() => {
         throw new Error('Failed to get kinds: Kinds failed');
       });
 
@@ -94,7 +95,7 @@ describe('Schema Commands Branch Coverage', () => {
 
       const command = new SchemaAttrs([], {} as any);
       
-      jest.spyOn(command, 'parse' as any).mockResolvedValue({
+      vi.spyOn(command, 'parse' as any).mockResolvedValue({
         args: { context: 'test-context' },
         flags: { format: 'table' }
       });
@@ -113,12 +114,12 @@ describe('Schema Commands Branch Coverage', () => {
 
       const command = new SchemaAttrs([], {} as any);
       
-      jest.spyOn(command, 'parse' as any).mockResolvedValue({
+      vi.spyOn(command, 'parse' as any).mockResolvedValue({
         args: {},
         flags: { format: 'json' }
       });
       
-      const logSpy = jest.spyOn(command, 'log').mockImplementation();
+      const logSpy = vi.spyOn(command, 'log').mockImplementation();
 
       await command.run();
 
@@ -140,12 +141,12 @@ describe('Schema Commands Branch Coverage', () => {
 
       const command = new SchemaAttrs([], {} as any);
       
-      jest.spyOn(command, 'parse' as any).mockResolvedValue({
+      vi.spyOn(command, 'parse' as any).mockResolvedValue({
         args: {},
         flags: { format: 'table' }
       });
       
-      jest.spyOn(command, 'error').mockImplementation(() => {
+      vi.spyOn(command, 'error').mockImplementation(() => {
         throw new Error('Failed to get attributes: Attrs failed');
       });
 
@@ -162,7 +163,7 @@ describe('Schema Commands Branch Coverage', () => {
 
       const command = new SchemaRelations([], {} as any);
       
-      jest.spyOn(command, 'parse' as any).mockResolvedValue({
+      vi.spyOn(command, 'parse' as any).mockResolvedValue({
         args: { context: 'test-context' },
         flags: { format: 'table' }
       });
@@ -181,12 +182,12 @@ describe('Schema Commands Branch Coverage', () => {
 
       const command = new SchemaRelations([], {} as any);
       
-      jest.spyOn(command, 'parse' as any).mockResolvedValue({
+      vi.spyOn(command, 'parse' as any).mockResolvedValue({
         args: {},
         flags: { format: 'json' }
       });
       
-      const logSpy = jest.spyOn(command, 'log').mockImplementation();
+      const logSpy = vi.spyOn(command, 'log').mockImplementation();
 
       await command.run();
 
@@ -208,12 +209,12 @@ describe('Schema Commands Branch Coverage', () => {
 
       const command = new SchemaRelations([], {} as any);
       
-      jest.spyOn(command, 'parse' as any).mockResolvedValue({
+      vi.spyOn(command, 'parse' as any).mockResolvedValue({
         args: {},
         flags: { format: 'table' }
       });
       
-      jest.spyOn(command, 'error').mockImplementation(() => {
+      vi.spyOn(command, 'error').mockImplementation(() => {
         throw new Error('Failed to get relation types: Relations failed');
       });
 

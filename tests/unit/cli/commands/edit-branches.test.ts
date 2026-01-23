@@ -1,17 +1,18 @@
+import { vi } from 'vitest';
 import { WorkEngine } from '../../../../src/core/engine.js';
 
 // Mock the WorkEngine to control branch execution
-jest.mock('../../../../src/core/engine.js');
+vi.mock('../../../../src/core/engine.js', () => ({ WorkEngine: vi.fn() }));
 
 describe('Edit Command Branch Coverage', () => {
-  let mockEngine: jest.Mocked<WorkEngine>;
+  let mockEngine: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockEngine = {
-      updateWorkItem: jest.fn(),
+      updateWorkItem: vi.fn(),
     } as any;
-    (WorkEngine as jest.MockedClass<typeof WorkEngine>).mockImplementation(() => mockEngine);
+    (WorkEngine as anyClass<typeof WorkEngine>).mockImplementation(() => mockEngine);
   });
 
   it('should trigger no-fields-specified branch', async () => {
@@ -21,12 +22,12 @@ describe('Edit Command Branch Coverage', () => {
     const command = new Edit([], {} as any);
     
     // Mock parse to return no flags (triggers the conditional branch)
-    jest.spyOn(command, 'parse' as any).mockResolvedValue({
+    vi.spyOn(command, 'parse' as any).mockResolvedValue({
       args: { id: 'TASK-001' },
       flags: {} // No flags triggers the branch
     });
     
-    const errorSpy = jest.spyOn(command, 'error').mockImplementation(() => {
+    const errorSpy = vi.spyOn(command, 'error').mockImplementation(() => {
       throw new Error('No fields specified');
     });
 
@@ -52,12 +53,12 @@ describe('Edit Command Branch Coverage', () => {
     const command = new Edit([], {} as any);
     
     // Mock parse to return flags (triggers the success branch)
-    jest.spyOn(command, 'parse' as any).mockResolvedValue({
+    vi.spyOn(command, 'parse' as any).mockResolvedValue({
       args: { id: 'TASK-001' },
       flags: { title: 'Updated', priority: 'high' }
     });
     
-    const logSpy = jest.spyOn(command, 'log').mockImplementation();
+    const logSpy = vi.spyOn(command, 'log').mockImplementation();
 
     await command.run();
 
