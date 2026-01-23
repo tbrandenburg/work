@@ -1,4 +1,4 @@
-import { parseQuery } from '../../../src/core/query';
+import { parseQuery, executeQuery } from '../../../src/core/query';
 
 describe('Query System', () => {
   describe('parseQuery', () => {
@@ -247,7 +247,7 @@ describe('Query System', () => {
     ];
 
     it('should evaluate comparison operators', () => {
-      const { executeQuery } = require('../../../src/core/query');
+      
       
       const query = parseQuery('where priority>medium');
       const results = executeQuery(mockWorkItems, query);
@@ -257,7 +257,7 @@ describe('Query System', () => {
     });
 
     it('should evaluate logical AND expressions', () => {
-      const { executeQuery } = require('../../../src/core/query');
+      
       
       const query = parseQuery('where state=active AND priority=high');
       const results = executeQuery(mockWorkItems, query);
@@ -267,7 +267,7 @@ describe('Query System', () => {
     });
 
     it('should evaluate logical OR expressions', () => {
-      const { executeQuery } = require('../../../src/core/query');
+      
       
       const query = parseQuery('where priority=high OR priority=medium');
       const results = executeQuery(mockWorkItems, query);
@@ -276,7 +276,7 @@ describe('Query System', () => {
     });
 
     it('should evaluate NOT expressions', () => {
-      const { executeQuery } = require('../../../src/core/query');
+      
       
       const query = parseQuery('where NOT state=closed');
       const results = executeQuery(mockWorkItems, query);
@@ -286,7 +286,7 @@ describe('Query System', () => {
     });
 
     it('should evaluate date comparisons', () => {
-      const { executeQuery } = require('../../../src/core/query');
+      
       
       const query = parseQuery('where createdAt>2024-01-01T12:00:00');
       const results = executeQuery(mockWorkItems, query);
@@ -307,7 +307,7 @@ describe('Query System', () => {
     });
 
     it('should handle unsupported operators in evaluation', () => {
-      const { executeQuery } = require('../../../src/core/query');
+      
       const mockItems = [{ id: '1', state: 'active', priority: 'high' }];
       
       // Create a malformed query condition (this would normally not be created by the parser)
@@ -406,7 +406,7 @@ describe('Query System', () => {
     });
 
     it('should handle label field specially', () => {
-      const { executeQuery } = require('../../../src/core/query');
+      
       const mockItems = [
         { id: '1', labels: ['urgent', 'backend'], state: 'active' },
         { id: '2', labels: ['frontend'], state: 'active' }
@@ -452,7 +452,7 @@ describe('Query System', () => {
     });
 
     it('should handle all comparison operators correctly', () => {
-      const { executeQuery } = require('../../../src/core/query');
+      
       const mockItems = [
         { id: '1', priority: 'low', createdAt: '2024-01-01T10:00:00.000Z' },
         { id: '2', priority: 'medium', createdAt: '2024-01-02T10:00:00.000Z' },

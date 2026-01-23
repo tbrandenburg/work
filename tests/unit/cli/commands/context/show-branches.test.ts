@@ -1,17 +1,18 @@
+import { vi } from 'vitest';
 import { WorkEngine } from '../../../../../src/core/engine.js';
 
-jest.mock('../../../../../src/core/engine.js');
+vi.mock('../../../../../src/core/engine.js', () => ({ WorkEngine: vi.fn() }));
 
 describe('Context Show Branch Coverage', () => {
-  let mockEngine: jest.Mocked<WorkEngine>;
+  let mockEngine: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockEngine = {
-      getActiveContext: jest.fn(),
-      getContexts: jest.fn(),
+      getActiveContext: vi.fn(),
+      getContexts: vi.fn(),
     } as any;
-    (WorkEngine as jest.MockedClass<typeof WorkEngine>).mockImplementation(() => mockEngine);
+    (WorkEngine as anyClass<typeof WorkEngine>).mockImplementation(() => mockEngine);
   });
 
   it('should trigger no-active-context branch', async () => {
@@ -22,12 +23,12 @@ describe('Context Show Branch Coverage', () => {
 
     const command = new ContextShow([], {} as any);
     
-    jest.spyOn(command, 'parse' as any).mockResolvedValue({
+    vi.spyOn(command, 'parse' as any).mockResolvedValue({
       args: {},
       flags: { format: 'table' }
     });
     
-    const errorSpy = jest.spyOn(command, 'error').mockImplementation(() => {
+    const errorSpy = vi.spyOn(command, 'error').mockImplementation(() => {
       throw new Error('No active context');
     });
 
@@ -49,12 +50,12 @@ describe('Context Show Branch Coverage', () => {
 
     const command = new ContextShow([], {} as any);
     
-    jest.spyOn(command, 'parse' as any).mockResolvedValue({
+    vi.spyOn(command, 'parse' as any).mockResolvedValue({
       args: {},
       flags: { format: 'table' }
     });
     
-    const logSpy = jest.spyOn(command, 'log').mockImplementation();
+    const logSpy = vi.spyOn(command, 'log').mockImplementation();
 
     await command.run();
 
@@ -70,12 +71,12 @@ describe('Context Show Branch Coverage', () => {
 
     const command = new ContextShow([], {} as any);
     
-    jest.spyOn(command, 'parse' as any).mockResolvedValue({
+    vi.spyOn(command, 'parse' as any).mockResolvedValue({
       args: { name: 'nonexistent' },
       flags: { format: 'table' }
     });
     
-    const errorSpy = jest.spyOn(command, 'error').mockImplementation(() => {
+    const errorSpy = vi.spyOn(command, 'error').mockImplementation(() => {
       throw new Error('Context not found');
     });
 

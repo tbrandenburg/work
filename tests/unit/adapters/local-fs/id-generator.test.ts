@@ -4,7 +4,7 @@
 
 import { promises as fs } from 'fs';
 import path from 'path';
-import { generateId } from '@/adapters/local-fs/id-generator';
+import { generateId } from '../../../../src/adapters/local-fs/id-generator';
 
 describe('ID Generator', () => {
   const testDir = path.join(__dirname, 'test-work-dir');

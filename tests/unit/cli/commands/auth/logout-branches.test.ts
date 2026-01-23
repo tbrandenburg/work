@@ -1,18 +1,19 @@
+import { vi } from 'vitest';
 import { WorkEngine } from '../../../../../src/core/engine.js';
 
 // Mock the WorkEngine to control branch execution
-jest.mock('../../../../../src/core/engine.js');
+vi.mock('../../../../../src/core/engine.js', () => ({ WorkEngine: vi.fn() }));
 
 describe('Auth Logout Command Branch Coverage', () => {
-  let mockEngine: jest.Mocked<WorkEngine>;
+  let mockEngine: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockEngine = {
-      setActiveContext: jest.fn(),
-      logout: jest.fn(),
+      setActiveContext: vi.fn(),
+      logout: vi.fn(),
     } as any;
-    (WorkEngine as jest.MockedClass<typeof WorkEngine>).mockImplementation(() => mockEngine);
+    (WorkEngine as anyClass<typeof WorkEngine>).mockImplementation(() => mockEngine);
   });
 
   it('should trigger context argument branch', async () => {
@@ -23,12 +24,12 @@ describe('Auth Logout Command Branch Coverage', () => {
     const command = new AuthLogout([], {} as any);
     
     // Mock parse to return context argument (triggers if (args.context) branch)
-    jest.spyOn(command, 'parse' as any).mockResolvedValue({
+    vi.spyOn(command, 'parse' as any).mockResolvedValue({
       args: { context: 'test-context' },
       flags: { format: 'table' }
     });
     
-    const logSpy = jest.spyOn(command, 'log').mockImplementation();
+    const logSpy = vi.spyOn(command, 'log').mockImplementation();
 
     await command.run();
 
@@ -44,11 +45,11 @@ describe('Auth Logout Command Branch Coverage', () => {
 
     const command = new AuthLogout([], {} as any);
     
-    jest.spyOn(command, 'parse' as any).mockResolvedValue({
+    vi.spyOn(command, 'parse' as any).mockResolvedValue({
       args: {}
     });
     
-    const errorSpy = jest.spyOn(command, 'error').mockImplementation(() => {
+    const errorSpy = vi.spyOn(command, 'error').mockImplementation(() => {
       throw new Error('Failed to logout: Logout failed');
     });
 

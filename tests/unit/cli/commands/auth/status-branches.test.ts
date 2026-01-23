@@ -1,18 +1,19 @@
+import { vi } from 'vitest';
 import { WorkEngine } from '../../../../../src/core/engine.js';
 
 // Mock the WorkEngine to control branch execution
-jest.mock('../../../../../src/core/engine.js');
+vi.mock('../../../../../src/core/engine.js', () => ({ WorkEngine: vi.fn() }));
 
 describe('Auth Status Command Branch Coverage', () => {
-  let mockEngine: jest.Mocked<WorkEngine>;
+  let mockEngine: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockEngine = {
-      setActiveContext: jest.fn(),
-      getAuthStatus: jest.fn(),
+      setActiveContext: vi.fn(),
+      getAuthStatus: vi.fn(),
     } as any;
-    (WorkEngine as jest.MockedClass<typeof WorkEngine>).mockImplementation(() => mockEngine);
+    (WorkEngine as anyClass<typeof WorkEngine>).mockImplementation(() => mockEngine);
   });
 
   it('should trigger context argument branch', async () => {
@@ -27,12 +28,12 @@ describe('Auth Status Command Branch Coverage', () => {
     const command = new AuthStatus([], {} as any);
     
     // Mock parse to return context argument (triggers if (args.context) branch)
-    jest.spyOn(command, 'parse' as any).mockResolvedValue({
+    vi.spyOn(command, 'parse' as any).mockResolvedValue({
       args: { context: 'test-context' },
       flags: { format: 'table' }
     });
     
-    const logSpy = jest.spyOn(command, 'log').mockImplementation();
+    const logSpy = vi.spyOn(command, 'log').mockImplementation();
 
     await command.run();
 
@@ -53,12 +54,12 @@ describe('Auth Status Command Branch Coverage', () => {
     const command = new AuthStatus([], {} as any);
     
     // Mock parse to return JSON format (triggers if (flags.format === 'json') branch)
-    jest.spyOn(command, 'parse' as any).mockResolvedValue({
+    vi.spyOn(command, 'parse' as any).mockResolvedValue({
       args: {},
       flags: { format: 'json' }
     });
     
-    const logSpy = jest.spyOn(command, 'log').mockImplementation();
+    const logSpy = vi.spyOn(command, 'log').mockImplementation();
 
     await command.run();
 
@@ -80,12 +81,12 @@ describe('Auth Status Command Branch Coverage', () => {
 
     const command = new AuthStatus([], {} as any);
     
-    jest.spyOn(command, 'parse' as any).mockResolvedValue({
+    vi.spyOn(command, 'parse' as any).mockResolvedValue({
       args: {},
       flags: { format: 'table' }
     });
     
-    const logSpy = jest.spyOn(command, 'log').mockImplementation();
+    const logSpy = vi.spyOn(command, 'log').mockImplementation();
 
     await command.run();
 
@@ -99,12 +100,12 @@ describe('Auth Status Command Branch Coverage', () => {
 
     const command = new AuthStatus([], {} as any);
     
-    jest.spyOn(command, 'parse' as any).mockResolvedValue({
+    vi.spyOn(command, 'parse' as any).mockResolvedValue({
       args: {},
       flags: { format: 'table' }
     });
     
-    const errorSpy = jest.spyOn(command, 'error').mockImplementation(() => {
+    const errorSpy = vi.spyOn(command, 'error').mockImplementation(() => {
       throw new Error('Failed to get auth status: Status failed');
     });
 

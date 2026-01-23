@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * Additional tests for BaseCommand edge cases to improve coverage
  */
@@ -29,7 +30,7 @@ describe('BaseCommand Edge Cases', () => {
     it('should return false for table format', async () => {
       const command = new TestCommand([], {} as any);
       
-      jest.spyOn(command, 'parse' as any).mockResolvedValue({
+      vi.spyOn(command, 'parse' as any).mockResolvedValue({
         flags: { format: 'table' }
       });
 
@@ -40,7 +41,7 @@ describe('BaseCommand Edge Cases', () => {
     it('should return true for json format', async () => {
       const command = new TestCommand([], {} as any);
       
-      jest.spyOn(command, 'parse' as any).mockResolvedValue({
+      vi.spyOn(command, 'parse' as any).mockResolvedValue({
         flags: { format: 'json' }
       });
 
@@ -51,7 +52,7 @@ describe('BaseCommand Edge Cases', () => {
     it('should handle missing format flag', async () => {
       const command = new TestCommand([], {} as any);
       
-      jest.spyOn(command, 'parse' as any).mockResolvedValue({
+      vi.spyOn(command, 'parse' as any).mockResolvedValue({
         flags: {}
       });
 
@@ -62,7 +63,7 @@ describe('BaseCommand Edge Cases', () => {
     it('should fallback to argv parsing when parse fails', async () => {
       const command = new TestCommand([], {} as any);
       
-      jest.spyOn(command, 'parse' as any).mockRejectedValue(new Error('Parse failed'));
+      vi.spyOn(command, 'parse' as any).mockRejectedValue(new Error('Parse failed'));
       
       // Mock process.argv to include --format=json
       const originalArgv = process.argv;
@@ -79,7 +80,7 @@ describe('BaseCommand Edge Cases', () => {
     it('should fallback to argv parsing with -f flag', async () => {
       const command = new TestCommand([], {} as any);
       
-      jest.spyOn(command, 'parse' as any).mockRejectedValue(new Error('Parse failed'));
+      vi.spyOn(command, 'parse' as any).mockRejectedValue(new Error('Parse failed'));
       
       // Mock process.argv to include -f json
       const originalArgv = process.argv;
@@ -98,7 +99,7 @@ describe('BaseCommand Edge Cases', () => {
     it('should use oclif error handling for table mode', () => {
       const command = new TestCommand([], {} as any);
       
-      const errorSpy = jest.spyOn(command, 'error').mockImplementation(() => {
+      const errorSpy = vi.spyOn(command, 'error').mockImplementation(() => {
         throw new Error('Test error');
       });
 
@@ -117,8 +118,8 @@ describe('BaseCommand Edge Cases', () => {
     it('should output to stderr and exit for JSON mode', () => {
       const command = new TestCommand([], {} as any);
       
-      const stderrSpy = jest.spyOn(process.stderr, 'write').mockImplementation();
-      const exitSpy = jest.spyOn(process, 'exit').mockImplementation(() => {
+      const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation();
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => {
         throw new Error('Process exit called');
       });
 
@@ -140,8 +141,8 @@ describe('BaseCommand Edge Cases', () => {
     it('should handle Error objects in JSON mode', () => {
       const command = new TestCommand([], {} as any);
       
-      const stderrSpy = jest.spyOn(process.stderr, 'write').mockImplementation();
-      const exitSpy = jest.spyOn(process, 'exit').mockImplementation(() => {
+      const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation();
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => {
         throw new Error('Process exit called');
       });
 
@@ -164,7 +165,7 @@ describe('BaseCommand Edge Cases', () => {
     it('should handle custom exit codes', () => {
       const command = new TestCommand([], {} as any);
       
-      const errorSpy = jest.spyOn(command, 'error').mockImplementation(() => {
+      const errorSpy = vi.spyOn(command, 'error').mockImplementation(() => {
         throw new Error('Test error');
       });
 

@@ -1,25 +1,26 @@
+import { vi } from 'vitest';
 import { WorkEngine } from '../../../src/core/engine.js';
 import { LocalFsAdapter } from '../../../src/adapters/local-fs/index.js';
 
 describe('WorkEngine Auth Methods', () => {
   let engine: WorkEngine;
-  let mockAdapter: jest.Mocked<LocalFsAdapter>;
+  let mockAdapter: any;
 
   beforeEach(() => {
     engine = new WorkEngine();
     mockAdapter = {
-      authenticate: jest.fn(),
-      logout: jest.fn(),
-      getAuthStatus: jest.fn(),
+      authenticate: vi.fn(),
+      logout: vi.fn(),
+      getAuthStatus: vi.fn(),
     } as any;
 
     // Mock the getActiveAdapter method
-    jest.spyOn(engine as any, 'getActiveAdapter').mockReturnValue(mockAdapter);
-    jest.spyOn(engine as any, 'ensureDefaultContext').mockResolvedValue(undefined);
+    vi.spyOn(engine as any, 'getActiveAdapter').mockReturnValue(mockAdapter);
+    vi.spyOn(engine as any, 'ensureDefaultContext').mockResolvedValue(undefined);
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should delegate authenticate to adapter', async () => {

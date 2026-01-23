@@ -1,16 +1,19 @@
+import { vi } from 'vitest';
 import { WorkEngine } from '../../../../src/core/engine.js';
 
-jest.mock('../../../../src/core/engine.js');
+vi.mock('../../../../src/core/engine.js', () => ({
+  WorkEngine: vi.fn()
+}));
 
 describe('Unset Command Branch Coverage', () => {
-  let mockEngine: jest.Mocked<WorkEngine>;
+  let mockEngine: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockEngine = {
-      updateWorkItem: jest.fn(),
+      updateWorkItem: vi.fn(),
     } as any;
-    (WorkEngine as jest.MockedClass<typeof WorkEngine>).mockImplementation(() => mockEngine);
+    (WorkEngine as anyClass<typeof WorkEngine>).mockImplementation(() => mockEngine);
   });
 
   it('should trigger assignee field branch', async () => {
@@ -30,12 +33,12 @@ describe('Unset Command Branch Coverage', () => {
 
     const command = new Unset([], {} as any);
     
-    jest.spyOn(command, 'parse' as any).mockResolvedValue({
+    vi.spyOn(command, 'parse' as any).mockResolvedValue({
       args: { id: 'TASK-001', field: 'assignee' },
       flags: { format: 'table' }
     });
     
-    const logSpy = jest.spyOn(command, 'log').mockImplementation();
+    const logSpy = vi.spyOn(command, 'log').mockImplementation();
 
     await command.run();
 
@@ -62,12 +65,12 @@ describe('Unset Command Branch Coverage', () => {
 
     const command = new Unset([], {} as any);
     
-    jest.spyOn(command, 'parse' as any).mockResolvedValue({
+    vi.spyOn(command, 'parse' as any).mockResolvedValue({
       args: { id: 'TASK-001', field: 'description' },
       flags: { format: 'table' }
     });
     
-    const logSpy = jest.spyOn(command, 'log').mockImplementation();
+    const logSpy = vi.spyOn(command, 'log').mockImplementation();
 
     await command.run();
 
