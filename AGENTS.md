@@ -107,6 +107,7 @@ If exhaustion is impossible:
 ### Security Practices
 - Validate and sanitize all user inputs
 - Never log sensitive data (credentials, tokens, PII)
+- Never read credentials into context - always check existence only, pipe to secure storage, or redact values
 - Use explicit error types without exposing internal details
 - Implement proper credential isolation per context
 

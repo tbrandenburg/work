@@ -939,21 +939,6 @@ To start: `git worktree add -b phase-{X} ../project-phase-{X} && cd ../project-p
 **NO_PRIOR_KNOWLEDGE_TEST**: Could an agent unfamiliar with this codebase implement using ONLY the plan with current information?
 </verification>
 
-<mandatory_output>
-MANDATORY OUTPUT ARTIFACT:
-Create `./dev/state/task-ledger.json` with schema:
-
-{
-  "TASK_ID": {
-    "status": "pending | in_progress | blocked | done",
-    "evidence": ["exact command + output snippet"],
-    "last_verified": "ISO-8601 timestamp"
-  }
-}
-
-This file is the single source of truth.
-</mandatory_output>
-
 <success_criteria>
 **CONTEXT_COMPLETE**: All patterns, gotchas, integration points documented from actual codebase via Explore agent
 **IMPLEMENTATION_READY**: Tasks executable top-to-bottom without questions, research, or clarification

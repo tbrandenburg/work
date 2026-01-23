@@ -25,10 +25,29 @@ Execute the plan end-to-end with rigorous self-validation and real-time verifica
 
 ## Phase -1: TASK LEDGER INITIALIZATION
 
-Before starting any task:
-- Load task-ledger.json
+Before executing the plan:
+- Create a new `./dev/state/task-ledger.json` based on following template
+- Add each task of the plan and initialize it
+
+Before starting any task of the plan:
+- Load `./dev/state/task-ledger.json`
 - Restate which task IDs are NOT done
-- Select exactly ONE task to work on
+- Select the next pending task to work on, and only this
+
+Task ledger schema:
+
+````json
+{
+  "TASK_ID": {
+    "status": "pending | in_progress | blocked | done",
+    "description": "Whole description of the task",
+    "evidence": ["exact command + output snippet"],
+    "last_verified": "ISO-8601 timestamp"
+  }
+}
+```
+
+This file is the single source of truth.
 
 ---
 
