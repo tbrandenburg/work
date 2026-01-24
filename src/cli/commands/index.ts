@@ -28,3 +28,7 @@ export * from './schema/show.js';
 export * from './schema/kinds.js';
 export * from './schema/attrs.js';
 export * from './schema/relations.js';
+export * from './notify/send.js';
+export * from './notify/target/add.js';
+export * from './notify/target/list.js';
+export * from './notify/target/remove.js';

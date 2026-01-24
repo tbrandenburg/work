@@ -8,6 +8,7 @@ import {
   UpdateWorkItemRequest,
   Relation,
 } from './work-item.js';
+import { NotificationTarget } from './notification.js';
 
 export type AuthState = 'authenticated' | 'unauthenticated' | 'expired';
 
@@ -44,6 +45,7 @@ export interface Context {
   readonly url?: string | undefined;
   readonly authState: AuthState;
   readonly isActive: boolean;
+  readonly notificationTargets?: readonly NotificationTarget[] | undefined;
 }
 
 export interface WorkAdapter {
