@@ -72,10 +72,11 @@ describe('Telegram Notification E2E', () => {
     }
 
     // Create a work item
-    execSync(
+    const createOutput = execSync(
       `node ${binPath} create "Test notification task" --priority high`,
-      { stdio: 'pipe' }
+      { encoding: 'utf8' }
     );
+    expect(createOutput).toContain('Created task');
 
     // Add telegram target with real credentials
     execSync(
@@ -83,9 +84,9 @@ describe('Telegram Notification E2E', () => {
       { stdio: 'pipe' }
     );
 
-    // Send notification (should succeed with real credentials)
+    // Send notification for all items (should include the created task)
     const result = execSync(
-      `node ${binPath} notify send where "state:open" to test-telegram`,
+      `node ${binPath} notify send where "priority=high" to test-telegram`,
       { encoding: 'utf8' }
     );
 
