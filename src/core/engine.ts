@@ -26,6 +26,7 @@ import { validateRelation, detectCycles } from './graph.js';
 import { parseQuery, executeQuery } from './query.js';
 import { NotificationService } from './notification-service.js';
 import { BashTargetHandler } from './target-handlers/bash-handler.js';
+import { TelegramTargetHandler } from './target-handlers/telegram-handler.js';
 
 export class WorkEngine {
   private adapters = new Map<string, WorkAdapter>();
@@ -51,12 +52,13 @@ export class WorkEngine {
   private registerNotificationHandlerSync(): void {
     // Register handlers synchronously - handlers are part of core system
     this.notificationService.registerHandler('bash', new BashTargetHandler());
+    this.notificationService.registerHandler('telegram', new TelegramTargetHandler());
   }
 
   /**
-   * Ensure default context exists for MVP
+   * Ensure default context exists for MVP - exposed for CLI commands
    */
-  private async ensureDefaultContext(): Promise<void> {
+  async ensureDefaultContext(): Promise<void> {
     // Load contexts from disk if not already loaded
     if (!this.contextsLoaded) {
       await this.loadContexts();
@@ -501,6 +503,14 @@ export class WorkEngine {
       
       this.contexts = new Map(contextsData.contexts);
       this.activeContext = contextsData.activeContext;
+      
+      // Initialize adapters for loaded contexts
+      for (const [, context] of this.contexts) {
+        const adapter = this.adapters.get(context.tool);
+        if (adapter) {
+          await adapter.initialize(context);
+        }
+      }
     } catch {
       // File doesn't exist or is invalid - start fresh
     }

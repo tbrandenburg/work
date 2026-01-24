@@ -28,11 +28,12 @@ describe('Context Lifecycle E2E', () => {
     );
     expect(addOutput).toContain('Added context');
 
-    // Test context list (should show no contexts due to no persistence)
+    // Test context list (should show default context due to auto-creation)
     const listOutput = execSync(`node ${binPath} context list`, {
       encoding: 'utf8',
     });
-    expect(listOutput).toContain('No contexts found');
+    expect(listOutput).toContain('default');
+    expect(listOutput).toContain('Total: 1 contexts');
 
     // Test context show with non-existent context (should fail gracefully)
     expect(() => {

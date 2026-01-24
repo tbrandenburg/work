@@ -216,7 +216,8 @@ describe('Universal JSON Output Support', () => {
 
       expect(parsed).toHaveProperty('data');
       expect(Array.isArray(parsed.data)).toBe(true);
-      expect(parsed.data).toHaveLength(0);
+      expect(parsed.data).toHaveLength(1); // Default context is auto-created
+      expect(parsed.data[0]).toHaveProperty('name', 'default');
     });
 
     it('should include proper newline termination', () => {
