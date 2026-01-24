@@ -6,7 +6,10 @@ import { formatOutput } from '../formatter.js';
 export default class Move extends BaseCommand {
   static override args = {
     id: Args.string({ description: 'work item ID to move', required: true }),
-    context: Args.string({ description: 'target context (with @context syntax)', required: true }),
+    context: Args.string({
+      description: 'target context (with @context syntax)',
+      required: true,
+    }),
   };
 
   static override description = 'Move a work item to another context';
@@ -28,16 +31,18 @@ export default class Move extends BaseCommand {
 
       // For MVP, this is a placeholder implementation
       engine.moveWorkItem(args.id, args.context);
-      
+
       const result = {
         message: `Moved ${args.id} to context ${args.context}`,
         workItemId: args.id,
-        targetContext: args.context
+        targetContext: args.context,
       };
-      
+
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(result, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(result, 'json', { timestamp: new Date().toISOString() })
+        );
       } else {
         this.log(`Moved ${args.id} to context ${args.context}`);
       }

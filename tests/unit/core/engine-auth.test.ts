@@ -16,7 +16,9 @@ describe('WorkEngine Auth Methods', () => {
 
     // Mock the getActiveAdapter method
     vi.spyOn(engine as any, 'getActiveAdapter').mockReturnValue(mockAdapter);
-    vi.spyOn(engine as any, 'ensureDefaultContext').mockResolvedValue(undefined);
+    vi.spyOn(engine as any, 'ensureDefaultContext').mockResolvedValue(
+      undefined
+    );
   });
 
   afterEach(() => {
@@ -24,7 +26,10 @@ describe('WorkEngine Auth Methods', () => {
   });
 
   it('should delegate authenticate to adapter', async () => {
-    const expectedStatus = { state: 'authenticated' as const, user: 'test-user' };
+    const expectedStatus = {
+      state: 'authenticated' as const,
+      user: 'test-user',
+    };
     mockAdapter.authenticate.mockResolvedValue(expectedStatus);
 
     const result = await engine.authenticate();
@@ -42,7 +47,10 @@ describe('WorkEngine Auth Methods', () => {
   });
 
   it('should delegate getAuthStatus to adapter', async () => {
-    const expectedStatus = { state: 'authenticated' as const, user: 'test-user' };
+    const expectedStatus = {
+      state: 'authenticated' as const,
+      user: 'test-user',
+    };
     mockAdapter.getAuthStatus.mockResolvedValue(expectedStatus);
 
     const result = await engine.getAuthStatus();

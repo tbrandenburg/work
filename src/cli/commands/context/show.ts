@@ -5,7 +5,7 @@ import { formatOutput } from '../../formatter.js';
 
 export default class ContextShow extends BaseCommand {
   static override args = {
-    name: Args.string({ 
+    name: Args.string({
       description: 'context name to show (defaults to active context)',
       required: false,
     }),
@@ -27,9 +27,9 @@ export default class ContextShow extends BaseCommand {
     const { args } = await this.parse(ContextShow);
 
     const engine = new WorkEngine();
-    
+
     let context;
-    
+
     if (args.name) {
       // Find context by name
       const contexts = engine.getContexts();
@@ -41,13 +41,17 @@ export default class ContextShow extends BaseCommand {
       // Get active context
       context = engine.getActiveContext();
       if (!context) {
-        this.handleError('No active context found. Use "work context set <name>" to set one.');
+        this.handleError(
+          'No active context found. Use "work context set <name>" to set one.'
+        );
       }
     }
 
     const isJsonMode = await this.getJsonMode();
     if (isJsonMode) {
-      this.log(formatOutput(context, 'json', { timestamp: new Date().toISOString() }));
+      this.log(
+        formatOutput(context, 'json', { timestamp: new Date().toISOString() })
+      );
     } else {
       // Table format
       this.log(`Context: ${context.name}`);

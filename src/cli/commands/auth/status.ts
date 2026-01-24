@@ -5,7 +5,7 @@ import { formatOutput } from '../../formatter.js';
 
 export default class AuthStatus extends BaseCommand {
   static override args = {
-    context: Args.string({ 
+    context: Args.string({
       description: 'context name to check status (defaults to active context)',
       required: false,
     }),
@@ -27,7 +27,7 @@ export default class AuthStatus extends BaseCommand {
     const { args } = await this.parse(AuthStatus);
 
     const engine = new WorkEngine();
-    
+
     try {
       if (args.context) {
         engine.setActiveContext(args.context);
@@ -37,7 +37,11 @@ export default class AuthStatus extends BaseCommand {
 
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(authStatus, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(authStatus, 'json', {
+            timestamp: new Date().toISOString(),
+          })
+        );
         return;
       }
 
@@ -50,7 +54,9 @@ export default class AuthStatus extends BaseCommand {
         this.log(`Expires: ${authStatus.expiresAt.toISOString()}`);
       }
     } catch (error) {
-      this.handleError(`Failed to get auth status: ${(error as Error).message}`);
+      this.handleError(
+        `Failed to get auth status: ${(error as Error).message}`
+      );
     }
   }
 }

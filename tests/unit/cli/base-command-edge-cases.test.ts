@@ -29,9 +29,9 @@ describe('BaseCommand Edge Cases', () => {
   describe('getJsonMode', () => {
     it('should return false for table format', async () => {
       const command = new TestCommand([], {} as any);
-      
+
       vi.spyOn(command, 'parse' as any).mockResolvedValue({
-        flags: { format: 'table' }
+        flags: { format: 'table' },
       });
 
       const result = await command.testGetJsonMode();
@@ -40,9 +40,9 @@ describe('BaseCommand Edge Cases', () => {
 
     it('should return true for json format', async () => {
       const command = new TestCommand([], {} as any);
-      
+
       vi.spyOn(command, 'parse' as any).mockResolvedValue({
-        flags: { format: 'json' }
+        flags: { format: 'json' },
       });
 
       const result = await command.testGetJsonMode();
@@ -51,9 +51,9 @@ describe('BaseCommand Edge Cases', () => {
 
     it('should handle missing format flag', async () => {
       const command = new TestCommand([], {} as any);
-      
+
       vi.spyOn(command, 'parse' as any).mockResolvedValue({
-        flags: {}
+        flags: {},
       });
 
       const result = await command.testGetJsonMode();
@@ -62,13 +62,15 @@ describe('BaseCommand Edge Cases', () => {
 
     it('should fallback to argv parsing when parse fails', async () => {
       const command = new TestCommand([], {} as any);
-      
-      vi.spyOn(command, 'parse' as any).mockRejectedValue(new Error('Parse failed'));
-      
+
+      vi.spyOn(command, 'parse' as any).mockRejectedValue(
+        new Error('Parse failed')
+      );
+
       // Mock process.argv to include --format=json
       const originalArgv = process.argv;
       process.argv = ['node', 'script', '--format=json'];
-      
+
       try {
         const result = await command.testGetJsonMode();
         expect(result).toBe(true);
@@ -79,13 +81,15 @@ describe('BaseCommand Edge Cases', () => {
 
     it('should fallback to argv parsing with -f flag', async () => {
       const command = new TestCommand([], {} as any);
-      
-      vi.spyOn(command, 'parse' as any).mockRejectedValue(new Error('Parse failed'));
-      
+
+      vi.spyOn(command, 'parse' as any).mockRejectedValue(
+        new Error('Parse failed')
+      );
+
       // Mock process.argv to include -f json
       const originalArgv = process.argv;
       process.argv = ['node', 'script', '-f', 'json'];
-      
+
       try {
         const result = await command.testGetJsonMode();
         expect(result).toBe(true);
@@ -98,7 +102,7 @@ describe('BaseCommand Edge Cases', () => {
   describe('handleError', () => {
     it('should use oclif error handling for table mode', () => {
       const command = new TestCommand([], {} as any);
-      
+
       const errorSpy = vi.spyOn(command, 'error').mockImplementation(() => {
         throw new Error('Test error');
       });
@@ -106,9 +110,11 @@ describe('BaseCommand Edge Cases', () => {
       // Mock process.argv to not include JSON format
       const originalArgv = process.argv;
       process.argv = ['node', 'script'];
-      
+
       try {
-        expect(() => command.testHandleError('Test error')).toThrow('Test error');
+        expect(() => command.testHandleError('Test error')).toThrow(
+          'Test error'
+        );
         expect(errorSpy).toHaveBeenCalledWith('Test error', { exit: 1 });
       } finally {
         process.argv = originalArgv;
@@ -117,7 +123,7 @@ describe('BaseCommand Edge Cases', () => {
 
     it('should output to stderr and exit for JSON mode', () => {
       const command = new TestCommand([], {} as any);
-      
+
       const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation();
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => {
         throw new Error('Process exit called');
@@ -126,10 +132,14 @@ describe('BaseCommand Edge Cases', () => {
       // Mock process.argv to include JSON format
       const originalArgv = process.argv;
       process.argv = ['node', 'script', '--format=json'];
-      
+
       try {
-        expect(() => command.testHandleError('Test error')).toThrow('Process exit called');
-        expect(stderrSpy).toHaveBeenCalledWith(expect.stringContaining('Test error'));
+        expect(() => command.testHandleError('Test error')).toThrow(
+          'Process exit called'
+        );
+        expect(stderrSpy).toHaveBeenCalledWith(
+          expect.stringContaining('Test error')
+        );
         expect(exitSpy).toHaveBeenCalledWith(1);
       } finally {
         process.argv = originalArgv;
@@ -140,7 +150,7 @@ describe('BaseCommand Edge Cases', () => {
 
     it('should handle Error objects in JSON mode', () => {
       const command = new TestCommand([], {} as any);
-      
+
       const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation();
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => {
         throw new Error('Process exit called');
@@ -149,11 +159,15 @@ describe('BaseCommand Edge Cases', () => {
       // Mock process.argv to include JSON format
       const originalArgv = process.argv;
       process.argv = ['node', 'script', '--format=json'];
-      
+
       try {
         const error = new Error('Test error message');
-        expect(() => command.testHandleError(error)).toThrow('Process exit called');
-        expect(stderrSpy).toHaveBeenCalledWith(expect.stringContaining('Test error message'));
+        expect(() => command.testHandleError(error)).toThrow(
+          'Process exit called'
+        );
+        expect(stderrSpy).toHaveBeenCalledWith(
+          expect.stringContaining('Test error message')
+        );
         expect(exitSpy).toHaveBeenCalledWith(1);
       } finally {
         process.argv = originalArgv;
@@ -164,7 +178,7 @@ describe('BaseCommand Edge Cases', () => {
 
     it('should handle custom exit codes', () => {
       const command = new TestCommand([], {} as any);
-      
+
       const errorSpy = vi.spyOn(command, 'error').mockImplementation(() => {
         throw new Error('Test error');
       });
@@ -172,9 +186,11 @@ describe('BaseCommand Edge Cases', () => {
       // Mock process.argv to not include JSON format
       const originalArgv = process.argv;
       process.argv = ['node', 'script'];
-      
+
       try {
-        expect(() => command.testHandleError('Test error', 2)).toThrow('Test error');
+        expect(() => command.testHandleError('Test error', 2)).toThrow(
+          'Test error'
+        );
         expect(errorSpy).toHaveBeenCalledWith('Test error', { exit: 2 });
       } finally {
         process.argv = originalArgv;

@@ -5,7 +5,7 @@ import { formatOutput } from '../../formatter.js';
 
 export default class SchemaShow extends BaseCommand {
   static override args = {
-    context: Args.string({ 
+    context: Args.string({
       description: 'context name to show schema (defaults to active context)',
       required: false,
     }),
@@ -27,7 +27,7 @@ export default class SchemaShow extends BaseCommand {
     const { args, flags } = await this.parse(SchemaShow);
 
     const engine = new WorkEngine();
-    
+
     try {
       if (args.context) {
         engine.setActiveContext(args.context);
@@ -36,24 +36,28 @@ export default class SchemaShow extends BaseCommand {
       const schema = await engine.getSchema();
 
       if (flags.format === 'json') {
-        this.log(formatOutput(schema, flags.format, { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(schema, flags.format, {
+            timestamp: new Date().toISOString(),
+          })
+        );
         return;
       }
 
       // Table format
       this.log(`Schema Information`);
       this.log('─'.repeat(40));
-      
+
       this.log(`\nWork Item Kinds (${schema.kinds.length}):`);
       schema.kinds.forEach(kind => this.log(`  • ${kind}`));
-      
+
       this.log(`\nAttributes (${schema.attributes.length}):`);
       schema.attributes.forEach(attr => {
         const required = attr.required ? ' (required)' : '';
         const desc = attr.description ? ` - ${attr.description}` : '';
         this.log(`  • ${attr.name}: ${attr.type}${required}${desc}`);
       });
-      
+
       this.log(`\nRelation Types (${schema.relationTypes.length}):`);
       schema.relationTypes.forEach(rel => {
         const desc = rel.description ? ` - ${rel.description}` : '';

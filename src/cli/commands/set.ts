@@ -59,24 +59,32 @@ export default class Set extends BaseCommand {
       if (flags.description) updateRequest.description = flags.description;
       if (flags.priority) updateRequest.priority = flags.priority as Priority;
       if (flags.assignee) updateRequest.assignee = flags.assignee;
-      if (flags.labels) updateRequest.labels = flags.labels.split(',').map(l => l.trim());
+      if (flags.labels)
+        updateRequest.labels = flags.labels.split(',').map(l => l.trim());
 
       if (Object.keys(updateRequest).length === 0) {
-        this.error('No properties specified to update. Use --title, --description, --priority, --assignee, or --labels');
+        this.error(
+          'No properties specified to update. Use --title, --description, --priority, --assignee, or --labels'
+        );
       }
 
       const workItem = await engine.updateWorkItem(args.id, updateRequest);
-      
+
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(workItem, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(workItem, 'json', {
+            timestamp: new Date().toISOString(),
+          })
+        );
       } else {
         this.log(`Updated work item ${workItem.id}`);
         this.log(`Title: ${workItem.title}`);
         this.log(`State: ${workItem.state}`);
         this.log(`Priority: ${workItem.priority}`);
         if (workItem.assignee) this.log(`Assignee: ${workItem.assignee}`);
-        if (workItem.labels.length > 0) this.log(`Labels: ${workItem.labels.join(', ')}`);
+        if (workItem.labels.length > 0)
+          this.log(`Labels: ${workItem.labels.join(', ')}`);
       }
     } catch (error) {
       this.error(error instanceof Error ? error.message : String(error));

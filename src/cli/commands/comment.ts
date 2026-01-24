@@ -28,16 +28,18 @@ export default class Comment extends BaseCommand {
 
       // For MVP, this is a placeholder implementation
       engine.addComment(args.id, args.text);
-      
+
       const result = {
         message: `Comment added to ${args.id}`,
         comment: args.text,
-        workItemId: args.id
+        workItemId: args.id,
       };
-      
+
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(result, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(result, 'json', { timestamp: new Date().toISOString() })
+        );
       } else {
         this.log(`Comment added to ${args.id}: "${args.text}"`);
       }

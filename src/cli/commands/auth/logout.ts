@@ -5,7 +5,7 @@ import { formatOutput } from '../../formatter.js';
 
 export default class AuthLogout extends BaseCommand {
   static override args = {
-    context: Args.string({ 
+    context: Args.string({
       description: 'context name to logout from (defaults to active context)',
       required: false,
     }),
@@ -26,17 +26,23 @@ export default class AuthLogout extends BaseCommand {
     const { args } = await this.parse(AuthLogout);
 
     const engine = new WorkEngine();
-    
+
     try {
       if (args.context) {
         engine.setActiveContext(args.context);
       }
 
       await engine.logout();
-      
+
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput({ success: true, message: 'Logout successful' }, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(
+            { success: true, message: 'Logout successful' },
+            'json',
+            { timestamp: new Date().toISOString() }
+          )
+        );
       } else {
         this.log(`✅ Logout successful`);
       }

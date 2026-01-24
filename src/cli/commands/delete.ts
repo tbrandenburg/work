@@ -26,20 +26,24 @@ export default class Delete extends BaseCommand {
       const engine = new WorkEngine();
 
       await engine.deleteWorkItem(args.id);
-      
+
       const result = {
         message: `Deleted work item ${args.id}`,
-        workItemId: args.id
+        workItemId: args.id,
       };
-      
+
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(result, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(result, 'json', { timestamp: new Date().toISOString() })
+        );
       } else {
         this.log(`Deleted work item ${args.id}`);
       }
     } catch (error) {
-      this.handleError(`Failed to delete work item: ${(error as Error).message}`);
+      this.handleError(
+        `Failed to delete work item: ${(error as Error).message}`
+      );
     }
   }
 }

@@ -1,0 +1,120 @@
+/**
+ * GitHub API client wrapper with rate limiting
+ */
+
+import { Octokit } from '@octokit/rest';
+import { throttling } from '@octokit/plugin-throttling';
+import { GitHubConfig, GitHubIssue } from './types.js';
+import { GitHubApiError } from './errors.js';
+
+// Create Octokit with throttling plugin
+const ThrottledOctokit = Octokit.plugin(throttling);
+
+export class GitHubApiClient {
+  private octokit: InstanceType<typeof ThrottledOctokit>;
+  private config: GitHubConfig;
+
+  constructor(config: GitHubConfig) {
+    this.config = config;
+    this.octokit = new ThrottledOctokit({
+      auth: config.token,
+      throttle: {
+        onRateLimit: (retryAfter: number, _options: unknown): boolean => {
+          console.warn(
+            `Rate limit exceeded, retrying after ${retryAfter} seconds`
+          );
+          return true; // Retry once
+        },
+        onSecondaryRateLimit: (
+          retryAfter: number,
+          _options: unknown
+        ): boolean => {
+          console.warn(
+            `Secondary rate limit exceeded, retrying after ${retryAfter} seconds`
+          );
+          return true; // Retry once
+        },
+      },
+    });
+  }
+
+  async listIssues(): Promise<GitHubIssue[]> {
+    try {
+      const response = await this.octokit.rest.issues.listForRepo({
+        owner: this.config.owner,
+        repo: this.config.repo,
+        state: 'all',
+        per_page: 100,
+      });
+
+      return response.data as GitHubIssue[];
+    } catch (error: unknown) {
+      const apiError = error as { message: string; status?: number };
+      throw new GitHubApiError(apiError.message, apiError.status || 500);
+    }
+  }
+
+  async getIssue(issueNumber: number): Promise<GitHubIssue> {
+    try {
+      const response = await this.octokit.rest.issues.get({
+        owner: this.config.owner,
+        repo: this.config.repo,
+        issue_number: issueNumber,
+      });
+
+      return response.data as GitHubIssue;
+    } catch (error: unknown) {
+      const apiError = error as { message: string; status?: number };
+      throw new GitHubApiError(apiError.message, apiError.status || 500);
+    }
+  }
+
+  async createIssue(
+    title: string,
+    body?: string,
+    labels?: string[]
+  ): Promise<GitHubIssue> {
+    try {
+      const response = await this.octokit.rest.issues.create({
+        owner: this.config.owner,
+        repo: this.config.repo,
+        title,
+        body: body || '',
+        labels: labels || [],
+      });
+
+      return response.data as GitHubIssue;
+    } catch (error: unknown) {
+      const apiError = error as { message: string; status?: number };
+      throw new GitHubApiError(apiError.message, apiError.status || 500);
+    }
+  }
+
+  async updateIssue(
+    issueNumber: number,
+    updates: {
+      title?: string;
+      body?: string;
+      state?: 'open' | 'closed';
+      labels?: string[];
+    }
+  ): Promise<GitHubIssue> {
+    try {
+      const response = await this.octokit.rest.issues.update({
+        owner: this.config.owner,
+        repo: this.config.repo,
+        issue_number: issueNumber,
+        ...updates,
+      });
+
+      return response.data as GitHubIssue;
+    } catch (error: unknown) {
+      const apiError = error as { message: string; status?: number };
+      throw new GitHubApiError(apiError.message, apiError.status || 500);
+    }
+  }
+
+  async closeIssue(issueNumber: number): Promise<GitHubIssue> {
+    return this.updateIssue(issueNumber, { state: 'closed' });
+  }
+}

@@ -1,10 +1,16 @@
-import { WorkError, WorkItemNotFoundError, ContextNotFoundError, InvalidQueryError, RelationError } from '../../../src/types/errors';
+import {
+  WorkError,
+  WorkItemNotFoundError,
+  ContextNotFoundError,
+  InvalidQueryError,
+  RelationError,
+} from '../../../src/types/errors';
 
 describe('Error Classes', () => {
   describe('WorkError', () => {
     it('should create a work error with message, code, and status', () => {
       const error = new WorkError('Test error', 'TEST_ERROR', 400);
-      
+
       expect(error.message).toBe('Test error');
       expect(error.code).toBe('TEST_ERROR');
       expect(error.statusCode).toBe(400);
@@ -15,7 +21,7 @@ describe('Error Classes', () => {
 
     it('should use default status code 500', () => {
       const error = new WorkError('Test error', 'TEST_ERROR');
-      
+
       expect(error.statusCode).toBe(500);
     });
   });
@@ -23,7 +29,7 @@ describe('Error Classes', () => {
   describe('WorkItemNotFoundError', () => {
     it('should create a work item not found error', () => {
       const error = new WorkItemNotFoundError('TASK-001');
-      
+
       expect(error.message).toBe('Work item not found: TASK-001');
       expect(error.code).toBe('WORK_ITEM_NOT_FOUND');
       expect(error.statusCode).toBe(404);
@@ -36,7 +42,7 @@ describe('Error Classes', () => {
   describe('ContextNotFoundError', () => {
     it('should create a context not found error', () => {
       const error = new ContextNotFoundError('test-context');
-      
+
       expect(error.message).toBe('Context not found: test-context');
       expect(error.code).toBe('CONTEXT_NOT_FOUND');
       expect(error.statusCode).toBe(404);
@@ -49,8 +55,10 @@ describe('Error Classes', () => {
   describe('InvalidQueryError', () => {
     it('should create an invalid query error', () => {
       const error = new InvalidQueryError('invalid syntax', 'missing operator');
-      
-      expect(error.message).toBe('Invalid query "invalid syntax": missing operator');
+
+      expect(error.message).toBe(
+        'Invalid query "invalid syntax": missing operator'
+      );
       expect(error.code).toBe('INVALID_QUERY');
       expect(error.statusCode).toBe(400);
       expect(error.name).toBe('InvalidQueryError');
@@ -62,7 +70,7 @@ describe('Error Classes', () => {
   describe('RelationError', () => {
     it('should create a relation error', () => {
       const error = new RelationError('Invalid relation');
-      
+
       expect(error.message).toBe('Invalid relation');
       expect(error.code).toBe('RELATION_ERROR');
       expect(error.statusCode).toBe(400);

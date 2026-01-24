@@ -24,7 +24,15 @@ export default class Unlink extends BaseCommand {
       char: 't',
       description: 'relation type',
       required: true,
-      options: ['parent_of', 'child_of', 'blocks', 'blocked_by', 'duplicates', 'duplicate_of', 'relates_to'],
+      options: [
+        'parent_of',
+        'child_of',
+        'blocks',
+        'blocked_by',
+        'duplicates',
+        'duplicate_of',
+        'relates_to',
+      ],
     }),
   };
 
@@ -34,25 +42,33 @@ export default class Unlink extends BaseCommand {
     try {
       const engine = new WorkEngine();
 
-      await engine.deleteRelation(args.from, args.to, flags.type as RelationType);
-      
+      await engine.deleteRelation(
+        args.from,
+        args.to,
+        flags.type as RelationType
+      );
+
       const result = {
         message: `Removed relation: ${args.from} ${flags.type} ${args.to}`,
         relation: {
           from: args.from,
           to: args.to,
-          type: flags.type
-        }
+          type: flags.type,
+        },
       };
-      
+
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(result, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(result, 'json', { timestamp: new Date().toISOString() })
+        );
       } else {
         this.log(`Removed relation: ${args.from} ${flags.type} ${args.to}`);
       }
     } catch (error) {
-      this.handleError(`Failed to unlink work items: ${(error as Error).message}`);
+      this.handleError(
+        `Failed to unlink work items: ${(error as Error).message}`
+      );
     }
   }
 }

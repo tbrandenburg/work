@@ -39,6 +39,8 @@
   "dependencies": {
     "@oclif/core": "^4.0.0",
     "@oclif/plugin-help": "^6.0.0",
+    "@octokit/rest": "^22.0.1",
+    "@octokit/plugin-throttling": "^11.0.3",
     "tslib": "^2.8.1"
   },
   "devDependencies": {

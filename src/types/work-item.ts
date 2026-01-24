@@ -8,7 +8,14 @@ export type WorkItemKind = 'task' | 'bug' | 'epic' | 'story';
 
 export type Priority = 'low' | 'medium' | 'high' | 'critical';
 
-export type RelationType = 'parent_of' | 'child_of' | 'blocks' | 'blocked_by' | 'duplicates' | 'duplicate_of' | 'relates_to';
+export type RelationType =
+  | 'parent_of'
+  | 'child_of'
+  | 'blocks'
+  | 'blocked_by'
+  | 'duplicates'
+  | 'duplicate_of'
+  | 'relates_to';
 
 export interface WorkItem {
   readonly id: string;

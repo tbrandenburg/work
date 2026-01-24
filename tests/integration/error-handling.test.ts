@@ -18,6 +18,8 @@ describe('Error Handling Integration', () => {
 
   it('should handle async error scenarios', async () => {
     // Test async error handling patterns
-    await expect(Promise.reject(new Error('Async error'))).rejects.toThrow('Async error');
+    await expect(Promise.reject(new Error('Async error'))).rejects.toThrow(
+      'Async error'
+    );
   });
 });

@@ -2,7 +2,12 @@
  * Unit tests for WorkItem types
  */
 
-import { WorkItem, WorkItemState, WorkItemKind, Priority } from '@/types/work-item';
+import {
+  WorkItem,
+  WorkItemState,
+  WorkItemKind,
+  Priority,
+} from '@/types/work-item';
 
 describe('WorkItem Types', () => {
   it('should have valid WorkItemState values', () => {

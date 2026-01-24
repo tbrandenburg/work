@@ -27,7 +27,8 @@ export default class List extends BaseCommand {
     ...BaseCommand.baseFlags,
     where: Flags.string({
       char: 'w',
-      description: 'filter work items (e.g., state=new, kind=task) - deprecated, use positional args',
+      description:
+        'filter work items (e.g., state=new, kind=task) - deprecated, use positional args',
     }),
   };
 
@@ -35,10 +36,10 @@ export default class List extends BaseCommand {
     const { args, flags } = await this.parse(List);
 
     const engine = new WorkEngine();
-    
+
     try {
       let whereClause: string | undefined;
-      
+
       // Handle new positional syntax: work list where "query"
       if (args.subcommand === 'where') {
         if (!args.query) {
@@ -57,7 +58,12 @@ export default class List extends BaseCommand {
 
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(workItems, 'json', { total: workItems.length, timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(workItems, 'json', {
+            total: workItems.length,
+            timestamp: new Date().toISOString(),
+          })
+        );
         return;
       }
 
@@ -70,17 +76,18 @@ export default class List extends BaseCommand {
       // Simple table output
       this.log('ID\t\tKind\tState\tPriority\tTitle');
       this.log('─'.repeat(80));
-      
+
       for (const item of workItems) {
         const id = item.id.padEnd(12);
         const kind = item.kind.padEnd(8);
         const state = item.state.padEnd(8);
         const priority = item.priority.padEnd(8);
-        const title = item.title.length > 40 ? item.title.slice(0, 37) + '...' : item.title;
-        
+        const title =
+          item.title.length > 40 ? item.title.slice(0, 37) + '...' : item.title;
+
         this.log(`${id}\t${kind}\t${state}\t${priority}\t${title}`);
       }
-      
+
       this.log(`\nTotal: ${workItems.length} work items`);
     } catch (error) {
       this.error(`Failed to list work items: ${(error as Error).message}`);

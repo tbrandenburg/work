@@ -13,7 +13,7 @@ describe('Schema Relations Command Integration', () => {
     testDir = mkdtempSync(join(tmpdir(), 'work-schema-relations-'));
     process.chdir(testDir);
     binPath = join(originalCwd, 'bin/run.js');
-    
+
     // Create .work directory structure for default context
     execSync('mkdir -p .work/projects/default', { stdio: 'pipe' });
   });
@@ -24,7 +24,9 @@ describe('Schema Relations Command Integration', () => {
   });
 
   it('should list relation types in table format', () => {
-    const result = execSync(`node ${binPath} schema relations`, { encoding: 'utf8' });
+    const result = execSync(`node ${binPath} schema relations`, {
+      encoding: 'utf8',
+    });
     expect(result).toContain('Available Relation Types (4):');
     expect(result).toContain('• blocks');
     expect(result).toContain('• parent_of');
@@ -33,7 +35,9 @@ describe('Schema Relations Command Integration', () => {
   });
 
   it('should list relations in JSON format', () => {
-    const result = execSync(`node ${binPath} schema relations --format json`, { encoding: 'utf8' });
+    const result = execSync(`node ${binPath} schema relations --format json`, {
+      encoding: 'utf8',
+    });
     const parsed = JSON.parse(result);
     expect(parsed.data).toHaveLength(4);
     expect(parsed.data[0].name).toBe('blocks');
@@ -44,7 +48,10 @@ describe('Schema Relations Command Integration', () => {
   it('should handle error when getting relations', () => {
     // Test error handling branch with invalid context
     expect(() => {
-      execSync(`node ${binPath} schema relations nonexistent`, { encoding: 'utf8', stdio: 'pipe' });
+      execSync(`node ${binPath} schema relations nonexistent`, {
+        encoding: 'utf8',
+        stdio: 'pipe',
+      });
     }).toThrow();
   });
 
@@ -52,7 +59,10 @@ describe('Schema Relations Command Integration', () => {
     // Test the if (args.context) branch - this will trigger the branch
     // even though it fails, which is what we want for coverage
     expect(() => {
-      execSync(`node ${binPath} schema relations nonexistent-context`, { encoding: 'utf8', stdio: 'pipe' });
+      execSync(`node ${binPath} schema relations nonexistent-context`, {
+        encoding: 'utf8',
+        stdio: 'pipe',
+      });
     }).toThrow();
   });
 });

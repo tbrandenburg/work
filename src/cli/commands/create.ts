@@ -6,7 +6,7 @@ import { formatOutput } from '../formatter.js';
 
 export default class Create extends BaseCommand {
   static override args = {
-    title: Args.string({ 
+    title: Args.string({
       description: 'title of the work item',
       required: true,
     }),
@@ -51,10 +51,12 @@ export default class Create extends BaseCommand {
     const { args, flags } = await this.parse(Create);
 
     const engine = new WorkEngine();
-    
+
     try {
-      const labels = flags.labels ? flags.labels.split(',').map(l => l.trim()) : [];
-      
+      const labels = flags.labels
+        ? flags.labels.split(',').map(l => l.trim())
+        : [];
+
       const workItem = await engine.createWorkItem({
         title: args.title,
         kind: flags.kind as WorkItemKind,
@@ -66,12 +68,18 @@ export default class Create extends BaseCommand {
 
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(workItem, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(workItem, 'json', {
+            timestamp: new Date().toISOString(),
+          })
+        );
       } else {
         this.log(`Created ${workItem.kind} ${workItem.id}: ${workItem.title}`);
       }
     } catch (error) {
-      this.handleError(`Failed to create work item: ${(error as Error).message}`);
+      this.handleError(
+        `Failed to create work item: ${(error as Error).message}`
+      );
     }
   }
 }

@@ -2,7 +2,19 @@
  * Main engine class with context resolution and command delegation
  */
 
-import { WorkAdapter, Context, WorkItem, CreateWorkItemRequest, UpdateWorkItemRequest, Relation, ContextNotFoundError, AuthStatus, Schema, SchemaAttribute, SchemaRelationType } from '../types/index.js';
+import {
+  WorkAdapter,
+  Context,
+  WorkItem,
+  CreateWorkItemRequest,
+  UpdateWorkItemRequest,
+  Relation,
+  ContextNotFoundError,
+  AuthStatus,
+  Schema,
+  SchemaAttribute,
+  SchemaRelationType,
+} from '../types/index.js';
 import { LocalFsAdapter } from '../adapters/local-fs/index.js';
 import { validateRelation, detectCycles } from './graph.js';
 import { parseQuery, executeQuery } from './query.js';
@@ -29,7 +41,7 @@ export class WorkEngine {
         authState: 'authenticated',
         isActive: true,
       };
-      
+
       await this.addContext(defaultContext);
       this.setActiveContext('default');
     } else if (!this.activeContext) {
@@ -146,7 +158,10 @@ export class WorkEngine {
   /**
    * Update a work item
    */
-  async updateWorkItem(id: string, request: UpdateWorkItemRequest): Promise<WorkItem> {
+  async updateWorkItem(
+    id: string,
+    request: UpdateWorkItemRequest
+  ): Promise<WorkItem> {
     await this.ensureDefaultContext();
     const adapter = this.getActiveAdapter();
     return adapter.updateWorkItem(id, request);
@@ -167,7 +182,7 @@ export class WorkEngine {
   async listWorkItems(queryString?: string): Promise<WorkItem[]> {
     await this.ensureDefaultContext();
     const adapter = this.getActiveAdapter();
-    
+
     if (!queryString) {
       return adapter.listWorkItems();
     }
@@ -176,7 +191,7 @@ export class WorkEngine {
     const fullQuery = `where ${queryString}`;
     const query = parseQuery(fullQuery);
     const allItems = await adapter.listWorkItems(); // Get all items, filter in executeQuery
-    
+
     return executeQuery(allItems, query);
   }
 
@@ -186,19 +201,19 @@ export class WorkEngine {
   async createRelation(relation: Relation): Promise<void> {
     await this.ensureDefaultContext();
     const adapter = this.getActiveAdapter();
-    
+
     // Get all work items and relations for validation
     const workItems = await adapter.listWorkItems();
     const allRelations = await this.getAllRelations();
-    
+
     // Validate the relation
     validateRelation(relation, workItems);
-    
+
     // Check for cycles in parent/child relationships
     if (relation.type === 'parent_of' && detectCycles(allRelations, relation)) {
       throw new Error('Creating this relation would create a cycle');
     }
-    
+
     await adapter.createRelation(relation);
   }
 
@@ -214,7 +229,11 @@ export class WorkEngine {
   /**
    * Delete a relation
    */
-  async deleteRelation(from: string, to: string, type: Relation['type']): Promise<void> {
+  async deleteRelation(
+    from: string,
+    to: string,
+    type: Relation['type']
+  ): Promise<void> {
     await this.ensureDefaultContext();
     const adapter = this.getActiveAdapter();
     await adapter.deleteRelation(from, to, type);
@@ -234,7 +253,9 @@ export class WorkEngine {
    */
   addComment(workItemId: string, text: string): void {
     // Placeholder implementation for MVP
-    console.log(`Comment operation not yet implemented: ${workItemId} - ${text}`);
+    console.log(
+      `Comment operation not yet implemented: ${workItemId} - ${text}`
+    );
   }
 
   /**
@@ -242,7 +263,9 @@ export class WorkEngine {
    */
   moveWorkItem(workItemId: string, targetContext: string): void {
     // Placeholder implementation for MVP
-    console.log(`Move operation not yet implemented: ${workItemId} to ${targetContext}`);
+    console.log(
+      `Move operation not yet implemented: ${workItemId} to ${targetContext}`
+    );
   }
 
   /**
@@ -252,26 +275,28 @@ export class WorkEngine {
     const adapter = this.getActiveAdapter();
     const workItems = await adapter.listWorkItems();
     const allRelations: Relation[] = [];
-    
+
     for (const item of workItems) {
       const relations = await adapter.getRelations(item.id);
       allRelations.push(...relations);
     }
-    
+
     // Remove duplicates
     const unique = new Map<string, Relation>();
     for (const relation of allRelations) {
       const key = `${relation.from}-${relation.to}-${relation.type}`;
       unique.set(key, relation);
     }
-    
+
     return Array.from(unique.values());
   }
 
   /**
    * Authenticate with the backend
    */
-  async authenticate(credentials?: Record<string, string>  ): Promise<AuthStatus> {
+  async authenticate(
+    credentials?: Record<string, string>
+  ): Promise<AuthStatus> {
     await this.ensureDefaultContext();
     const adapter = this.getActiveAdapter();
     return adapter.authenticate(credentials);

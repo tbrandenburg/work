@@ -5,7 +5,7 @@ import { formatOutput } from '../formatter.js';
 
 export default class Close extends BaseCommand {
   static override args = {
-    id: Args.string({ 
+    id: Args.string({
       description: 'work item ID to close',
       required: true,
     }),
@@ -26,16 +26,18 @@ export default class Close extends BaseCommand {
     const { args } = await this.parse(Close);
 
     const engine = new WorkEngine();
-    
+
     try {
       const workItem = await engine.changeState(args.id, 'closed');
-      
+
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(workItem, 'json', { 
-          timestamp: new Date().toISOString(),
-          closedAt: workItem.closedAt 
-        }));
+        this.log(
+          formatOutput(workItem, 'json', {
+            timestamp: new Date().toISOString(),
+            closedAt: workItem.closedAt,
+          })
+        );
       } else {
         this.log(`Closed ${workItem.kind} ${workItem.id}: ${workItem.title}`);
       }

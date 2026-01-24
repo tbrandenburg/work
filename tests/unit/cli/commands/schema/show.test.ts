@@ -13,7 +13,7 @@ describe('Schema Show Command Integration', () => {
     testDir = mkdtempSync(join(tmpdir(), 'work-schema-show-'));
     process.chdir(testDir);
     binPath = join(originalCwd, 'bin/run.js');
-    
+
     // Create .work directory structure for default context
     execSync('mkdir -p .work/projects/default', { stdio: 'pipe' });
   });
@@ -24,7 +24,9 @@ describe('Schema Show Command Integration', () => {
   });
 
   it('should show complete schema in table format', () => {
-    const result = execSync(`node ${binPath} schema show`, { encoding: 'utf8' });
+    const result = execSync(`node ${binPath} schema show`, {
+      encoding: 'utf8',
+    });
     expect(result).toContain('Schema Information');
     expect(result).toContain('Work Item Kinds (4):');
     expect(result).toContain('• task');
@@ -36,7 +38,9 @@ describe('Schema Show Command Integration', () => {
   });
 
   it('should show schema in JSON format', () => {
-    const result = execSync(`node ${binPath} schema show --format json`, { encoding: 'utf8' });
+    const result = execSync(`node ${binPath} schema show --format json`, {
+      encoding: 'utf8',
+    });
     const parsed = JSON.parse(result);
     expect(parsed.data.kinds).toContain('task');
     expect(parsed.data.kinds).toContain('bug');
@@ -48,7 +52,10 @@ describe('Schema Show Command Integration', () => {
   it('should handle error when getting schema', () => {
     // Test error handling branch with invalid context
     expect(() => {
-      execSync(`node ${binPath} schema show nonexistent`, { encoding: 'utf8', stdio: 'pipe' });
+      execSync(`node ${binPath} schema show nonexistent`, {
+        encoding: 'utf8',
+        stdio: 'pipe',
+      });
     }).toThrow();
   });
 
@@ -56,8 +63,10 @@ describe('Schema Show Command Integration', () => {
     // The CLI automatically creates default context, so this test verifies
     // that schema show works even when starting from scratch
     execSync('rm -rf .work', { stdio: 'pipe' });
-    
-    const result = execSync(`node ${binPath} schema show`, { encoding: 'utf8' });
+
+    const result = execSync(`node ${binPath} schema show`, {
+      encoding: 'utf8',
+    });
     expect(result).toContain('Schema Information');
   });
 
@@ -65,7 +74,10 @@ describe('Schema Show Command Integration', () => {
     // Test the if (args.context) branch - this will trigger the branch
     // even though it fails, which is what we want for coverage
     expect(() => {
-      execSync(`node ${binPath} schema show nonexistent-context`, { encoding: 'utf8', stdio: 'pipe' });
+      execSync(`node ${binPath} schema show nonexistent-context`, {
+        encoding: 'utf8',
+        stdio: 'pipe',
+      });
     }).toThrow();
   });
 });

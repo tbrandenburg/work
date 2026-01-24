@@ -13,7 +13,7 @@ describe('Schema Kinds Command Integration', () => {
     testDir = mkdtempSync(join(tmpdir(), 'work-schema-kinds-'));
     process.chdir(testDir);
     binPath = join(originalCwd, 'bin/run.js');
-    
+
     // Create .work directory structure for default context
     execSync('mkdir -p .work/projects/default', { stdio: 'pipe' });
   });
@@ -24,7 +24,9 @@ describe('Schema Kinds Command Integration', () => {
   });
 
   it('should list work item kinds in table format', () => {
-    const result = execSync(`node ${binPath} schema kinds`, { encoding: 'utf8' });
+    const result = execSync(`node ${binPath} schema kinds`, {
+      encoding: 'utf8',
+    });
     expect(result).toContain('Available Work Item Kinds (4):');
     expect(result).toContain('• task');
     expect(result).toContain('• bug');
@@ -33,7 +35,9 @@ describe('Schema Kinds Command Integration', () => {
   });
 
   it('should list kinds in JSON format', () => {
-    const result = execSync(`node ${binPath} schema kinds --format json`, { encoding: 'utf8' });
+    const result = execSync(`node ${binPath} schema kinds --format json`, {
+      encoding: 'utf8',
+    });
     const parsed = JSON.parse(result);
     expect(parsed.data).toContain('task');
     expect(parsed.data).toContain('bug');
@@ -45,7 +49,10 @@ describe('Schema Kinds Command Integration', () => {
   it('should handle error when getting kinds', () => {
     // Test error handling branch with invalid context
     expect(() => {
-      execSync(`node ${binPath} schema kinds nonexistent`, { encoding: 'utf8', stdio: 'pipe' });
+      execSync(`node ${binPath} schema kinds nonexistent`, {
+        encoding: 'utf8',
+        stdio: 'pipe',
+      });
     }).toThrow();
   });
 
@@ -53,7 +60,10 @@ describe('Schema Kinds Command Integration', () => {
     // Test the if (args.context) branch - this will trigger the branch
     // even though it fails, which is what we want for coverage
     expect(() => {
-      execSync(`node ${binPath} schema kinds nonexistent-context`, { encoding: 'utf8', stdio: 'pipe' });
+      execSync(`node ${binPath} schema kinds nonexistent-context`, {
+        encoding: 'utf8',
+        stdio: 'pipe',
+      });
     }).toThrow();
   });
 });

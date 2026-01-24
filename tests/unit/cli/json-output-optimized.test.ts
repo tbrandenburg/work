@@ -20,9 +20,11 @@ describe('JSON Output Validation (Optimized)', () => {
 
   describe('Structured Response Format', () => {
     it('should output structured JSON for create command', () => {
-      const result = formatOutput(mockWorkItem, 'json', { timestamp: '2024-01-01T00:00:00Z' });
+      const result = formatOutput(mockWorkItem, 'json', {
+        timestamp: '2024-01-01T00:00:00Z',
+      });
       const parsed = JSON.parse(result);
-      
+
       expect(parsed).toHaveProperty('data');
       expect(parsed).toHaveProperty('meta');
       expect(parsed.data).toHaveProperty('id');
@@ -32,9 +34,12 @@ describe('JSON Output Validation (Optimized)', () => {
 
     it('should output structured JSON for list command', () => {
       const mockList = [mockWorkItem];
-      const result = formatOutput(mockList, 'json', { total: 1, timestamp: '2024-01-01T00:00:00Z' });
+      const result = formatOutput(mockList, 'json', {
+        total: 1,
+        timestamp: '2024-01-01T00:00:00Z',
+      });
       const parsed = JSON.parse(result);
-      
+
       expect(parsed).toHaveProperty('data');
       expect(parsed).toHaveProperty('meta');
       expect(Array.isArray(parsed.data)).toBe(true);
@@ -44,9 +49,11 @@ describe('JSON Output Validation (Optimized)', () => {
 
     it('should output structured JSON for auth status command', () => {
       const authData = { state: 'authenticated', user: 'test-user' };
-      const result = formatOutput(authData, 'json', { timestamp: '2024-01-01T00:00:00Z' });
+      const result = formatOutput(authData, 'json', {
+        timestamp: '2024-01-01T00:00:00Z',
+      });
       const parsed = JSON.parse(result);
-      
+
       expect(parsed).toHaveProperty('data');
       expect(parsed).toHaveProperty('meta');
       expect(parsed.data).toHaveProperty('state');
@@ -55,9 +62,11 @@ describe('JSON Output Validation (Optimized)', () => {
 
     it('should output structured JSON for hello command', () => {
       const helloData = { message: 'hello world from test' };
-      const result = formatOutput(helloData, 'json', { timestamp: '2024-01-01T00:00:00Z' });
+      const result = formatOutput(helloData, 'json', {
+        timestamp: '2024-01-01T00:00:00Z',
+      });
       const parsed = JSON.parse(result);
-      
+
       expect(parsed).toHaveProperty('data');
       expect(parsed).toHaveProperty('meta');
       expect(parsed.data).toHaveProperty('message');
@@ -69,7 +78,7 @@ describe('JSON Output Validation (Optimized)', () => {
       const startedItem = { ...mockWorkItem, state: 'active' as const };
       const result = formatOutput(startedItem, 'json');
       const parsed = JSON.parse(result);
-      
+
       expect(parsed.data.state).toBe('active');
     });
 
@@ -77,7 +86,7 @@ describe('JSON Output Validation (Optimized)', () => {
       const closedItem = { ...mockWorkItem, state: 'closed' as const };
       const result = formatOutput(closedItem, 'json');
       const parsed = JSON.parse(result);
-      
+
       expect(parsed.data.state).toBe('closed');
     });
 
@@ -85,7 +94,7 @@ describe('JSON Output Validation (Optimized)', () => {
       const reopenedItem = { ...mockWorkItem, state: 'new' as const };
       const result = formatOutput(reopenedItem, 'json');
       const parsed = JSON.parse(result);
-      
+
       expect(parsed.data.state).toBe('new');
     });
   });
@@ -97,7 +106,7 @@ describe('JSON Output Validation (Optimized)', () => {
         [mockWorkItem],
         { message: 'test' },
         null,
-        []
+        [],
       ];
 
       testData.forEach(data => {
@@ -134,9 +143,11 @@ describe('JSON Output Validation (Optimized)', () => {
 
   describe('Meta Information', () => {
     it('should include timestamp in meta when provided', () => {
-      const result = formatOutput(mockWorkItem, 'json', { timestamp: '2024-01-01T00:00:00Z' });
+      const result = formatOutput(mockWorkItem, 'json', {
+        timestamp: '2024-01-01T00:00:00Z',
+      });
       const parsed = JSON.parse(result);
-      
+
       expect(parsed.meta).toHaveProperty('timestamp');
       expect(typeof parsed.meta.timestamp).toBe('string');
       expect(new Date(parsed.meta.timestamp)).toBeInstanceOf(Date);
@@ -145,7 +156,7 @@ describe('JSON Output Validation (Optimized)', () => {
     it('should include total count for list commands', () => {
       const result = formatOutput([mockWorkItem], 'json', { total: 1 });
       const parsed = JSON.parse(result);
-      
+
       expect(parsed.meta).toHaveProperty('total', 1);
     });
   });
