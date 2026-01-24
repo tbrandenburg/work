@@ -26,6 +26,7 @@ import { validateRelation, detectCycles } from './graph.js';
 import { parseQuery, executeQuery } from './query.js';
 import { NotificationService } from './notification-service.js';
 import { BashTargetHandler } from './target-handlers/bash-handler.js';
+import { TelegramTargetHandler } from './target-handlers/telegram-handler.js';
 
 export class WorkEngine {
   private adapters = new Map<string, WorkAdapter>();
@@ -51,6 +52,7 @@ export class WorkEngine {
   private registerNotificationHandlerSync(): void {
     // Register handlers synchronously - handlers are part of core system
     this.notificationService.registerHandler('bash', new BashTargetHandler());
+    this.notificationService.registerHandler('telegram', new TelegramTargetHandler());
   }
 
   /**
