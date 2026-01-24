@@ -503,6 +503,14 @@ export class WorkEngine {
       
       this.contexts = new Map(contextsData.contexts);
       this.activeContext = contextsData.activeContext;
+      
+      // Initialize adapters for loaded contexts
+      for (const [, context] of this.contexts) {
+        const adapter = this.adapters.get(context.tool);
+        if (adapter) {
+          await adapter.initialize(context);
+        }
+      }
     } catch {
       // File doesn't exist or is invalid - start fresh
     }

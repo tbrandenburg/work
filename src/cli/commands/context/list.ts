@@ -20,6 +20,9 @@ export default class ContextList extends BaseCommand {
     const engine = new WorkEngine();
 
     try {
+      // Ensure contexts are loaded from disk
+      await (engine as any).ensureDefaultContext();
+      
       const contexts = engine.getContexts();
 
       if (flags.format === 'json') {
