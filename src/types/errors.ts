@@ -11,7 +11,7 @@ export class WorkError extends Error {
     this.name = 'WorkError';
     this.code = code;
     this.statusCode = statusCode;
-    
+
     // Restore prototype chain for proper instanceof checks
     Object.setPrototypeOf(this, WorkError.prototype);
   }
@@ -51,7 +51,11 @@ export class RelationError extends WorkError {
 
 export class QuerySyntaxError extends WorkError {
   constructor(query: string, reason: string) {
-    super(`Query syntax error in "${query}": ${reason}`, 'QUERY_SYNTAX_ERROR', 400);
+    super(
+      `Query syntax error in "${query}": ${reason}`,
+      'QUERY_SYNTAX_ERROR',
+      400
+    );
     this.name = 'QuerySyntaxError';
     Object.setPrototypeOf(this, QuerySyntaxError.prototype);
   }
@@ -67,7 +71,11 @@ export class UnsupportedOperatorError extends WorkError {
 
 export class InvalidDateError extends WorkError {
   constructor(dateString: string) {
-    super(`Invalid date format: ${dateString}. Expected ISO 8601 format (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss)`, 'INVALID_DATE', 400);
+    super(
+      `Invalid date format: ${dateString}. Expected ISO 8601 format (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss)`,
+      'INVALID_DATE',
+      400
+    );
     this.name = 'InvalidDateError';
     Object.setPrototypeOf(this, InvalidDateError.prototype);
   }

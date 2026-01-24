@@ -2,7 +2,11 @@
  * Additional edge case tests for JSON formatting to improve coverage
  */
 
-import { formatOutput, formatError, formatSuccess } from '../../../src/cli/formatter.js';
+import {
+  formatOutput,
+  formatError,
+  formatSuccess,
+} from '../../../src/cli/formatter.js';
 
 describe('JSON Formatter Edge Cases', () => {
   describe('formatOutput edge cases', () => {
@@ -36,8 +40,8 @@ describe('JSON Formatter Edge Cases', () => {
         nested: {
           array: [1, 2, { deep: 'value' }],
           unicode: '🚀 émojis',
-          special: 'quotes "and" backslashes \\'
-        }
+          special: 'quotes "and" backslashes \\',
+        },
       };
       const result = formatOutput(complexData, 'json');
       const parsed = JSON.parse(result);
@@ -55,7 +59,7 @@ describe('JSON Formatter Edge Cases', () => {
         total: 100,
         timestamp: '2026-01-22T18:00:00.000Z',
         customField: 'custom value',
-        nested: { field: 'value' }
+        nested: { field: 'value' },
       };
       const result = formatOutput('test', 'json', meta);
       const parsed = JSON.parse(result);
@@ -141,7 +145,7 @@ describe('JSON Formatter Edge Cases', () => {
         [],
         {},
         [1, 2, 3],
-        { a: 1, b: 'test' }
+        { a: 1, b: 'test' },
       ];
 
       testCases.forEach(testCase => {

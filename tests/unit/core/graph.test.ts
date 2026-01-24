@@ -1,8 +1,15 @@
-import { validateRelation, detectCycles, buildGraphSlice } from '../../../src/core/graph';
+import {
+  validateRelation,
+  detectCycles,
+  buildGraphSlice,
+} from '../../../src/core/graph';
 import { WorkItem, Relation } from '../../../src/types/index';
 
 describe('Graph Operations', () => {
-  const createTestWorkItem = (id: string, kind: 'task' | 'epic' | 'bug' = 'task'): WorkItem => ({
+  const createTestWorkItem = (
+    id: string,
+    kind: 'task' | 'epic' | 'bug' = 'task'
+  ): WorkItem => ({
     id,
     kind,
     title: `Test ${kind}`,
@@ -38,7 +45,9 @@ describe('Graph Operations', () => {
         type: 'blocks',
       };
 
-      expect(() => validateRelation(relation, workItems)).toThrow('Source work item not found: TASK-001');
+      expect(() => validateRelation(relation, workItems)).toThrow(
+        'Source work item not found: TASK-001'
+      );
     });
 
     it('should throw error for non-existent target work item', () => {
@@ -50,7 +59,9 @@ describe('Graph Operations', () => {
         type: 'blocks',
       };
 
-      expect(() => validateRelation(relation, workItems)).toThrow('Target work item not found: TASK-002');
+      expect(() => validateRelation(relation, workItems)).toThrow(
+        'Target work item not found: TASK-002'
+      );
     });
 
     it('should throw error for self-referencing relation', () => {
@@ -62,7 +73,9 @@ describe('Graph Operations', () => {
         type: 'blocks',
       };
 
-      expect(() => validateRelation(relation, workItems)).toThrow('Work item cannot have a relation to itself');
+      expect(() => validateRelation(relation, workItems)).toThrow(
+        'Work item cannot have a relation to itself'
+      );
     });
 
     it('should validate hierarchical constraints', () => {
@@ -77,7 +90,9 @@ describe('Graph Operations', () => {
         type: 'parent_of',
       };
 
-      expect(() => validateRelation(invalidRelation, workItems)).toThrow('Task cannot be parent of epic');
+      expect(() => validateRelation(invalidRelation, workItems)).toThrow(
+        'Task cannot be parent of epic'
+      );
     });
   });
 

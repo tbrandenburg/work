@@ -13,27 +13,36 @@ describe('Schema Show Command Branch Coverage', () => {
       setActiveContext: vi.fn(),
       getSchema: vi.fn(),
     } as any;
-    (WorkEngine as anyClass<typeof WorkEngine>).mockImplementation(() => mockEngine);
+    (WorkEngine as anyClass<typeof WorkEngine>).mockImplementation(
+      () => mockEngine
+    );
   });
 
   it('should trigger context argument branch', async () => {
-    const { default: SchemaShow } = await import('../../../../../src/cli/commands/schema/show.js');
-    
+    const { default: SchemaShow } =
+      await import('../../../../../src/cli/commands/schema/show.js');
+
     const mockSchema = {
       kinds: ['task', 'bug'],
       attributes: [{ name: 'title', type: 'string', required: true }],
-      relationTypes: [{ name: 'blocks', allowedFromKinds: ['task'], allowedToKinds: ['task'] }]
+      relationTypes: [
+        {
+          name: 'blocks',
+          allowedFromKinds: ['task'],
+          allowedToKinds: ['task'],
+        },
+      ],
     };
     mockEngine.getSchema.mockResolvedValue(mockSchema);
 
     const command = new SchemaShow([], {} as any);
-    
+
     // Mock parse to return context argument (triggers if (args.context) branch)
     vi.spyOn(command, 'parse' as any).mockResolvedValue({
       args: { context: 'test-context' },
-      flags: { format: 'table' }
+      flags: { format: 'table' },
     });
-    
+
     const logSpy = vi.spyOn(command, 'log').mockImplementation();
 
     await command.run();
@@ -44,23 +53,30 @@ describe('Schema Show Command Branch Coverage', () => {
   });
 
   it('should trigger JSON format branch', async () => {
-    const { default: SchemaShow } = await import('../../../../../src/cli/commands/schema/show.js');
-    
+    const { default: SchemaShow } =
+      await import('../../../../../src/cli/commands/schema/show.js');
+
     const mockSchema = {
       kinds: ['task', 'bug'],
       attributes: [{ name: 'title', type: 'string', required: true }],
-      relationTypes: [{ name: 'blocks', allowedFromKinds: ['task'], allowedToKinds: ['task'] }]
+      relationTypes: [
+        {
+          name: 'blocks',
+          allowedFromKinds: ['task'],
+          allowedToKinds: ['task'],
+        },
+      ],
     };
     mockEngine.getSchema.mockResolvedValue(mockSchema);
 
     const command = new SchemaShow([], {} as any);
-    
+
     // Mock parse to return JSON format (triggers if (flags.format === 'json') branch)
     vi.spyOn(command, 'parse' as any).mockResolvedValue({
       args: {},
-      flags: { format: 'json' }
+      flags: { format: 'json' },
     });
-    
+
     const logSpy = vi.spyOn(command, 'log').mockImplementation();
 
     await command.run();
@@ -78,22 +94,27 @@ describe('Schema Show Command Branch Coverage', () => {
   });
 
   it('should trigger error handling branch', async () => {
-    const { default: SchemaShow } = await import('../../../../../src/cli/commands/schema/show.js');
-    
+    const { default: SchemaShow } =
+      await import('../../../../../src/cli/commands/schema/show.js');
+
     mockEngine.getSchema.mockRejectedValue(new Error('Schema failed'));
 
     const command = new SchemaShow([], {} as any);
-    
+
     vi.spyOn(command, 'parse' as any).mockResolvedValue({
       args: {},
-      flags: { format: 'table' }
+      flags: { format: 'table' },
     });
-    
+
     const errorSpy = vi.spyOn(command, 'error').mockImplementation(() => {
       throw new Error('Failed to get schema: Schema failed');
     });
 
-    await expect(command.run()).rejects.toThrow('Failed to get schema: Schema failed');
-    expect(errorSpy).toHaveBeenCalledWith('Failed to get schema: Schema failed');
+    await expect(command.run()).rejects.toThrow(
+      'Failed to get schema: Schema failed'
+    );
+    expect(errorSpy).toHaveBeenCalledWith(
+      'Failed to get schema: Schema failed'
+    );
   });
 });

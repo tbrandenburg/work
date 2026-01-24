@@ -13,7 +13,7 @@ describe('Auth Logout Command Integration', () => {
     testDir = mkdtempSync(join(tmpdir(), 'work-auth-logout-'));
     process.chdir(testDir);
     binPath = join(originalCwd, 'bin/run.js');
-    
+
     // Create .work directory structure for default context
     execSync('mkdir -p .work/projects/default', { stdio: 'pipe' });
   });
@@ -24,14 +24,19 @@ describe('Auth Logout Command Integration', () => {
   });
 
   it('should logout successfully with default context', () => {
-    const result = execSync(`node ${binPath} auth logout`, { encoding: 'utf8' });
+    const result = execSync(`node ${binPath} auth logout`, {
+      encoding: 'utf8',
+    });
     expect(result).toContain('✅ Logout successful');
   });
 
   it('should handle logout error', () => {
     // Test error handling branch with invalid context
     expect(() => {
-      execSync(`node ${binPath} auth logout nonexistent`, { encoding: 'utf8', stdio: 'pipe' });
+      execSync(`node ${binPath} auth logout nonexistent`, {
+        encoding: 'utf8',
+        stdio: 'pipe',
+      });
     }).toThrow();
   });
 
@@ -39,7 +44,10 @@ describe('Auth Logout Command Integration', () => {
     // Test the if (args.context) branch - this will trigger the branch
     // even though it fails, which is what we want for coverage
     expect(() => {
-      execSync(`node ${binPath} auth logout nonexistent-context`, { encoding: 'utf8', stdio: 'pipe' });
+      execSync(`node ${binPath} auth logout nonexistent-context`, {
+        encoding: 'utf8',
+        stdio: 'pipe',
+      });
     }).toThrow();
   });
 });

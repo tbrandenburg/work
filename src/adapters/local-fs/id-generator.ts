@@ -23,17 +23,23 @@ const DEFAULT_COUNTERS: IdCounters = {
   story: 0,
 };
 
-export async function generateId(kind: WorkItemKind, workDir: string): Promise<string> {
+export async function generateId(
+  kind: WorkItemKind,
+  workDir: string
+): Promise<string> {
   // Ensure the work directory exists before any file operations
   await ensureWorkDir(workDir);
-  
+
   const counterPath = path.join(workDir, ID_COUNTER_FILE);
-  
+
   let counters: IdCounters;
-  
+
   try {
     const data = await fs.readFile(counterPath, 'utf-8');
-    counters = { ...DEFAULT_COUNTERS, ...(JSON.parse(data) as Partial<IdCounters>) };
+    counters = {
+      ...DEFAULT_COUNTERS,
+      ...(JSON.parse(data) as Partial<IdCounters>),
+    };
   } catch (error) {
     // File doesn't exist or is invalid, start with defaults
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
@@ -42,16 +48,16 @@ export async function generateId(kind: WorkItemKind, workDir: string): Promise<s
       throw error;
     }
   }
-  
+
   // Increment counter for this kind
   counters[kind] += 1;
-  
+
   // Save updated counters
   await fs.writeFile(counterPath, JSON.stringify(counters, null, 2));
-  
+
   // Generate ID with format: KIND-NNN (e.g., TASK-001, BUG-042)
   const prefix = kind.toUpperCase();
   const number = counters[kind].toString().padStart(3, '0');
-  
+
   return `${prefix}-${number}`;
 }

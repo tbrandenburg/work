@@ -5,8 +5,9 @@ import { formatOutput } from '../../formatter.js';
 
 export default class SchemaAttrs extends BaseCommand {
   static override args = {
-    context: Args.string({ 
-      description: 'context name to list attributes (defaults to active context)',
+    context: Args.string({
+      description:
+        'context name to list attributes (defaults to active context)',
       required: false,
     }),
   };
@@ -27,7 +28,7 @@ export default class SchemaAttrs extends BaseCommand {
     const { args } = await this.parse(SchemaAttrs);
 
     const engine = new WorkEngine();
-    
+
     try {
       if (args.context) {
         engine.setActiveContext(args.context);
@@ -37,7 +38,11 @@ export default class SchemaAttrs extends BaseCommand {
 
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(attributes, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(attributes, 'json', {
+            timestamp: new Date().toISOString(),
+          })
+        );
         return;
       }
 

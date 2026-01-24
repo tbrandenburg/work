@@ -13,7 +13,7 @@ describe('Schema Attrs Command Integration', () => {
     testDir = mkdtempSync(join(tmpdir(), 'work-schema-attrs-'));
     process.chdir(testDir);
     binPath = join(originalCwd, 'bin/run.js');
-    
+
     // Create .work directory structure for default context
     execSync('mkdir -p .work/projects/default', { stdio: 'pipe' });
   });
@@ -24,7 +24,9 @@ describe('Schema Attrs Command Integration', () => {
   });
 
   it('should list attributes in table format', () => {
-    const result = execSync(`node ${binPath} schema attrs`, { encoding: 'utf8' });
+    const result = execSync(`node ${binPath} schema attrs`, {
+      encoding: 'utf8',
+    });
     expect(result).toContain('Available Attributes (5):');
     expect(result).toContain('• title: string (required)');
     expect(result).toContain('• description: string');
@@ -32,7 +34,9 @@ describe('Schema Attrs Command Integration', () => {
   });
 
   it('should list attributes in JSON format', () => {
-    const result = execSync(`node ${binPath} schema attrs --format json`, { encoding: 'utf8' });
+    const result = execSync(`node ${binPath} schema attrs --format json`, {
+      encoding: 'utf8',
+    });
     const parsed = JSON.parse(result);
     expect(parsed.data).toHaveLength(5);
     expect(parsed.data[0].name).toBe('title');
@@ -43,7 +47,10 @@ describe('Schema Attrs Command Integration', () => {
   it('should handle error when getting attributes', () => {
     // Test error handling branch with invalid context
     expect(() => {
-      execSync(`node ${binPath} schema attrs nonexistent`, { encoding: 'utf8', stdio: 'pipe' });
+      execSync(`node ${binPath} schema attrs nonexistent`, {
+        encoding: 'utf8',
+        stdio: 'pipe',
+      });
     }).toThrow();
   });
 
@@ -51,7 +58,10 @@ describe('Schema Attrs Command Integration', () => {
     // Test the if (args.context) branch - this will trigger the branch
     // even though it fails, which is what we want for coverage
     expect(() => {
-      execSync(`node ${binPath} schema attrs nonexistent-context`, { encoding: 'utf8', stdio: 'pipe' });
+      execSync(`node ${binPath} schema attrs nonexistent-context`, {
+        encoding: 'utf8',
+        stdio: 'pipe',
+      });
     }).toThrow();
   });
 });

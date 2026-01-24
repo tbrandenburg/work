@@ -5,7 +5,7 @@ import { formatOutput } from '../formatter.js';
 
 export default class Get extends BaseCommand {
   static override args = {
-    id: Args.string({ 
+    id: Args.string({
       description: 'work item ID to retrieve',
       required: true,
     }),
@@ -26,12 +26,16 @@ export default class Get extends BaseCommand {
     const { args, flags } = await this.parse(Get);
 
     const engine = new WorkEngine();
-    
+
     try {
       const workItem = await engine.getWorkItem(args.id);
 
       if (flags.format === 'json') {
-        this.log(formatOutput(workItem, flags.format, { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(workItem, flags.format, {
+            timestamp: new Date().toISOString(),
+          })
+        );
         return;
       }
 

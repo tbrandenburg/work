@@ -5,8 +5,9 @@ import { formatOutput } from '../../formatter.js';
 
 export default class SchemaRelations extends BaseCommand {
   static override args = {
-    context: Args.string({ 
-      description: 'context name to list relations (defaults to active context)',
+    context: Args.string({
+      description:
+        'context name to list relations (defaults to active context)',
       required: false,
     }),
   };
@@ -27,7 +28,7 @@ export default class SchemaRelations extends BaseCommand {
     const { args } = await this.parse(SchemaRelations);
 
     const engine = new WorkEngine();
-    
+
     try {
       if (args.context) {
         engine.setActiveContext(args.context);
@@ -37,7 +38,11 @@ export default class SchemaRelations extends BaseCommand {
 
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(relationTypes, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(relationTypes, 'json', {
+            timestamp: new Date().toISOString(),
+          })
+        );
         return;
       }
 
@@ -51,7 +56,9 @@ export default class SchemaRelations extends BaseCommand {
         this.log(`    To: ${rel.allowedToKinds.join(', ')}`);
       });
     } catch (error) {
-      this.handleError(`Failed to get relation types: ${(error as Error).message}`);
+      this.handleError(
+        `Failed to get relation types: ${(error as Error).message}`
+      );
     }
   }
 }

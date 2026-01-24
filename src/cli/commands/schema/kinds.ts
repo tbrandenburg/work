@@ -5,7 +5,7 @@ import { formatOutput } from '../../formatter.js';
 
 export default class SchemaKinds extends BaseCommand {
   static override args = {
-    context: Args.string({ 
+    context: Args.string({
       description: 'context name to list kinds (defaults to active context)',
       required: false,
     }),
@@ -27,7 +27,7 @@ export default class SchemaKinds extends BaseCommand {
     const { args } = await this.parse(SchemaKinds);
 
     const engine = new WorkEngine();
-    
+
     try {
       if (args.context) {
         engine.setActiveContext(args.context);
@@ -37,7 +37,9 @@ export default class SchemaKinds extends BaseCommand {
 
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(kinds, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(kinds, 'json', { timestamp: new Date().toISOString() })
+        );
         return;
       }
 

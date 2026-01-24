@@ -2,7 +2,12 @@
  * Context and adapter interface definitions
  */
 
-import { WorkItem, CreateWorkItemRequest, UpdateWorkItemRequest, Relation } from './work-item.js';
+import {
+  WorkItem,
+  CreateWorkItemRequest,
+  UpdateWorkItemRequest,
+  Relation,
+} from './work-item.js';
 
 export type AuthState = 'authenticated' | 'unauthenticated' | 'expired';
 
@@ -85,7 +90,11 @@ export interface WorkAdapter {
   /**
    * Delete a relation
    */
-  deleteRelation(from: string, to: string, type: Relation['type']): Promise<void>;
+  deleteRelation(
+    from: string,
+    to: string,
+    type: Relation['type']
+  ): Promise<void>;
 
   /**
    * Delete a work item
@@ -95,7 +104,7 @@ export interface WorkAdapter {
   /**
    * Authenticate with the backend
    */
-  authenticate(credentials?: Record<string, string>  ): Promise<AuthStatus>;
+  authenticate(credentials?: Record<string, string>): Promise<AuthStatus>;
 
   /**
    * Logout from the backend

@@ -5,7 +5,7 @@ import { formatOutput } from '../../formatter.js';
 
 export default class AuthLogin extends BaseCommand {
   static override args = {
-    context: Args.string({ 
+    context: Args.string({
       description: 'context name to authenticate (defaults to active context)',
       required: false,
     }),
@@ -26,17 +26,21 @@ export default class AuthLogin extends BaseCommand {
     const { args } = await this.parse(AuthLogin);
 
     const engine = new WorkEngine();
-    
+
     try {
       if (args.context) {
         engine.setActiveContext(args.context);
       }
 
       const authStatus = await engine.authenticate();
-      
+
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(authStatus, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(authStatus, 'json', {
+            timestamp: new Date().toISOString(),
+          })
+        );
       } else {
         this.log(`✅ Authentication successful`);
         this.log(`User: ${authStatus.user || 'N/A'}`);

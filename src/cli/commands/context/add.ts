@@ -6,7 +6,7 @@ import { formatOutput } from '../../formatter.js';
 
 export default class ContextAdd extends BaseCommand {
   static override args = {
-    name: Args.string({ 
+    name: Args.string({
       description: 'context name',
       required: true,
     }),
@@ -41,7 +41,7 @@ export default class ContextAdd extends BaseCommand {
     const { args, flags } = await this.parse(ContextAdd);
 
     const engine = new WorkEngine();
-    
+
     try {
       if (flags.tool === 'local-fs' && !flags.path) {
         this.error('--path is required for local-fs tool');
@@ -57,15 +57,17 @@ export default class ContextAdd extends BaseCommand {
       };
 
       await engine.addContext(context);
-      
+
       const result = {
         message: `Added context '${args.name}' using ${flags.tool}`,
-        context: context
+        context: context,
       };
-      
+
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(result, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(result, 'json', { timestamp: new Date().toISOString() })
+        );
       } else {
         this.log(`Added context '${args.name}' using ${flags.tool}`);
       }

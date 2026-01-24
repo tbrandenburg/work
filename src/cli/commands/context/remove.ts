@@ -5,7 +5,7 @@ import { formatOutput } from '../../formatter.js';
 
 export default class ContextRemove extends BaseCommand {
   static override args = {
-    name: Args.string({ 
+    name: Args.string({
       description: 'context name to remove',
       required: true,
     }),
@@ -26,18 +26,20 @@ export default class ContextRemove extends BaseCommand {
     const { args } = await this.parse(ContextRemove);
 
     const engine = new WorkEngine();
-    
+
     try {
       engine.removeContext(args.name);
-      
+
       const result = {
         message: `Removed context '${args.name}'`,
-        contextName: args.name
+        contextName: args.name,
       };
-      
+
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(result, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(result, 'json', { timestamp: new Date().toISOString() })
+        );
       } else {
         this.log(`Removed context '${args.name}'`);
       }

@@ -24,7 +24,15 @@ export default class Link extends BaseCommand {
       char: 't',
       description: 'relation type',
       required: true,
-      options: ['parent_of', 'child_of', 'blocks', 'blocked_by', 'duplicates', 'duplicate_of', 'relates_to'],
+      options: [
+        'parent_of',
+        'child_of',
+        'blocks',
+        'blocked_by',
+        'duplicates',
+        'duplicate_of',
+        'relates_to',
+      ],
     }),
   };
 
@@ -41,14 +49,16 @@ export default class Link extends BaseCommand {
       };
 
       await engine.createRelation(relation);
-      
+
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
         const result = {
           message: `Created relation: ${args.from} ${flags.type} ${args.to}`,
-          relation: relation
+          relation: relation,
         };
-        this.log(formatOutput(result, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(result, 'json', { timestamp: new Date().toISOString() })
+        );
       } else {
         this.log(`Created relation: ${args.from} ${flags.type} ${args.to}`);
       }

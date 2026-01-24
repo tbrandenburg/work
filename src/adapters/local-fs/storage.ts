@@ -21,12 +21,15 @@ export async function ensureWorkDir(workDir: string): Promise<void> {
   }
 }
 
-export async function saveWorkItem(workItem: WorkItem, workDir: string): Promise<void> {
+export async function saveWorkItem(
+  workItem: WorkItem,
+  workDir: string
+): Promise<void> {
   await ensureWorkDir(workDir);
-  
+
   const fileName = `${workItem.id}.md`;
   const filePath = path.join(workDir, WORK_ITEMS_DIR, fileName);
-  
+
   // Create markdown content with frontmatter
   const frontmatter = {
     id: workItem.id,
@@ -40,7 +43,7 @@ export async function saveWorkItem(workItem: WorkItem, workDir: string): Promise
     updatedAt: workItem.updatedAt,
     closedAt: workItem.closedAt,
   };
-  
+
   const content = [
     '---',
     JSON.stringify(frontmatter, null, 2),
@@ -48,26 +51,32 @@ export async function saveWorkItem(workItem: WorkItem, workDir: string): Promise
     '',
     workItem.description || '',
   ].join('\n');
-  
+
   await fs.writeFile(filePath, content, 'utf-8');
 }
 
-export async function loadWorkItem(id: string, workDir: string): Promise<WorkItem | null> {
+export async function loadWorkItem(
+  id: string,
+  workDir: string
+): Promise<WorkItem | null> {
   const fileName = `${id}.md`;
   const filePath = path.join(workDir, WORK_ITEMS_DIR, fileName);
-  
+
   try {
     const content = await fs.readFile(filePath, 'utf-8');
-    
+
     // Parse frontmatter
     const frontmatterMatch = content.match(/^---\n(.*?)\n---\n(.*)/s);
     if (!frontmatterMatch || frontmatterMatch.length < 3) {
       throw new Error(`Invalid work item format: ${id}`);
     }
-    
-    const frontmatter = JSON.parse(frontmatterMatch[1]!) as Record<string, unknown>;
+
+    const frontmatter = JSON.parse(frontmatterMatch[1]!) as Record<
+      string,
+      unknown
+    >;
     const description = frontmatterMatch[2]?.trim() || undefined;
-    
+
     return {
       ...frontmatter,
       description,
@@ -82,11 +91,11 @@ export async function loadWorkItem(id: string, workDir: string): Promise<WorkIte
 
 export async function listWorkItems(workDir: string): Promise<WorkItem[]> {
   const workItemsDir = path.join(workDir, WORK_ITEMS_DIR);
-  
+
   try {
     const files = await fs.readdir(workItemsDir);
     const workItems: WorkItem[] = [];
-    
+
     for (const file of files) {
       if (file.endsWith('.md')) {
         const id = file.slice(0, -3); // Remove .md extension
@@ -96,7 +105,7 @@ export async function listWorkItems(workDir: string): Promise<WorkItem[]> {
         }
       }
     }
-    
+
     return workItems;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
@@ -106,16 +115,19 @@ export async function listWorkItems(workDir: string): Promise<WorkItem[]> {
   }
 }
 
-export async function saveLinks(relations: Relation[], workDir: string): Promise<void> {
+export async function saveLinks(
+  relations: Relation[],
+  workDir: string
+): Promise<void> {
   await ensureWorkDir(workDir);
-  
+
   const linksPath = path.join(workDir, LINKS_FILE);
   await fs.writeFile(linksPath, JSON.stringify(relations, null, 2), 'utf-8');
 }
 
 export async function loadLinks(workDir: string): Promise<Relation[]> {
   const linksPath = path.join(workDir, LINKS_FILE);
-  
+
   try {
     const content = await fs.readFile(linksPath, 'utf-8');
     return JSON.parse(content) as Relation[];

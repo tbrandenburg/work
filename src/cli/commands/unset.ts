@@ -6,7 +6,7 @@ import { formatOutput } from '../formatter.js';
 export default class Unset extends BaseCommand {
   static override args = {
     id: Args.string({ description: 'work item ID', required: true }),
-    field: Args.string({ 
+    field: Args.string({
       description: 'field to clear',
       required: true,
       options: ['assignee', 'description'],
@@ -43,18 +43,22 @@ export default class Unset extends BaseCommand {
       }
 
       const workItem = await engine.updateWorkItem(args.id, updateRequest);
-      
+
       const result = {
         message: `Cleared ${args.field} from ${workItem.kind} ${workItem.id}: ${workItem.title}`,
         workItem: workItem,
-        clearedField: args.field
+        clearedField: args.field,
       };
-      
+
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(result, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(result, 'json', { timestamp: new Date().toISOString() })
+        );
       } else {
-        this.log(`Cleared ${args.field} from ${workItem.kind} ${workItem.id}: ${workItem.title}`);
+        this.log(
+          `Cleared ${args.field} from ${workItem.kind} ${workItem.id}: ${workItem.title}`
+        );
       }
     } catch (error) {
       this.handleError(`Failed to unset field: ${(error as Error).message}`);

@@ -5,13 +5,14 @@ import { formatOutput } from '../formatter.js';
 
 export default class Start extends BaseCommand {
   static override args = {
-    id: Args.string({ 
+    id: Args.string({
       description: 'work item ID to start',
       required: true,
     }),
   };
 
-  static override description = 'Start working on a work item (change state to active)';
+  static override description =
+    'Start working on a work item (change state to active)';
 
   static override examples = [
     '<%= config.bin %> <%= command.id %> TASK-001',
@@ -26,13 +27,17 @@ export default class Start extends BaseCommand {
     const { args } = await this.parse(Start);
 
     const engine = new WorkEngine();
-    
+
     try {
       const workItem = await engine.changeState(args.id, 'active');
-      
+
       const isJsonMode = await this.getJsonMode();
       if (isJsonMode) {
-        this.log(formatOutput(workItem, 'json', { timestamp: new Date().toISOString() }));
+        this.log(
+          formatOutput(workItem, 'json', {
+            timestamp: new Date().toISOString(),
+          })
+        );
       } else {
         this.log(`Started ${workItem.kind} ${workItem.id}: ${workItem.title}`);
       }

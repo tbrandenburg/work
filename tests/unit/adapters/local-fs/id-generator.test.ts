@@ -56,7 +56,7 @@ describe('ID Generator', () => {
   it('should persist counters between calls', async () => {
     await generateId('task', testDir);
     await generateId('bug', testDir);
-    
+
     const taskId = await generateId('task', testDir);
     const bugId = await generateId('bug', testDir);
 

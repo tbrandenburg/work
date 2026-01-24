@@ -27,10 +27,16 @@ export default class Hello extends BaseCommand {
     const { args, flags } = await this.parse(Hello);
 
     const message = `hello ${args.person ?? 'World'} from ${flags.from}! (./src/commands/hello.ts)`;
-    
+
     const isJsonMode = await this.getJsonMode();
     if (isJsonMode) {
-      this.log(formatOutput({ message, person: args.person ?? 'World', from: flags.from }, 'json', { timestamp: new Date().toISOString() }));
+      this.log(
+        formatOutput(
+          { message, person: args.person ?? 'World', from: flags.from },
+          'json',
+          { timestamp: new Date().toISOString() }
+        )
+      );
     } else {
       this.log(message);
     }

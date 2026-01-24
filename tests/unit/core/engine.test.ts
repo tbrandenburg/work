@@ -5,7 +5,7 @@ import { WorkItemKind, Priority, WorkItem } from '../../../src/types/index';
 
 // Mock the LocalFsAdapter
 vi.mock('../../../src/adapters/local-fs/index', () => ({
-  LocalFsAdapter: vi.fn()
+  LocalFsAdapter: vi.fn(),
 }));
 
 describe('WorkEngine', () => {
@@ -15,7 +15,7 @@ describe('WorkEngine', () => {
   beforeEach(() => {
     // Clear all mocks
     vi.clearAllMocks();
-    
+
     // Create mock adapter
     mockAdapter = {
       initialize: vi.fn(),
@@ -32,7 +32,7 @@ describe('WorkEngine', () => {
 
     // Mock the LocalFsAdapter constructor
     vi.mocked(LocalFsAdapter).mockImplementation(() => mockAdapter);
-    
+
     engine = new WorkEngine();
   });
 
@@ -103,7 +103,10 @@ describe('WorkEngine', () => {
 
       const result = await engine.changeState('TASK-001', 'active');
 
-      expect(mockAdapter.changeState).toHaveBeenCalledWith('TASK-001', 'active');
+      expect(mockAdapter.changeState).toHaveBeenCalledWith(
+        'TASK-001',
+        'active'
+      );
       expect(result).toEqual(mockWorkItem);
     });
   });
@@ -130,7 +133,10 @@ describe('WorkEngine', () => {
 
       const result = await engine.updateWorkItem('TASK-001', updateRequest);
 
-      expect(mockAdapter.updateWorkItem).toHaveBeenCalledWith('TASK-001', updateRequest);
+      expect(mockAdapter.updateWorkItem).toHaveBeenCalledWith(
+        'TASK-001',
+        updateRequest
+      );
       expect(result).toEqual(mockWorkItem);
     });
   });
@@ -238,11 +244,11 @@ describe('WorkEngine', () => {
         tool: 'local-fs',
         path: '/test',
         authState: 'authenticated',
-        isActive: false
+        isActive: false,
       });
 
       engine.removeContext('test-context');
-      
+
       const contexts = engine.getContexts();
       expect(contexts.find(c => c.name === 'test-context')).toBeUndefined();
     });
@@ -264,7 +270,9 @@ describe('WorkEngine', () => {
 
       engine.addComment('TASK-001', 'test comment');
 
-      expect(consoleSpy).toHaveBeenCalledWith('Comment operation not yet implemented: TASK-001 - test comment');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Comment operation not yet implemented: TASK-001 - test comment'
+      );
       consoleSpy.mockRestore();
     });
   });
@@ -275,7 +283,9 @@ describe('WorkEngine', () => {
 
       engine.moveWorkItem('TASK-001', '@other-context');
 
-      expect(consoleSpy).toHaveBeenCalledWith('Move operation not yet implemented: TASK-001 to @other-context');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Move operation not yet implemented: TASK-001 to @other-context'
+      );
       consoleSpy.mockRestore();
     });
   });

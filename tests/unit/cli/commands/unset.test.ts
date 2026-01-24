@@ -13,7 +13,7 @@ describe('Unset Command Integration', () => {
     testDir = mkdtempSync(join(tmpdir(), 'work-unset-'));
     process.chdir(testDir);
     binPath = join(originalCwd, 'bin/run.js');
-    
+
     // Create .work directory structure for default context
     execSync('mkdir -p .work/projects/default', { stdio: 'pipe' });
   });
@@ -26,18 +26,22 @@ describe('Unset Command Integration', () => {
   it('should clear assignee field', () => {
     // Create a work item first
     execSync(`node ${binPath} create "Test task"`, { stdio: 'pipe' });
-    
+
     // Clear assignee field - should trigger assignee conditional branch
-    const result = execSync(`node ${binPath} unset TASK-001 assignee`, { encoding: 'utf8' });
+    const result = execSync(`node ${binPath} unset TASK-001 assignee`, {
+      encoding: 'utf8',
+    });
     expect(result).toContain('Cleared assignee from task TASK-001');
   });
 
   it('should clear description field', () => {
     // Create a work item first
     execSync(`node ${binPath} create "Test task"`, { stdio: 'pipe' });
-    
+
     // Clear description field - should trigger description conditional branch
-    const result = execSync(`node ${binPath} unset TASK-001 description`, { encoding: 'utf8' });
+    const result = execSync(`node ${binPath} unset TASK-001 description`, {
+      encoding: 'utf8',
+    });
     expect(result).toContain('Cleared description from task TASK-001');
   });
 });
