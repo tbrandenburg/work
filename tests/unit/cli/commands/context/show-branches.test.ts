@@ -11,6 +11,7 @@ describe('Context Show Branch Coverage', () => {
     mockEngine = {
       getActiveContext: vi.fn(),
       getContexts: vi.fn(),
+      ensureDefaultContext: vi.fn().mockResolvedValue(undefined),
     } as any;
     (WorkEngine as anyClass<typeof WorkEngine>).mockImplementation(
       () => mockEngine
