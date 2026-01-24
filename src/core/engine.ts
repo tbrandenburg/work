@@ -25,6 +25,7 @@ import { LocalFsAdapter } from '../adapters/local-fs/index.js';
 import { validateRelation, detectCycles } from './graph.js';
 import { parseQuery, executeQuery } from './query.js';
 import { NotificationService } from './notification-service.js';
+import { BashTargetHandler } from './target-handlers/bash-handler.js';
 
 export class WorkEngine {
   private adapters = new Map<string, WorkAdapter>();
@@ -37,20 +38,19 @@ export class WorkEngine {
     // Register built-in adapters
     this.registerAdapter('local-fs', new LocalFsAdapter());
     
-    // Register built-in notification handlers
-    this.registerNotificationHandler();
+    // Register built-in notification handlers synchronously
+    this.registerNotificationHandlerSync();
   }
 
   /**
    * Register notification handlers
    */
-  private registerNotificationHandler(): void {
-    // Import here to avoid circular dependencies
-    import('./target-handlers/index.js').then(({ BashTargetHandler }) => {
-      this.notificationService.registerHandler('bash', new BashTargetHandler());
-    }).catch(() => {
-      // Silently fail if handlers not available
-    });
+  /**
+   * Register notification handlers synchronously
+   */
+  private registerNotificationHandlerSync(): void {
+    // Register handlers synchronously - handlers are part of core system
+    this.notificationService.registerHandler('bash', new BashTargetHandler());
   }
 
   /**
