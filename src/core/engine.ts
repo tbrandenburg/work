@@ -56,9 +56,9 @@ export class WorkEngine {
   }
 
   /**
-   * Ensure default context exists for MVP
+   * Ensure default context exists for MVP - exposed for CLI commands
    */
-  private async ensureDefaultContext(): Promise<void> {
+  async ensureDefaultContext(): Promise<void> {
     // Load contexts from disk if not already loaded
     if (!this.contextsLoaded) {
       await this.loadContexts();

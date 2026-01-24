@@ -29,7 +29,7 @@ export default class ContextShow extends BaseCommand {
     const engine = new WorkEngine();
 
     // Ensure contexts are loaded from disk
-    await (engine as any).ensureDefaultContext();
+    await engine.ensureDefaultContext();
 
     let context;
 
