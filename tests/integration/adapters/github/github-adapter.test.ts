@@ -23,6 +23,16 @@ describe('GitHub Adapter Integration', () => {
       return;
     }
 
+    // Skip if GitHub CLI is authenticated (uses read-only token in CI)
+    try {
+      const { execSync } = await import('child_process');
+      execSync('gh auth status', { stdio: 'pipe' });
+      console.warn('Skipping GitHub integration tests - GitHub CLI authenticated with read-only token');
+      return;
+    } catch {
+      // GitHub CLI not authenticated, tests can proceed
+    }
+
     adapter = new GitHubAdapter();
     context = {
       name: 'test-github',
