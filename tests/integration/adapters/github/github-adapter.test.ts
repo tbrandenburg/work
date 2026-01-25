@@ -10,29 +10,38 @@ import { GitHubAdapter } from '../../../../src/adapters/github/index.js';
 import { Context } from '../../../../src/types/context.js';
 import { CreateWorkItemRequest } from '../../../../src/types/work-item.js';
 
+// Check if tests should be skipped
+function shouldSkipTests(): boolean {
+  // Skip tests if no GitHub token is available
+  const token = process.env['CI_GITHUB_TOKEN'] || process.env['GITHUB_TOKEN'];
+  if (!token) {
+    console.warn('Skipping GitHub integration tests - no GitHub token available');
+    return true;
+  }
+
+  // Skip if GitHub CLI is authenticated (uses read-only token in CI)
+  try {
+    const { execSync } = require('child_process');
+    execSync('gh auth status', { stdio: 'pipe' });
+    console.warn('Skipping GitHub integration tests - GitHub CLI authenticated with read-only token');
+    return true;
+  } catch {
+    // GitHub CLI not authenticated, tests can proceed
+    return false;
+  }
+}
+
+const skipTests = shouldSkipTests();
+
 describe('GitHub Adapter Integration', () => {
   let adapter: GitHubAdapter;
   let context: Context;
   let createdIssueIds: string[] = [];
 
   beforeAll(async () => {
-    // Skip tests if no GitHub token is available
+    if (skipTests) return;
+
     const token = process.env['CI_GITHUB_TOKEN'] || process.env['GITHUB_TOKEN'];
-    if (!token) {
-      console.warn('Skipping GitHub integration tests - no GitHub token available');
-      return;
-    }
-
-    // Skip if GitHub CLI is authenticated (uses read-only token in CI)
-    try {
-      const { execSync } = await import('child_process');
-      execSync('gh auth status', { stdio: 'pipe' });
-      console.warn('Skipping GitHub integration tests - GitHub CLI authenticated with read-only token');
-      return;
-    } catch {
-      // GitHub CLI not authenticated, tests can proceed
-    }
-
     adapter = new GitHubAdapter();
     context = {
       name: 'test-github',
@@ -50,6 +59,8 @@ describe('GitHub Adapter Integration', () => {
   });
 
   afterAll(async () => {
+    if (skipTests) return;
+    
     // Clean up created issues by closing them
     if (adapter && createdIssueIds.length > 0) {
       for (const issueId of createdIssueIds) {
@@ -62,19 +73,12 @@ describe('GitHub Adapter Integration', () => {
     }
   });
 
-  it('should authenticate successfully', async () => {
-    if (!process.env['CI_GITHUB_TOKEN'] && !process.env['GITHUB_TOKEN']) {
-      return; // Skip if no token
-    }
-
+  it.skipIf(skipTests)('should authenticate successfully', async () => {
     const authStatus = await adapter.getAuthStatus();
     expect(authStatus.state).toBe('authenticated');
   });
 
-  it('should create a new issue', async () => {
-    if (!process.env['CI_GITHUB_TOKEN'] && !process.env['GITHUB_TOKEN']) {
-      return; // Skip if no token
-    }
+  it.skipIf(skipTests)('should create a new issue', async () => {
 
     const request: CreateWorkItemRequest = {
       kind: 'task',
@@ -98,11 +102,7 @@ describe('GitHub Adapter Integration', () => {
     createdIssueIds.push(workItem.id);
   });
 
-  it('should list issues from repository', async () => {
-    if (!process.env['CI_GITHUB_TOKEN'] && !process.env['GITHUB_TOKEN']) {
-      return; // Skip if no token
-    }
-
+  it.skipIf(skipTests)('should list issues from repository', async () => {
     const workItems = await adapter.listWorkItems();
 
     expect(Array.isArray(workItems)).toBe(true);
@@ -120,9 +120,9 @@ describe('GitHub Adapter Integration', () => {
     }
   });
 
-  it('should get specific issue by ID', async () => {
-    if (!process.env['GITHUB_TOKEN'] || createdIssueIds.length === 0) {
-      return; // Skip if no token or no created issues
+  it.skipIf(skipTests)('should get specific issue by ID', async () => {
+    if (createdIssueIds.length === 0) {
+      return; // Skip if no created issues
     }
 
     const issueId = createdIssueIds[0];
@@ -136,8 +136,8 @@ describe('GitHub Adapter Integration', () => {
     );
   });
 
-  it('should update issue', async () => {
-    if (!process.env['GITHUB_TOKEN'] || createdIssueIds.length === 0) {
+  it.skipIf(skipTests)('should update issue', async () => {
+    if (createdIssueIds.length === 0) {
       return; // Skip if no token or no created issues
     }
 
@@ -155,9 +155,9 @@ describe('GitHub Adapter Integration', () => {
     expect(updatedWorkItem.labels).toEqual(['test', 'integration', 'updated']);
   });
 
-  it('should change issue state', async () => {
-    if (!process.env['GITHUB_TOKEN'] || createdIssueIds.length === 0) {
-      return; // Skip if no token or no created issues
+  it.skipIf(skipTests)('should change issue state', async () => {
+    if (createdIssueIds.length === 0) {
+      return; // Skip if no created issues
     }
 
     const issueId = createdIssueIds[0];
@@ -172,11 +172,7 @@ describe('GitHub Adapter Integration', () => {
     expect(reopenedWorkItem.state).toBe('new');
   });
 
-  it('should filter issues with query', async () => {
-    if (!process.env['CI_GITHUB_TOKEN'] && !process.env['GITHUB_TOKEN']) {
-      return; // Skip if no token
-    }
-
+  it.skipIf(skipTests)('should filter issues with query', async () => {
     const allItems = await adapter.listWorkItems();
     const filteredItems = await adapter.listWorkItems('test');
 
@@ -191,11 +187,7 @@ describe('GitHub Adapter Integration', () => {
     }
   });
 
-  it('should get schema information', async () => {
-    if (!process.env['CI_GITHUB_TOKEN'] && !process.env['GITHUB_TOKEN']) {
-      return; // Skip if no token
-    }
-
+  it.skipIf(skipTests)('should get schema information', async () => {
     const schema = await adapter.getSchema();
 
     expect(schema.kinds).toEqual(['task']);
@@ -208,19 +200,15 @@ describe('GitHub Adapter Integration', () => {
     expect(titleAttr?.required).toBe(true);
   });
 
-  it('should handle non-existent issue gracefully', async () => {
-    if (!process.env['CI_GITHUB_TOKEN'] && !process.env['GITHUB_TOKEN']) {
-      return; // Skip if no token
-    }
-
+  it.skipIf(skipTests)('should handle non-existent issue gracefully', async () => {
     await expect(adapter.getWorkItem('999999')).rejects.toThrow(
       'Work item not found: 999999'
     );
   });
 
-  it('should delete (close) issue', async () => {
-    if (!process.env['GITHUB_TOKEN'] || createdIssueIds.length === 0) {
-      return; // Skip if no token or no created issues
+  it.skipIf(skipTests)('should delete (close) issue', async () => {
+    if (createdIssueIds.length === 0) {
+      return; // Skip if no created issues
     }
 
     const issueId = createdIssueIds[0];
