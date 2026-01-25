@@ -30,6 +30,13 @@ if [ -n "$GITHUB_TOKEN" ]; then
          -H "Accept: application/vnd.github.v3+json" \
          https://api.github.com/repos/tbrandenburg/work/issues \
          -w "Status: %{http_code}\n" -s -o /dev/null
+    
+    # Test access to playground repository
+    echo "Testing GITHUB_TOKEN access to tbrandenburg/playground..."
+    curl -H "Authorization: token $GITHUB_TOKEN" \
+         -H "Accept: application/vnd.github.v3+json" \
+         https://api.github.com/repos/tbrandenburg/playground/issues \
+         -w "Status: %{http_code}\n" -s -o /dev/null
 else
     echo "GITHUB_TOKEN is not available"
 fi
