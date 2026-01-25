@@ -5,15 +5,35 @@
 
 import { execSync } from 'child_process';
 import path from 'path';
+import { mkdtempSync, rmSync } from 'fs';
+import { tmpdir } from 'os';
 
 const binPath = path.resolve(__dirname, '../../../bin/run.js');
 
 describe('JSON Output Validation', () => {
+  let testDir: string;
+
+  beforeEach(() => {
+    // Create a temporary directory for each test
+    testDir = mkdtempSync(path.join(tmpdir(), 'work-cli-test-'));
+  });
+
+  afterEach(() => {
+    // Clean up the temporary directory
+    if (testDir) {
+      rmSync(testDir, { recursive: true, force: true });
+    }
+  });
+
   describe('Structured Response Format', () => {
     it('should output structured JSON for create command', () => {
       const result = execSync(
         `node ${binPath} create "Test JSON task" --format json`,
-        { encoding: 'utf8' }
+        { 
+          encoding: 'utf8',
+          cwd: testDir,
+          env: { ...process.env, HOME: testDir }
+        }
       );
       const parsed = JSON.parse(result);
 
@@ -27,6 +47,8 @@ describe('JSON Output Validation', () => {
     it('should output structured JSON for list command', () => {
       const result = execSync(`node ${binPath} list --format json`, {
         encoding: 'utf8',
+        cwd: testDir,
+        env: { ...process.env, HOME: testDir }
       });
       const parsed = JSON.parse(result);
 
@@ -40,6 +62,8 @@ describe('JSON Output Validation', () => {
     it('should output structured JSON for auth status command', () => {
       const result = execSync(`node ${binPath} auth status --format json`, {
         encoding: 'utf8',
+        cwd: testDir,
+        env: { ...process.env, HOME: testDir }
       });
       const parsed = JSON.parse(result);
 
@@ -54,6 +78,8 @@ describe('JSON Output Validation', () => {
     it('should support JSON output for hello command', () => {
       const result = execSync(`node ${binPath} hello --from test --format json`, {
         encoding: 'utf8',
+        cwd: testDir,
+        env: { ...process.env, HOME: testDir }
       });
       const parsed = JSON.parse(result);
 
@@ -65,6 +91,8 @@ describe('JSON Output Validation', () => {
     it('should support JSON output for auth login command', () => {
       const result = execSync(`node ${binPath} auth login --format json`, {
         encoding: 'utf8',
+        cwd: testDir,
+        env: { ...process.env, HOME: testDir }
       });
       const parsed = JSON.parse(result);
 
@@ -76,6 +104,8 @@ describe('JSON Output Validation', () => {
     it('should support JSON output for auth logout command', () => {
       const result = execSync(`node ${binPath} auth logout --format json`, {
         encoding: 'utf8',
+        cwd: testDir,
+        env: { ...process.env, HOME: testDir }
       });
       const parsed = JSON.parse(result);
 
@@ -98,6 +128,8 @@ describe('JSON Output Validation', () => {
       commands.forEach(cmd => {
         const result = execSync(`node ${binPath} ${cmd} --format json`, {
           encoding: 'utf8',
+          cwd: testDir,
+          env: { ...process.env, HOME: testDir }
         });
         
         expect(() => JSON.parse(result)).not.toThrow();
@@ -110,6 +142,8 @@ describe('JSON Output Validation', () => {
     it('should include proper newline termination', () => {
       const result = execSync(`node ${binPath} hello --from test --format json`, {
         encoding: 'utf8',
+        cwd: testDir,
+        env: { ...process.env, HOME: testDir }
       });
       
       expect(result.endsWith('\n')).toBe(true);
@@ -118,6 +152,8 @@ describe('JSON Output Validation', () => {
     it('should use 2-space indentation', () => {
       const result = execSync(`node ${binPath} hello --from test --format json`, {
         encoding: 'utf8',
+        cwd: testDir,
+        env: { ...process.env, HOME: testDir }
       });
       
       expect(result).toContain('  "data"');
@@ -129,6 +165,8 @@ describe('JSON Output Validation', () => {
     it('should handle empty data responses', () => {
       const result = execSync(`node ${binPath} list --format json`, {
         encoding: 'utf8',
+        cwd: testDir,
+        env: { ...process.env, HOME: testDir }
       });
       const parsed = JSON.parse(result);
 
@@ -143,6 +181,8 @@ describe('JSON Output Validation', () => {
     it('should maintain same data structure for existing JSON outputs', () => {
       const result = execSync(`node ${binPath} auth status --format json`, {
         encoding: 'utf8',
+        cwd: testDir,
+        env: { ...process.env, HOME: testDir }
       });
       const parsed = JSON.parse(result);
 
