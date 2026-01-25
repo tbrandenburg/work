@@ -156,6 +156,17 @@ describe('GitHub Authentication', () => {
       expect(token).toBe('ghp_1234567890123456789012345678901234567890');
     });
 
+    it('should prefer CI_GITHUB_TOKEN over GITHUB_TOKEN', () => {
+      mockExecFileSync.mockImplementation(() => {
+        throw new Error('gh not found');
+      });
+
+      process.env['GITHUB_TOKEN'] = 'ghp_1234567890123456789012345678901234567890';
+      process.env['CI_GITHUB_TOKEN'] = 'ghp_0987654321098765432109876543210987654321';
+      const token = getTokenFromCredentials();
+      expect(token).toBe('ghp_0987654321098765432109876543210987654321');
+    });
+
     it('should prefer credentials over environment variables', () => {
       mockExecFileSync.mockImplementation(() => {
         throw new Error('gh not found');
