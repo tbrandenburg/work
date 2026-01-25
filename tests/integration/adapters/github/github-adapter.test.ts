@@ -27,7 +27,7 @@ describe('GitHub Adapter Integration', () => {
     context = {
       name: 'test-github',
       tool: 'github',
-      url: 'https://github.com/tbrandenburg/playground',
+      url: 'https://github.com/tbrandenburg/work',
       authState: 'unauthenticated',
       isActive: true,
     };

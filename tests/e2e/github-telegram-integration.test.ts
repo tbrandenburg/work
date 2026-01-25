@@ -123,6 +123,15 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
       return;
     }
 
+    // Skip if GitHub CLI is authenticated (it uses read-only GITHUB_TOKEN in CI)
+    try {
+      execSync('gh auth status', { stdio: 'pipe' });
+      console.log('Skipping test - GitHub CLI is authenticated with read-only token in CI');
+      return;
+    } catch {
+      // GitHub CLI not authenticated, test can proceed
+    }
+
     const botToken = process.env.TELEGRAM_BOT_TOKEN!;
     const chatId = process.env.TELEGRAM_CHAT_ID!;
 
