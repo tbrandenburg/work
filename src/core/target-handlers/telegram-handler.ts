@@ -6,7 +6,10 @@ import { TargetConfig, NotificationResult } from '../../types/notification.js';
  * Telegram target handler for sending work item notifications to Telegram chats
  */
 export class TelegramTargetHandler implements TargetHandler {
-  async send(workItems: WorkItem[], config: TargetConfig): Promise<NotificationResult> {
+  async send(
+    workItems: WorkItem[],
+    config: TargetConfig
+  ): Promise<NotificationResult> {
     if (config.type !== 'telegram') {
       return {
         success: false,
@@ -33,16 +36,40 @@ export class TelegramTargetHandler implements TargetHandler {
     }
 
     const header = `<b>📋 Work Items Update</b>\n<i>${workItems.length} item${workItems.length === 1 ? '' : 's'}</i>\n`;
-    
-    const items = workItems.map((item, index) => {
-      const emoji = this.getStateEmoji(item.state);
-      const title = this.escapeHtml(item.title);
-      const id = this.escapeHtml(item.id);
-      
-      return `${index + 1}. ${emoji} <b>${title}</b>\n   ID: <code>${id}</code>`;
-    }).join('\n\n');
 
-    return header + '\n' + items;
+    const items = workItems
+      .map((item, index) => {
+        const emoji = this.getStateEmoji(item.state);
+        const title = this.escapeHtml(item.title);
+        const id = this.escapeHtml(item.id);
+
+        return `${index + 1}. ${emoji} <b>${title}</b>\n   ID: <code>${id}</code>`;
+      })
+      .join('\n\n');
+
+    const fullMessage = header + '\n' + items;
+    
+    // Telegram message limit is 4096 characters
+    if (fullMessage.length > 4000) {
+      const truncatedItems = workItems
+        .slice(0, 3) // Show only first 3 items
+        .map((item, index) => {
+          const emoji = this.getStateEmoji(item.state);
+          const title = this.escapeHtml(item.title.substring(0, 50) + (item.title.length > 50 ? '...' : ''));
+          const id = this.escapeHtml(item.id);
+
+          return `${index + 1}. ${emoji} <b>${title}</b>\n   ID: <code>${id}</code>`;
+        })
+        .join('\n\n');
+      
+      const remaining = workItems.length - 3;
+      const truncatedMessage = header + '\n' + truncatedItems + 
+        (remaining > 0 ? `\n\n<i>... and ${remaining} more item${remaining === 1 ? '' : 's'}</i>` : '');
+      
+      return truncatedMessage;
+    }
+
+    return fullMessage;
   }
 
   private getStateEmoji(state: string): string {
@@ -70,9 +97,13 @@ export class TelegramTargetHandler implements TargetHandler {
       .replace(/>/g, '&gt;');
   }
 
-  private async sendToTelegram(botToken: string, chatId: string, message: string): Promise<NotificationResult> {
+  private async sendToTelegram(
+    botToken: string,
+    chatId: string,
+    message: string
+  ): Promise<NotificationResult> {
     const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-    
+
     const payload = {
       chat_id: chatId,
       text: message,
@@ -89,7 +120,9 @@ export class TelegramTargetHandler implements TargetHandler {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({})) as { description?: string };
+        const errorData = (await response.json().catch(() => ({}))) as {
+          description?: string;
+        };
         return {
           success: false,
           error: `Telegram API error: ${response.status} ${response.statusText}${errorData.description ? ` - ${errorData.description}` : ''}`,

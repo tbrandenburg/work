@@ -67,7 +67,10 @@ export default class NotifyTargetAdd extends BaseCommand {
       this.error('--script is required for bash targets');
     }
 
-    if (flags.type === 'telegram' && (!flags['bot-token'] || !flags['chat-id'])) {
+    if (
+      flags.type === 'telegram' &&
+      (!flags['bot-token'] || !flags['chat-id'])
+    ) {
       this.error('--bot-token and --chat-id are required for telegram targets');
     }
 
@@ -91,7 +94,9 @@ export default class NotifyTargetAdd extends BaseCommand {
 
       this.log(output);
     } catch (error) {
-      this.handleError(error instanceof Error ? error : new Error(String(error)));
+      this.handleError(
+        error instanceof Error ? error : new Error(String(error))
+      );
     }
   }
 

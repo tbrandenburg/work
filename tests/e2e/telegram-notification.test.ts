@@ -43,10 +43,9 @@ describe('Telegram Notification E2E', () => {
     expect(listData.data[0].config.chatId).toBe('test-chat');
 
     // Remove target
-    execSync(
-      `node ${binPath} notify target remove test-telegram`,
-      { stdio: 'pipe' }
-    );
+    execSync(`node ${binPath} notify target remove test-telegram`, {
+      stdio: 'pipe',
+    });
 
     // Verify removal
     const emptyListOutput = execSync(
@@ -65,9 +64,13 @@ describe('Telegram Notification E2E', () => {
 
     if (!botToken || !chatId) {
       if (isCI) {
-        throw new Error('TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID environment variables are required in CI');
+        throw new Error(
+          'TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID environment variables are required in CI'
+        );
       }
-      console.log('Skipping real Telegram test - missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID env vars');
+      console.log(
+        'Skipping real Telegram test - missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID env vars'
+      );
       return;
     }
 

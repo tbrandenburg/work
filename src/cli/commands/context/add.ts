@@ -17,6 +17,7 @@ export default class ContextAdd extends BaseCommand {
   static override examples = [
     '<%= config.bin %> context <%= command.id %> local --tool local-fs --path ./tasks',
     '<%= config.bin %> context <%= command.id %> project1 --tool local-fs --path /home/user/project1',
+    '<%= config.bin %> context <%= command.id %> github-project --tool github --url https://github.com/owner/repo',
   ];
 
   static override flags = {
@@ -24,7 +25,7 @@ export default class ContextAdd extends BaseCommand {
     tool: Flags.string({
       char: 't',
       description: 'backend tool',
-      options: ['local-fs'],
+      options: ['local-fs', 'github'],
       required: true,
     }),
     path: Flags.string({
@@ -47,12 +48,16 @@ export default class ContextAdd extends BaseCommand {
         this.error('--path is required for local-fs tool');
       }
 
+      if (flags.tool === 'github' && !flags.url) {
+        this.error('--url is required for github tool');
+      }
+
       const context: Context = {
         name: args.name,
         tool: flags.tool,
         path: flags.path,
         url: flags.url,
-        authState: 'authenticated', // local-fs doesn't need auth
+        authState: flags.tool === 'local-fs' ? 'authenticated' : 'unauthenticated',
         isActive: false,
       };
 

@@ -46,6 +46,7 @@ export interface Context {
   readonly authState: AuthState;
   readonly isActive: boolean;
   readonly notificationTargets?: readonly NotificationTarget[] | undefined;
+  readonly credentialSource?: 'gh-cli' | 'manual' | 'environment' | 'none';
 }
 
 export interface WorkAdapter {

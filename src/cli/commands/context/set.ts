@@ -28,7 +28,8 @@ export default class ContextSet extends BaseCommand {
     const engine = new WorkEngine();
 
     try {
-      engine.setActiveContext(args.name);
+      await engine.ensureDefaultContext();
+      await engine.setActiveContext(args.name);
 
       const result = {
         message: `Activated context '${args.name}'`,

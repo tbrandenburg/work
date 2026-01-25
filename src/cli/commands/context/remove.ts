@@ -28,7 +28,8 @@ export default class ContextRemove extends BaseCommand {
     const engine = new WorkEngine();
 
     try {
-      engine.removeContext(args.name);
+      await engine.ensureDefaultContext();
+      await engine.removeContext(args.name);
 
       const result = {
         message: `Removed context '${args.name}'`,

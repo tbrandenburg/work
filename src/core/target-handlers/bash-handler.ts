@@ -11,7 +11,10 @@ import { TargetConfig, NotificationResult } from '../../types/notification.js';
 import { TargetHandler } from '../notification-service.js';
 
 export class BashTargetHandler implements TargetHandler {
-  async send(workItems: WorkItem[], config: TargetConfig): Promise<NotificationResult> {
+  async send(
+    workItems: WorkItem[],
+    config: TargetConfig
+  ): Promise<NotificationResult> {
     if (config.type !== 'bash') {
       return {
         success: false,
@@ -37,9 +40,15 @@ export class BashTargetHandler implements TargetHandler {
     }
   }
 
-  private async handleBuiltinLog(workItems: WorkItem[]): Promise<NotificationResult> {
+  private async handleBuiltinLog(
+    workItems: WorkItem[]
+  ): Promise<NotificationResult> {
     try {
-      const notificationsDir = path.join(os.homedir(), '.work', 'notifications');
+      const notificationsDir = path.join(
+        os.homedir(),
+        '.work',
+        'notifications'
+      );
       await fs.mkdir(notificationsDir, { recursive: true });
 
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -71,7 +80,7 @@ export class BashTargetHandler implements TargetHandler {
     workItems: WorkItem[],
     timeoutSeconds: number
   ): Promise<NotificationResult> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const jsonData = JSON.stringify({
         timestamp: new Date().toISOString(),
         itemCount: workItems.length,
@@ -94,7 +103,7 @@ export class BashTargetHandler implements TargetHandler {
         stderr += data.toString();
       });
 
-      child.on('close', (code) => {
+      child.on('close', code => {
         if (code === 0) {
           resolve({
             success: true,
@@ -108,7 +117,7 @@ export class BashTargetHandler implements TargetHandler {
         }
       });
 
-      child.on('error', (error) => {
+      child.on('error', error => {
         resolve({
           success: false,
           error: `Failed to execute script: ${error.message}`,

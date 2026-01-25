@@ -21,32 +21,40 @@ describe('Notify Send Command', () => {
 
   it('should validate command structure', () => {
     const binPath = join(originalCwd, 'bin/run.js');
-    
+
     expect(() => {
-      execSync(`node ${binPath} notify send invalid query to target`, { stdio: 'pipe' });
+      execSync(`node ${binPath} notify send invalid query to target`, {
+        stdio: 'pipe',
+      });
     }).toThrow();
   });
 
   it('should validate "to" keyword', () => {
     const binPath = join(originalCwd, 'bin/run.js');
-    
+
     expect(() => {
-      execSync(`node ${binPath} notify send where state=new invalid target`, { stdio: 'pipe' });
+      execSync(`node ${binPath} notify send where state=new invalid target`, {
+        stdio: 'pipe',
+      });
     }).toThrow();
   });
 
   it('should handle missing target gracefully', () => {
     const binPath = join(originalCwd, 'bin/run.js');
-    
+
     expect(() => {
-      execSync(`node ${binPath} notify send where state=new to nonexistent`, { stdio: 'pipe' });
+      execSync(`node ${binPath} notify send where state=new to nonexistent`, {
+        stdio: 'pipe',
+      });
     }).toThrow();
   });
 
   it('should show help when requested', () => {
     const binPath = join(originalCwd, 'bin/run.js');
-    
-    const output = execSync(`node ${binPath} notify send --help`, { encoding: 'utf8' });
+
+    const output = execSync(`node ${binPath} notify send --help`, {
+      encoding: 'utf8',
+    });
     expect(output).toContain('Send work item notifications');
     expect(output).toContain('where');
     expect(output).toContain('to');

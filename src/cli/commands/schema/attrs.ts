@@ -31,7 +31,7 @@ export default class SchemaAttrs extends BaseCommand {
 
     try {
       if (args.context) {
-        engine.setActiveContext(args.context);
+        await engine.setActiveContext(args.context);
       }
 
       const attributes = await engine.getAttributes();

@@ -12,6 +12,7 @@ describe('Auth Status Command Branch Coverage', () => {
     mockEngine = {
       setActiveContext: vi.fn(),
       getAuthStatus: vi.fn(),
+      ensureDefaultContext: vi.fn(),
     } as any;
     (WorkEngine as anyClass<typeof WorkEngine>).mockImplementation(
       () => mockEngine

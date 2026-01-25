@@ -4,7 +4,8 @@ import { BaseCommand } from '../../base-command.js';
 import { formatOutput } from '../../formatter.js';
 
 export default class NotifySend extends BaseCommand {
-  static override description = 'Send work item notifications to configured targets';
+  static override description =
+    'Send work item notifications to configured targets';
 
   static override examples = [
     '<%= config.bin %> notify <%= command.id %> where state=new to alerts',
@@ -67,7 +68,9 @@ export default class NotifySend extends BaseCommand {
 
       this.log(output);
     } catch (error) {
-      this.handleError(error instanceof Error ? error : new Error(String(error)));
+      this.handleError(
+        error instanceof Error ? error : new Error(String(error))
+      );
     }
   }
 }

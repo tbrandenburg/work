@@ -1,7 +1,13 @@
 import { vi } from 'vitest';
-import { NotificationService, TargetHandler } from '../../../src/core/notification-service';
+import {
+  NotificationService,
+  TargetHandler,
+} from '../../../src/core/notification-service';
 import { WorkItem } from '../../../src/types/work-item';
-import { NotificationTarget, NotificationResult } from '../../../src/types/notification';
+import {
+  NotificationTarget,
+  NotificationResult,
+} from '../../../src/types/notification';
 
 describe('NotificationService', () => {
   let service: NotificationService;
@@ -64,7 +70,10 @@ describe('NotificationService', () => {
 
       const result = await service.sendNotification(mockWorkItems, mockTarget);
 
-      expect(mockHandler.send).toHaveBeenCalledWith(mockWorkItems, mockTarget.config);
+      expect(mockHandler.send).toHaveBeenCalledWith(
+        mockWorkItems,
+        mockTarget.config
+      );
       expect(result).toEqual(expectedResult);
     });
 
@@ -72,7 +81,9 @@ describe('NotificationService', () => {
       const result = await service.sendNotification(mockWorkItems, mockTarget);
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain('No handler registered for target type: bash');
+      expect(result.error).toContain(
+        'No handler registered for target type: bash'
+      );
     });
 
     it('should handle handler errors gracefully', async () => {

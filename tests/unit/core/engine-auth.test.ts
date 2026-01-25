@@ -19,6 +19,19 @@ describe('WorkEngine Auth Methods', () => {
     vi.spyOn(engine as any, 'ensureDefaultContext').mockResolvedValue(
       undefined
     );
+    
+    // Mock getActiveContext to return a test context
+    vi.spyOn(engine as any, 'getActiveContext').mockReturnValue({
+      name: 'test',
+      tool: 'local-fs',
+      path: '/test',
+      authState: 'unauthenticated',
+      isActive: true,
+    });
+    
+    // Mock context management methods
+    vi.spyOn(engine as any, 'setActiveContext').mockImplementation();
+    vi.spyOn(engine as any, 'saveContexts').mockResolvedValue(undefined);
   });
 
   afterEach(() => {

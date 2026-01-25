@@ -2,6 +2,7 @@
  * GitHub authentication utilities
  */
 
+import { execFileSync } from 'child_process';
 import { GitHubAuthError } from './errors.js';
 
 /**
@@ -19,12 +20,26 @@ export function validateToken(token: string): boolean {
 
 /**
  * Extracts GitHub token from credentials or environment
- * Supports CI_GITHUB_TOKEN fallback for GitHub Actions
+ * Three-tier hierarchy: gh CLI → manual credentials → environment variables
  */
 export function getTokenFromCredentials(
   credentials?: Record<string, string>
 ): string {
-  // First try credentials parameter
+  // First priority: GitHub CLI
+  try {
+    const ghToken = execFileSync('gh', ['auth', 'token'], {
+      encoding: 'utf8',
+      timeout: 5000,
+    }).trim();
+
+    if (ghToken && validateToken(ghToken)) {
+      return ghToken;
+    }
+  } catch {
+    // gh CLI not available or not authenticated - continue to next method
+  }
+
+  // Second priority: credentials parameter
   if (credentials?.['token']) {
     const token = credentials['token'];
     if (validateToken(token)) {
@@ -33,17 +48,26 @@ export function getTokenFromCredentials(
     throw new GitHubAuthError('Invalid token format in credentials');
   }
 
-  // Fallback to environment variables
+  // Third priority: environment variables (prefer CI_GITHUB_TOKEN over GITHUB_TOKEN)
   const envToken =
-    process.env['GITHUB_TOKEN'] || process.env['CI_GITHUB_TOKEN'];
+    process.env['CI_GITHUB_TOKEN'] || process.env['GITHUB_TOKEN'];
   if (envToken) {
     if (validateToken(envToken)) {
+      console.warn(
+        'Using GitHub token from environment variable. Consider using "gh auth login" for better security.'
+      );
       return envToken;
     }
     throw new GitHubAuthError('Invalid token format in environment variable');
   }
 
   throw new GitHubAuthError(
-    'No GitHub token found in credentials or environment variables'
+    `No GitHub token found. Please authenticate using one of these methods:
+
+1. GitHub CLI (recommended): gh auth login
+2. Environment variable: export GITHUB_TOKEN=your_token
+3. Manual credentials: work context add --tool github --token your_token
+
+For help: https://docs.github.com/en/authentication`
   );
 }

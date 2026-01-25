@@ -34,11 +34,13 @@ describe('TelegramTargetHandler', () => {
   describe('send', () => {
     it('should reject invalid config type', async () => {
       const invalidConfig = { type: 'bash' as any, script: 'test' };
-      
+
       const result = await handler.send(mockWorkItems, invalidConfig);
-      
+
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Invalid config type for TelegramTargetHandler');
+      expect(result.error).toBe(
+        'Invalid config type for TelegramTargetHandler'
+      );
     });
 
     it('should send message to Telegram successfully', async () => {
@@ -51,7 +53,9 @@ describe('TelegramTargetHandler', () => {
       const result = await handler.send(mockWorkItems, mockConfig);
 
       expect(result.success).toBe(true);
-      expect(result.message).toBe('Sent notification to Telegram chat test-chat-id');
+      expect(result.message).toBe(
+        'Sent notification to Telegram chat test-chat-id'
+      );
       expect(global.fetch).toHaveBeenCalledWith(
         'https://api.telegram.org/bottest-bot-token/sendMessage',
         expect.objectContaining({
@@ -74,7 +78,9 @@ describe('TelegramTargetHandler', () => {
       const result = await handler.send(mockWorkItems, mockConfig);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Telegram API error: 400 Bad Request - Invalid chat_id');
+      expect(result.error).toBe(
+        'Telegram API error: 400 Bad Request - Invalid chat_id'
+      );
     });
 
     it('should handle network error', async () => {
@@ -83,7 +89,9 @@ describe('TelegramTargetHandler', () => {
       const result = await handler.send(mockWorkItems, mockConfig);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Failed to send Telegram message: Network error');
+      expect(result.error).toBe(
+        'Failed to send Telegram message: Network error'
+      );
     });
 
     it('should format message with HTML and emojis', async () => {
@@ -97,7 +105,7 @@ describe('TelegramTargetHandler', () => {
 
       const fetchCall = (global.fetch as any).mock.calls[0];
       const body = JSON.parse(fetchCall[1].body);
-      
+
       expect(body.parse_mode).toBe('HTML');
       expect(body.text).toContain('<b>📋 Work Items Update</b>');
       expect(body.text).toContain('🆕');
@@ -115,7 +123,7 @@ describe('TelegramTargetHandler', () => {
 
       const fetchCall = (global.fetch as any).mock.calls[0];
       const body = JSON.parse(fetchCall[1].body);
-      
+
       expect(body.text).toContain('No items to report');
     });
   });

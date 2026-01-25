@@ -22,7 +22,7 @@ export default class ContextList extends BaseCommand {
     try {
       // Ensure contexts are loaded from disk
       await engine.ensureDefaultContext();
-      
+
       const contexts = engine.getContexts();
 
       if (flags.format === 'json') {

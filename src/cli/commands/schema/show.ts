@@ -30,7 +30,7 @@ export default class SchemaShow extends BaseCommand {
 
     try {
       if (args.context) {
-        engine.setActiveContext(args.context);
+        await engine.setActiveContext(args.context);
       }
 
       const schema = await engine.getSchema();

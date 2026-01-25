@@ -11,7 +11,10 @@ import {
 } from '../types/notification.js';
 
 export interface TargetHandler {
-  send(workItems: WorkItem[], config: TargetConfig): Promise<NotificationResult>;
+  send(
+    workItems: WorkItem[],
+    config: TargetConfig
+  ): Promise<NotificationResult>;
 }
 
 export class NotificationService {

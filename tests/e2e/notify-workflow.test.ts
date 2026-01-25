@@ -43,10 +43,9 @@ describe('Notify Workflow E2E', () => {
     expect(listData.data[0].type).toBe('bash');
 
     // Remove target
-    execSync(
-      `node ${binPath} notify target remove test-log`,
-      { stdio: 'pipe' }
-    );
+    execSync(`node ${binPath} notify target remove test-log`, {
+      stdio: 'pipe',
+    });
 
     // Verify removal
     const emptyListOutput = execSync(
@@ -78,15 +77,17 @@ describe('Notify Workflow E2E', () => {
     // Verify notification log file was created
     const notificationsDir = join(os.homedir(), '.work', 'notifications');
     const files = await fs.readdir(notificationsDir);
-    const logFiles = files.filter(f => f.startsWith('notification-') && f.endsWith('.json'));
-    
+    const logFiles = files.filter(
+      f => f.startsWith('notification-') && f.endsWith('.json')
+    );
+
     expect(logFiles.length).toBeGreaterThan(0);
 
     // Verify log file content
     const logFile = join(notificationsDir, logFiles[0]);
     const logContent = await fs.readFile(logFile, 'utf8');
     const logData = JSON.parse(logContent);
-    
+
     expect(logData.itemCount).toBe(0);
     expect(logData.items).toHaveLength(0);
   });
@@ -112,14 +113,16 @@ describe('Notify Workflow E2E', () => {
     // Verify notification contains proper structure
     const notificationsDir = join(os.homedir(), '.work', 'notifications');
     const files = await fs.readdir(notificationsDir);
-    const logFiles = files.filter(f => f.startsWith('notification-') && f.endsWith('.json'));
-    
+    const logFiles = files.filter(
+      f => f.startsWith('notification-') && f.endsWith('.json')
+    );
+
     expect(logFiles.length).toBeGreaterThan(0);
 
     const logFile = join(notificationsDir, logFiles[0]);
     const logContent = await fs.readFile(logFile, 'utf8');
     const logData = JSON.parse(logContent);
-    
+
     expect(logData.itemCount).toBe(0);
     expect(logData.items).toHaveLength(0);
     expect(logData.timestamp).toBeDefined();
@@ -138,10 +141,9 @@ describe('Notify Workflow E2E', () => {
 
     // Try to remove non-existent target
     expect(() => {
-      execSync(
-        `node ${binPath} notify target remove non-existent-target`,
-        { stdio: 'pipe' }
-      );
+      execSync(`node ${binPath} notify target remove non-existent-target`, {
+        stdio: 'pipe',
+      });
     }).toThrow();
   });
 });

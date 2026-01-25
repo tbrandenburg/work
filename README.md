@@ -36,6 +36,29 @@ The work CLI is a unified, stateless command-line tool that bridges AI agents an
    work hello world --from oclif
    ```
 
+## GitHub Authentication
+
+The work CLI provides seamless GitHub integration with a three-tier authentication hierarchy:
+
+### Quick Setup (Recommended)
+
+```bash
+# If you already use GitHub CLI
+gh auth login  # (if not already authenticated)
+work context add my-project --tool github --url https://github.com/owner/repo
+
+# Start working immediately - no token management needed!
+work list
+```
+
+### Authentication Methods
+
+1. **GitHub CLI** (Recommended) - Uses your existing `gh auth login` credentials
+2. **Manual Token** - Explicit token via `--token` parameter  
+3. **Environment Variable** - `GITHUB_TOKEN` for CI/CD workflows
+
+For detailed setup instructions, troubleshooting, and security best practices, see the [GitHub Authentication Guide](docs/work-github-auth.md).
+
 ## Development
 
 ### Setup Development Environment

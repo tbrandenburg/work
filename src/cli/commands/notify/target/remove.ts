@@ -37,7 +37,9 @@ export default class NotifyTargetRemove extends BaseCommand {
 
       this.log(output);
     } catch (error) {
-      this.handleError(error instanceof Error ? error : new Error(String(error)));
+      this.handleError(
+        error instanceof Error ? error : new Error(String(error))
+      );
     }
   }
 }

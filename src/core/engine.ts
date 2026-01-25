@@ -22,6 +22,7 @@ import {
   NotificationResult,
 } from '../types/notification.js';
 import { LocalFsAdapter } from '../adapters/local-fs/index.js';
+import { GitHubAdapter } from '../adapters/github/index.js';
 import { validateRelation, detectCycles } from './graph.js';
 import { parseQuery, executeQuery } from './query.js';
 import { NotificationService } from './notification-service.js';
@@ -38,7 +39,8 @@ export class WorkEngine {
   constructor() {
     // Register built-in adapters
     this.registerAdapter('local-fs', new LocalFsAdapter());
-    
+    this.registerAdapter('github', new GitHubAdapter());
+
     // Register built-in notification handlers synchronously
     this.registerNotificationHandlerSync();
   }
@@ -52,7 +54,10 @@ export class WorkEngine {
   private registerNotificationHandlerSync(): void {
     // Register handlers synchronously - handlers are part of core system
     this.notificationService.registerHandler('bash', new BashTargetHandler());
-    this.notificationService.registerHandler('telegram', new TelegramTargetHandler());
+    this.notificationService.registerHandler(
+      'telegram',
+      new TelegramTargetHandler()
+    );
   }
 
   /**
@@ -75,12 +80,12 @@ export class WorkEngine {
       };
 
       await this.addContext(defaultContext);
-      this.setActiveContext('default');
+      await this.setActiveContext('default');
     } else if (!this.activeContext) {
       // Set first context as active if none is set
       const firstContext = Array.from(this.contexts.keys())[0];
       if (firstContext) {
-        this.setActiveContext(firstContext);
+        await this.setActiveContext(firstContext);
       }
     }
   }
@@ -105,16 +110,22 @@ export class WorkEngine {
     await adapter.initialize(context);
 
     this.contexts.set(context.name, context);
+    
+    // Save contexts to disk
+    await this.saveContexts();
   }
 
   /**
    * Set the active context
    */
-  setActiveContext(name: string): void {
+  async setActiveContext(name: string): Promise<void> {
     if (!this.contexts.has(name)) {
       throw new ContextNotFoundError(name);
     }
     this.activeContext = name;
+    
+    // Save contexts to disk
+    await this.saveContexts();
   }
 
   /**
@@ -143,7 +154,7 @@ export class WorkEngine {
   /**
    * Remove a context
    */
-  removeContext(name: string): void {
+  async removeContext(name: string): Promise<void> {
     const context = this.contexts.get(name);
     if (!context) {
       throw new ContextNotFoundError(name);
@@ -155,6 +166,9 @@ export class WorkEngine {
     }
 
     this.contexts.delete(name);
+    
+    // Save contexts to disk
+    await this.saveContexts();
   }
 
   /**
@@ -331,7 +345,19 @@ export class WorkEngine {
   ): Promise<AuthStatus> {
     await this.ensureDefaultContext();
     const adapter = this.getActiveAdapter();
-    return adapter.authenticate(credentials);
+    const authStatus = await adapter.authenticate(credentials);
+    
+    // Update context auth state
+    const context = this.getActiveContext();
+    const updatedContext: Context = {
+      ...context,
+      authState: authStatus.state,
+    };
+    
+    this.contexts.set(context.name, updatedContext);
+    await this.saveContexts();
+    
+    return authStatus;
   }
 
   /**
@@ -340,7 +366,17 @@ export class WorkEngine {
   async logout(): Promise<void> {
     await this.ensureDefaultContext();
     const adapter = this.getActiveAdapter();
-    return adapter.logout();
+    await adapter.logout();
+    
+    // Update context auth state
+    const context = this.getActiveContext();
+    const updatedContext: Context = {
+      ...context,
+      authState: 'unauthenticated',
+    };
+    
+    this.contexts.set(context.name, updatedContext);
+    await this.saveContexts();
   }
 
   /**
@@ -391,18 +427,24 @@ export class WorkEngine {
   /**
    * Add a notification target to the active context
    */
-  async addNotificationTarget(name: string, target: NotificationTarget): Promise<void> {
+  async addNotificationTarget(
+    name: string,
+    target: NotificationTarget
+  ): Promise<void> {
     await this.ensureDefaultContext();
     const context = this.getActiveContext();
-    
+
     const existingTargets = context.notificationTargets || [];
-    const updatedTargets = [...existingTargets.filter(t => t.name !== name), target];
-    
+    const updatedTargets = [
+      ...existingTargets.filter(t => t.name !== name),
+      target,
+    ];
+
     const updatedContext: Context = {
       ...context,
       notificationTargets: updatedTargets,
     };
-    
+
     this.contexts.set(context.name, updatedContext);
     await this.saveContexts();
   }
@@ -413,21 +455,21 @@ export class WorkEngine {
   async removeNotificationTarget(name: string): Promise<void> {
     await this.ensureDefaultContext();
     const context = this.getActiveContext();
-    
+
     const existingTargets = context.notificationTargets || [];
     const targetExists = existingTargets.some(t => t.name === name);
-    
+
     if (!targetExists) {
       throw new Error(`Notification target '${name}' not found`);
     }
-    
+
     const updatedTargets = existingTargets.filter(t => t.name !== name);
-    
+
     const updatedContext: Context = {
       ...context,
       notificationTargets: updatedTargets,
     };
-    
+
     this.contexts.set(context.name, updatedContext);
     await this.saveContexts();
   }
@@ -444,26 +486,29 @@ export class WorkEngine {
   /**
    * Send notification to a target
    */
-  async sendNotification(workItems: WorkItem[], targetName: string): Promise<NotificationResult> {
+  async sendNotification(
+    workItems: WorkItem[],
+    targetName: string
+  ): Promise<NotificationResult> {
     await this.ensureDefaultContext();
     const context = this.getActiveContext();
-    
+
     const targets = context.notificationTargets || [];
     const target = targets.find(t => t.name === targetName);
-    
+
     if (!target) {
       return {
         success: false,
         error: `Notification target '${targetName}' not found`,
       };
     }
-    
+
     return this.notificationService.sendNotification(workItems, target);
   }
 
   /**
    * Get contexts file path
-   * 
+   *
    * Context Persistence: Notification targets and other context data are persisted
    * to .work/contexts.json to maintain state between CLI command invocations.
    * This enables notification targets to be configured once and used across
@@ -480,12 +525,12 @@ export class WorkEngine {
     try {
       const contextsPath = this.getContextsFilePath();
       await fs.mkdir(path.dirname(contextsPath), { recursive: true });
-      
+
       const contextsData = {
         contexts: Array.from(this.contexts.entries()),
         activeContext: this.activeContext,
       };
-      
+
       await fs.writeFile(contextsPath, JSON.stringify(contextsData, null, 2));
     } catch {
       // Silently fail - context persistence is not critical for functionality
@@ -499,11 +544,14 @@ export class WorkEngine {
     try {
       const contextsPath = this.getContextsFilePath();
       const content = await fs.readFile(contextsPath, 'utf-8');
-      const contextsData = JSON.parse(content) as { contexts: [string, Context][]; activeContext: string | null };
-      
+      const contextsData = JSON.parse(content) as {
+        contexts: [string, Context][];
+        activeContext: string | null;
+      };
+
       this.contexts = new Map(contextsData.contexts);
       this.activeContext = contextsData.activeContext;
-      
+
       // Initialize adapters for loaded contexts
       for (const [, context] of this.contexts) {
         const adapter = this.adapters.get(context.tool);
