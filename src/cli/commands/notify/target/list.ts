@@ -22,14 +22,10 @@ export default class NotifyTargetList extends BaseCommand {
       const isJsonMode = await this.getJsonMode();
 
       if (isJsonMode) {
-        const output = formatOutput(
-          targets,
-          'json',
-          {
-            total: targets.length,
-            timestamp: new Date().toISOString(),
-          }
-        );
+        const output = formatOutput(targets, 'json', {
+          total: targets.length,
+          timestamp: new Date().toISOString(),
+        });
         this.log(output);
         return;
       }
@@ -55,7 +51,9 @@ export default class NotifyTargetList extends BaseCommand {
         this.log(`${target.name}\t\t${target.type}\t${config}`);
       }
     } catch (error) {
-      this.handleError(error instanceof Error ? error : new Error(String(error)));
+      this.handleError(
+        error instanceof Error ? error : new Error(String(error))
+      );
     }
   }
 }

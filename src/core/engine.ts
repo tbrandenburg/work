@@ -38,7 +38,7 @@ export class WorkEngine {
   constructor() {
     // Register built-in adapters
     this.registerAdapter('local-fs', new LocalFsAdapter());
-    
+
     // Register built-in notification handlers synchronously
     this.registerNotificationHandlerSync();
   }
@@ -52,7 +52,10 @@ export class WorkEngine {
   private registerNotificationHandlerSync(): void {
     // Register handlers synchronously - handlers are part of core system
     this.notificationService.registerHandler('bash', new BashTargetHandler());
-    this.notificationService.registerHandler('telegram', new TelegramTargetHandler());
+    this.notificationService.registerHandler(
+      'telegram',
+      new TelegramTargetHandler()
+    );
   }
 
   /**
@@ -391,18 +394,24 @@ export class WorkEngine {
   /**
    * Add a notification target to the active context
    */
-  async addNotificationTarget(name: string, target: NotificationTarget): Promise<void> {
+  async addNotificationTarget(
+    name: string,
+    target: NotificationTarget
+  ): Promise<void> {
     await this.ensureDefaultContext();
     const context = this.getActiveContext();
-    
+
     const existingTargets = context.notificationTargets || [];
-    const updatedTargets = [...existingTargets.filter(t => t.name !== name), target];
-    
+    const updatedTargets = [
+      ...existingTargets.filter(t => t.name !== name),
+      target,
+    ];
+
     const updatedContext: Context = {
       ...context,
       notificationTargets: updatedTargets,
     };
-    
+
     this.contexts.set(context.name, updatedContext);
     await this.saveContexts();
   }
@@ -413,21 +422,21 @@ export class WorkEngine {
   async removeNotificationTarget(name: string): Promise<void> {
     await this.ensureDefaultContext();
     const context = this.getActiveContext();
-    
+
     const existingTargets = context.notificationTargets || [];
     const targetExists = existingTargets.some(t => t.name === name);
-    
+
     if (!targetExists) {
       throw new Error(`Notification target '${name}' not found`);
     }
-    
+
     const updatedTargets = existingTargets.filter(t => t.name !== name);
-    
+
     const updatedContext: Context = {
       ...context,
       notificationTargets: updatedTargets,
     };
-    
+
     this.contexts.set(context.name, updatedContext);
     await this.saveContexts();
   }
@@ -444,26 +453,29 @@ export class WorkEngine {
   /**
    * Send notification to a target
    */
-  async sendNotification(workItems: WorkItem[], targetName: string): Promise<NotificationResult> {
+  async sendNotification(
+    workItems: WorkItem[],
+    targetName: string
+  ): Promise<NotificationResult> {
     await this.ensureDefaultContext();
     const context = this.getActiveContext();
-    
+
     const targets = context.notificationTargets || [];
     const target = targets.find(t => t.name === targetName);
-    
+
     if (!target) {
       return {
         success: false,
         error: `Notification target '${targetName}' not found`,
       };
     }
-    
+
     return this.notificationService.sendNotification(workItems, target);
   }
 
   /**
    * Get contexts file path
-   * 
+   *
    * Context Persistence: Notification targets and other context data are persisted
    * to .work/contexts.json to maintain state between CLI command invocations.
    * This enables notification targets to be configured once and used across
@@ -480,12 +492,12 @@ export class WorkEngine {
     try {
       const contextsPath = this.getContextsFilePath();
       await fs.mkdir(path.dirname(contextsPath), { recursive: true });
-      
+
       const contextsData = {
         contexts: Array.from(this.contexts.entries()),
         activeContext: this.activeContext,
       };
-      
+
       await fs.writeFile(contextsPath, JSON.stringify(contextsData, null, 2));
     } catch {
       // Silently fail - context persistence is not critical for functionality
@@ -499,11 +511,14 @@ export class WorkEngine {
     try {
       const contextsPath = this.getContextsFilePath();
       const content = await fs.readFile(contextsPath, 'utf-8');
-      const contextsData = JSON.parse(content) as { contexts: [string, Context][]; activeContext: string | null };
-      
+      const contextsData = JSON.parse(content) as {
+        contexts: [string, Context][];
+        activeContext: string | null;
+      };
+
       this.contexts = new Map(contextsData.contexts);
       this.activeContext = contextsData.activeContext;
-      
+
       // Initialize adapters for loaded contexts
       for (const [, context] of this.contexts) {
         const adapter = this.adapters.get(context.tool);

@@ -10,7 +10,10 @@ export interface NotificationTarget {
   readonly config: TargetConfig;
 }
 
-export type TargetConfig = BashTargetConfig | TelegramTargetConfig | EmailTargetConfig;
+export type TargetConfig =
+  | BashTargetConfig
+  | TelegramTargetConfig
+  | EmailTargetConfig;
 
 export interface BashTargetConfig {
   readonly type: 'bash';
