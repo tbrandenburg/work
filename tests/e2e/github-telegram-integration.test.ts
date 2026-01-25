@@ -113,7 +113,7 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
     createdIssueId = null;
   });
 
-  it('should complete token-based auth workflow with external repository', async () => {
+  it('should complete token-based auth workflow with work repository', async () => {
     // Skip if we don't have required environment variables
     const hasRequiredEnvVars = process.env.CI_GITHUB_TOKEN && 
                               process.env.TELEGRAM_BOT_TOKEN && 
@@ -126,14 +126,14 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
     const botToken = process.env.TELEGRAM_BOT_TOKEN!;
     const chatId = process.env.TELEGRAM_CHAT_ID!;
 
-    // Step 1: Add GitHub context using external playground repository
+    // Step 1: Add GitHub context using work repository (consistent access)
     execSync(
-      `node ${binPath} context add playground-repo --tool github --url https://github.com/tbrandenburg/playground`,
+      `node ${binPath} context add work-repo --tool github --url https://github.com/tbrandenburg/work`,
       { stdio: 'pipe' }
     );
 
     // Step 2: Set the GitHub context as active
-    execSync(`node ${binPath} context set playground-repo`, { stdio: 'pipe' });
+    execSync(`node ${binPath} context set work-repo`, { stdio: 'pipe' });
 
     // Step 3: Authenticate with token (this will use CI_GITHUB_TOKEN from environment)
     execSync(`node ${binPath} auth login`, { 
@@ -146,7 +146,7 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
     const authData = JSON.parse(authOutput);
     expect(authData.data.state).toBe('authenticated');
 
-    // Step 5: Create a test issue in the playground repository
+    // Step 5: Create a test issue in the work repository
     const createOutput = execSync(
       `node ${binPath} create "E2E Test: Token Auth" --labels test --format json`,
       { encoding: 'utf8' }
