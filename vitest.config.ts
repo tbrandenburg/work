@@ -9,8 +9,8 @@ export default defineConfig({
     environment: 'node',
     globals: true,
     pool: 'forks',
-    maxWorkers: '50%',
-    testTimeout: 30000,
+    maxWorkers: '75%',
+    testTimeout: 10000,
     coverage: {
       provider: 'v8',
       enabled: false,
