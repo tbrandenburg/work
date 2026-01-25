@@ -20,7 +20,7 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
   let createdIssueId: string | null = null;
   let binPath: string;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     originalCwd = process.cwd();
     binPath = join(originalCwd, 'bin/run.js');
     
@@ -43,6 +43,24 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
         throw new Error('TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID environment variables are required in CI');
       }
       console.log('Skipping GitHub + Telegram E2E test - missing Telegram credentials');
+      return;
+    }
+
+    // Check if we can access the test repository
+    try {
+      const response = await fetch('https://api.github.com/repos/tbrandenburg/playground/issues', {
+        headers: {
+          'Authorization': `token ${process.env.GITHUB_TOKEN}`,
+          'User-Agent': 'work-cli-test'
+        }
+      });
+      
+      if (!response.ok) {
+        console.log(`Skipping GitHub + Telegram E2E test - cannot access test repository (${response.status})`);
+        return;
+      }
+    } catch (error) {
+      console.log('Skipping GitHub + Telegram E2E test - repository access check failed:', error);
       return;
     }
   });
@@ -100,6 +118,24 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
                               process.env.TELEGRAM_CHAT_ID;
     if (!hasRequiredEnvVars) {
       console.log('Skipping test - missing required environment variables');
+      return;
+    }
+
+    // Check repository access
+    try {
+      const response = await fetch('https://api.github.com/repos/tbrandenburg/playground/issues', {
+        headers: {
+          'Authorization': `token ${process.env.GITHUB_TOKEN}`,
+          'User-Agent': 'work-cli-test'
+        }
+      });
+      
+      if (!response.ok) {
+        console.log(`Skipping test - cannot access repository (${response.status})`);
+        return;
+      }
+    } catch (error) {
+      console.log('Skipping test - repository access failed:', error);
       return;
     }
 
@@ -185,6 +221,24 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
                               process.env.TELEGRAM_CHAT_ID;
     if (!hasRequiredEnvVars) {
       console.log('Skipping test - missing required environment variables');
+      return;
+    }
+
+    // Check repository access
+    try {
+      const response = await fetch('https://api.github.com/repos/tbrandenburg/playground/issues', {
+        headers: {
+          'Authorization': `token ${process.env.GITHUB_TOKEN}`,
+          'User-Agent': 'work-cli-test'
+        }
+      });
+      
+      if (!response.ok) {
+        console.log(`Skipping test - cannot access repository (${response.status})`);
+        return;
+      }
+    } catch (error) {
+      console.log('Skipping test - repository access failed:', error);
       return;
     }
 
