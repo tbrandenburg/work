@@ -12,6 +12,13 @@ This folder contains comprehensive documentation for the `work` CLI - a unified,
 - Authentication, relations, notifications, and schema discovery
 - Comprehensive command grammar and UX rules
 
+### [work-notifications.md](work-notifications.md)
+**Bash and Telegram notification setup**
+- Complete guide for setting up bash script and Telegram notification targets
+- JSON data structure and script requirements
+- Security best practices and error handling
+- Real-world examples and use cases
+
 ### [work-user-journey-context-and-query.md](work-user-journey-context-and-query.md)
 **Concrete user journey demonstrating context and querying**
 - Step-by-step example: finding high-priority tasks under an epic
