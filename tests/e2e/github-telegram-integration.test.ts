@@ -134,8 +134,11 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
     // Step 2: Set the GitHub context as active
     execSync(`node ${binPath} context set playground-repo`, { stdio: 'pipe' });
 
-    // Step 3: Authenticate with token (this will use CI_GITHUB_TOKEN)
-    execSync(`node ${binPath} auth login --token ${process.env.CI_GITHUB_TOKEN}`, { stdio: 'pipe' });
+    // Step 3: Authenticate with token (this will use CI_GITHUB_TOKEN from environment)
+    execSync(`node ${binPath} auth login`, { 
+      stdio: 'pipe',
+      env: { ...process.env, CI_GITHUB_TOKEN: process.env.CI_GITHUB_TOKEN }
+    });
 
     // Step 4: Verify authentication works
     const authOutput = execSync(`node ${binPath} auth status --format json`, { encoding: 'utf8' });
