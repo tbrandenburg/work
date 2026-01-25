@@ -14,31 +14,12 @@ describe('GitHub Adapter Integration', () => {
   let adapter: GitHubAdapter;
   let context: Context;
   let createdIssueIds: string[] = [];
-  let shouldSkipTests = false;
-
-  const checkShouldSkip = async (): Promise<boolean> => {
-    if (shouldSkipTests) {
-      return true;
-    }
-
-    try {
-      const response = await fetch('https://api.github.com/repos/tbrandenburg/playground/issues', {
-        headers: {
-          'Authorization': `token ${process.env.GITHUB_TOKEN}`,
-          'User-Agent': 'work-cli-test'
-        }
-      });
-      return !response.ok;
-    } catch {
-      return true;
-    }
-  };
 
   beforeAll(async () => {
-    shouldSkipTests = await checkShouldSkip();
-    
-    if (shouldSkipTests) {
-      console.warn('Skipping GitHub integration tests - no access to repository');
+    // Skip tests if no GitHub token is available
+    const token = process.env['CI_GITHUB_TOKEN'] || process.env['GITHUB_TOKEN'];
+    if (!token) {
+      console.warn('Skipping GitHub integration tests - no GitHub token available');
       return;
     }
 
@@ -54,8 +35,8 @@ describe('GitHub Adapter Integration', () => {
     // Initialize adapter
     await adapter.initialize(context);
 
-    // Authenticate
-    await adapter.authenticate();
+    // Authenticate with CI_GITHUB_TOKEN (preferred) or fallback to GITHUB_TOKEN
+    await adapter.authenticate({ token });
   });
 
   afterAll(async () => {
@@ -72,8 +53,8 @@ describe('GitHub Adapter Integration', () => {
   });
 
   it('should authenticate successfully', async () => {
-    if (shouldSkipTests) {
-      return; // Skip if no repository access
+    if (!process.env['CI_GITHUB_TOKEN'] && !process.env['GITHUB_TOKEN']) {
+      return; // Skip if no token
     }
 
     const authStatus = await adapter.getAuthStatus();
@@ -81,8 +62,8 @@ describe('GitHub Adapter Integration', () => {
   });
 
   it('should create a new issue', async () => {
-    if (shouldSkipTests) {
-      return; // Skip if no repository access
+    if (!process.env['CI_GITHUB_TOKEN'] && !process.env['GITHUB_TOKEN']) {
+      return; // Skip if no token
     }
 
     const request: CreateWorkItemRequest = {
@@ -108,8 +89,8 @@ describe('GitHub Adapter Integration', () => {
   });
 
   it('should list issues from repository', async () => {
-    if (shouldSkipTests) {
-      return; // Skip if no repository access
+    if (!process.env['CI_GITHUB_TOKEN'] && !process.env['GITHUB_TOKEN']) {
+      return; // Skip if no token
     }
 
     const workItems = await adapter.listWorkItems();
@@ -131,7 +112,7 @@ describe('GitHub Adapter Integration', () => {
 
   it('should get specific issue by ID', async () => {
     if (!process.env['GITHUB_TOKEN'] || createdIssueIds.length === 0) {
-      return; // Skip if no repository access or no created issues
+      return; // Skip if no token or no created issues
     }
 
     const issueId = createdIssueIds[0];
@@ -147,7 +128,7 @@ describe('GitHub Adapter Integration', () => {
 
   it('should update issue', async () => {
     if (!process.env['GITHUB_TOKEN'] || createdIssueIds.length === 0) {
-      return; // Skip if no repository access or no created issues
+      return; // Skip if no token or no created issues
     }
 
     const issueId = createdIssueIds[0];
@@ -166,7 +147,7 @@ describe('GitHub Adapter Integration', () => {
 
   it('should change issue state', async () => {
     if (!process.env['GITHUB_TOKEN'] || createdIssueIds.length === 0) {
-      return; // Skip if no repository access or no created issues
+      return; // Skip if no token or no created issues
     }
 
     const issueId = createdIssueIds[0];
@@ -182,8 +163,8 @@ describe('GitHub Adapter Integration', () => {
   });
 
   it('should filter issues with query', async () => {
-    if (shouldSkipTests) {
-      return; // Skip if no repository access
+    if (!process.env['CI_GITHUB_TOKEN'] && !process.env['GITHUB_TOKEN']) {
+      return; // Skip if no token
     }
 
     const allItems = await adapter.listWorkItems();
@@ -201,8 +182,8 @@ describe('GitHub Adapter Integration', () => {
   });
 
   it('should get schema information', async () => {
-    if (shouldSkipTests) {
-      return; // Skip if no repository access
+    if (!process.env['CI_GITHUB_TOKEN'] && !process.env['GITHUB_TOKEN']) {
+      return; // Skip if no token
     }
 
     const schema = await adapter.getSchema();
@@ -218,8 +199,8 @@ describe('GitHub Adapter Integration', () => {
   });
 
   it('should handle non-existent issue gracefully', async () => {
-    if (shouldSkipTests) {
-      return; // Skip if no repository access
+    if (!process.env['CI_GITHUB_TOKEN'] && !process.env['GITHUB_TOKEN']) {
+      return; // Skip if no token
     }
 
     await expect(adapter.getWorkItem('999999')).rejects.toThrow(
@@ -229,7 +210,7 @@ describe('GitHub Adapter Integration', () => {
 
   it('should delete (close) issue', async () => {
     if (!process.env['GITHUB_TOKEN'] || createdIssueIds.length === 0) {
-      return; // Skip if no repository access or no created issues
+      return; // Skip if no token or no created issues
     }
 
     const issueId = createdIssueIds[0];
