@@ -29,8 +29,10 @@ export default class AuthStatus extends BaseCommand {
     const engine = new WorkEngine();
 
     try {
+      await engine.ensureDefaultContext();
+      
       if (args.context) {
-        engine.setActiveContext(args.context);
+        await engine.setActiveContext(args.context);
       }
 
       const authStatus = await engine.getAuthStatus();

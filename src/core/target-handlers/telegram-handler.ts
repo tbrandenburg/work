@@ -47,7 +47,29 @@ export class TelegramTargetHandler implements TargetHandler {
       })
       .join('\n\n');
 
-    return header + '\n' + items;
+    const fullMessage = header + '\n' + items;
+    
+    // Telegram message limit is 4096 characters
+    if (fullMessage.length > 4000) {
+      const truncatedItems = workItems
+        .slice(0, 3) // Show only first 3 items
+        .map((item, index) => {
+          const emoji = this.getStateEmoji(item.state);
+          const title = this.escapeHtml(item.title.substring(0, 50) + (item.title.length > 50 ? '...' : ''));
+          const id = this.escapeHtml(item.id);
+
+          return `${index + 1}. ${emoji} <b>${title}</b>\n   ID: <code>${id}</code>`;
+        })
+        .join('\n\n');
+      
+      const remaining = workItems.length - 3;
+      const truncatedMessage = header + '\n' + truncatedItems + 
+        (remaining > 0 ? `\n\n<i>... and ${remaining} more item${remaining === 1 ? '' : 's'}</i>` : '');
+      
+      return truncatedMessage;
+    }
+
+    return fullMessage;
   }
 
   private getStateEmoji(state: string): string {

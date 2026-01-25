@@ -29,7 +29,7 @@ export default class AuthLogout extends BaseCommand {
 
     try {
       if (args.context) {
-        engine.setActiveContext(args.context);
+        await engine.setActiveContext(args.context);
       }
 
       await engine.logout();

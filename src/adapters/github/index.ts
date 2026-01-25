@@ -56,6 +56,20 @@ export class GitHubAdapter implements WorkAdapter {
       token: '', // Will be set during authentication
     };
 
+    // If context is already authenticated, try to restore authentication
+    if (context.authState === 'authenticated') {
+      try {
+        const token = getTokenFromCredentials();
+        this.config = {
+          ...this.config,
+          token,
+        };
+        this.apiClient = new GitHubApiClient(this.config);
+      } catch {
+        // Authentication failed, will need to re-authenticate
+      }
+    }
+
     return Promise.resolve();
   }
 

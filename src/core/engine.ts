@@ -22,6 +22,7 @@ import {
   NotificationResult,
 } from '../types/notification.js';
 import { LocalFsAdapter } from '../adapters/local-fs/index.js';
+import { GitHubAdapter } from '../adapters/github/index.js';
 import { validateRelation, detectCycles } from './graph.js';
 import { parseQuery, executeQuery } from './query.js';
 import { NotificationService } from './notification-service.js';
@@ -38,6 +39,7 @@ export class WorkEngine {
   constructor() {
     // Register built-in adapters
     this.registerAdapter('local-fs', new LocalFsAdapter());
+    this.registerAdapter('github', new GitHubAdapter());
 
     // Register built-in notification handlers synchronously
     this.registerNotificationHandlerSync();
@@ -78,12 +80,12 @@ export class WorkEngine {
       };
 
       await this.addContext(defaultContext);
-      this.setActiveContext('default');
+      await this.setActiveContext('default');
     } else if (!this.activeContext) {
       // Set first context as active if none is set
       const firstContext = Array.from(this.contexts.keys())[0];
       if (firstContext) {
-        this.setActiveContext(firstContext);
+        await this.setActiveContext(firstContext);
       }
     }
   }
@@ -108,16 +110,22 @@ export class WorkEngine {
     await adapter.initialize(context);
 
     this.contexts.set(context.name, context);
+    
+    // Save contexts to disk
+    await this.saveContexts();
   }
 
   /**
    * Set the active context
    */
-  setActiveContext(name: string): void {
+  async setActiveContext(name: string): Promise<void> {
     if (!this.contexts.has(name)) {
       throw new ContextNotFoundError(name);
     }
     this.activeContext = name;
+    
+    // Save contexts to disk
+    await this.saveContexts();
   }
 
   /**
@@ -146,7 +154,7 @@ export class WorkEngine {
   /**
    * Remove a context
    */
-  removeContext(name: string): void {
+  async removeContext(name: string): Promise<void> {
     const context = this.contexts.get(name);
     if (!context) {
       throw new ContextNotFoundError(name);
@@ -158,6 +166,9 @@ export class WorkEngine {
     }
 
     this.contexts.delete(name);
+    
+    // Save contexts to disk
+    await this.saveContexts();
   }
 
   /**
@@ -334,7 +345,19 @@ export class WorkEngine {
   ): Promise<AuthStatus> {
     await this.ensureDefaultContext();
     const adapter = this.getActiveAdapter();
-    return adapter.authenticate(credentials);
+    const authStatus = await adapter.authenticate(credentials);
+    
+    // Update context auth state
+    const context = this.getActiveContext();
+    const updatedContext: Context = {
+      ...context,
+      authState: authStatus.state,
+    };
+    
+    this.contexts.set(context.name, updatedContext);
+    await this.saveContexts();
+    
+    return authStatus;
   }
 
   /**
@@ -343,7 +366,17 @@ export class WorkEngine {
   async logout(): Promise<void> {
     await this.ensureDefaultContext();
     const adapter = this.getActiveAdapter();
-    return adapter.logout();
+    await adapter.logout();
+    
+    // Update context auth state
+    const context = this.getActiveContext();
+    const updatedContext: Context = {
+      ...context,
+      authState: 'unauthenticated',
+    };
+    
+    this.contexts.set(context.name, updatedContext);
+    await this.saveContexts();
   }
 
   /**

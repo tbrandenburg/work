@@ -12,6 +12,7 @@ describe('Auth Login Command Branch Coverage', () => {
     mockEngine = {
       setActiveContext: vi.fn(),
       authenticate: vi.fn(),
+      ensureDefaultContext: vi.fn(),
     } as any;
     (WorkEngine as anyClass<typeof WorkEngine>).mockImplementation(
       () => mockEngine
