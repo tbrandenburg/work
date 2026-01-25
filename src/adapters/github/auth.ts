@@ -48,9 +48,9 @@ export function getTokenFromCredentials(
     throw new GitHubAuthError('Invalid token format in credentials');
   }
 
-  // Third priority: environment variables
+  // Third priority: environment variables (prefer CI_GITHUB_TOKEN over GITHUB_TOKEN)
   const envToken =
-    process.env['GITHUB_TOKEN'] || process.env['CI_GITHUB_TOKEN'];
+    process.env['CI_GITHUB_TOKEN'] || process.env['GITHUB_TOKEN'];
   if (envToken) {
     if (validateToken(envToken)) {
       console.warn(
