@@ -1,6 +1,6 @@
 # work CLI - Unified Task Management
 
-https://github.com/user-attachments/assets/4019fdba-05bc-4008-8c26-75e37c43672f
+![Work CLI Demo](https://github.com/user-attachments/assets/4019fdba-05bc-4008-8c26-75e37c43672f)
 
 The work CLI is a unified, stateless command-line tool that bridges AI agents and task management systems. It provides a consistent interface for managing work items across multiple backends (Jira, GitHub, Linear, Azure DevOps, local filesystem) without vendor lock-in.
 
