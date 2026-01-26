@@ -1,6 +1,6 @@
 # work CLI - Unified Task Management
 
-<video width="100%" controls>
+<video width="100%" autoplay loop muted>
   <source src="https://github.com/tbrandenburg/work/raw/refs/heads/main/docs/dev-cycles-demo.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
