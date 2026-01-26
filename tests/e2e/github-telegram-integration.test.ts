@@ -73,7 +73,7 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
     // Step 2: Set the GitHub context as active
     execSync(`node ${binPath} context set work-repo`, { stdio: 'pipe' });
 
-    // Step 3: Authenticate with GitHub CLI (this will use gh auth login if available)
+    // Step 3: Authenticate with GitHub CLI (uses tokens from previous gh auth login)
     execSync(`node ${binPath} auth login`, { stdio: 'pipe' });
 
     // Step 4: Verify authentication works

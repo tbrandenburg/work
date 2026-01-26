@@ -19,16 +19,14 @@ function shouldSkipTests(): boolean {
     return true;
   }
 
-  // Skip if GitHub CLI is authenticated (uses read-only token in CI)
-  try {
-    const { execSync } = require('child_process');
-    execSync('gh auth status', { stdio: 'pipe' });
-    console.warn('Skipping GitHub integration tests - GitHub CLI authenticated with read-only token');
+  // Only skip if we're in CI with the default read-only GITHUB_TOKEN
+  // If CI_GITHUB_TOKEN is available, we have write permissions
+  if (process.env['CI'] === 'true' && !process.env['CI_GITHUB_TOKEN']) {
+    console.warn('Skipping GitHub integration tests - CI environment without CI_GITHUB_TOKEN');
     return true;
-  } catch {
-    // GitHub CLI not authenticated, tests can proceed
-    return false;
   }
+
+  return false;
 }
 
 const skipTests = shouldSkipTests();
