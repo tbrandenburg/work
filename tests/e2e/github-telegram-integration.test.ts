@@ -54,10 +54,9 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
       return;
     }
 
-    // Skip in CI if we don't have write permissions 
-    // This test uses GitHub CLI auth which falls back to GITHUB_TOKEN in CI (read-only)
-    if (process.env.CI === 'true') {
-      console.log('Skipping test - CI environment uses read-only GITHUB_TOKEN for GitHub CLI auth');
+    // Skip in CI if we don't have CI_GITHUB_TOKEN (write permissions)
+    if (process.env.CI === 'true' && !process.env.CI_GITHUB_TOKEN) {
+      console.log('Skipping test - CI environment without CI_GITHUB_TOKEN');
       return;
     }
 
@@ -83,12 +82,12 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
 
     // Step 5: Create a test issue in the work repository
     const createOutput = execSync(
-      `node ${binPath} create "E2E Test: GitHub CLI Auth" --format json`,
+      `node ${binPath} create "E2E Test: GitHub CLI Auth ${Date.now()}" --format json`,
       { encoding: 'utf8' }
     );
     const createData = JSON.parse(createOutput);
     createdIssueId = createData.data.id;
-    expect(createData.data.title).toBe('E2E Test: GitHub CLI Auth');
+    expect(createData.data.title).toContain('E2E Test: GitHub CLI Auth');
 
     // Step 6: Add Telegram notification target
     execSync(
@@ -98,7 +97,7 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
 
     // Step 7: Send notification about the created issue
     const notifyOutput = execSync(
-      `node ${binPath} notify send where "title=E2E Test: GitHub CLI Auth" to work-telegram-test`,
+      `node ${binPath} notify send where "title~E2E Test: GitHub CLI Auth" to work-telegram-test`,
       { encoding: 'utf8' }
     );
     expect(notifyOutput).toContain('Notification sent successfully');
@@ -121,15 +120,6 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
     if (!hasRequiredEnvVars) {
       console.log('Skipping test - missing CI_GITHUB_TOKEN or Telegram credentials');
       return;
-    }
-
-    // Skip if GitHub CLI is authenticated (it uses read-only GITHUB_TOKEN in CI)
-    try {
-      execSync('gh auth status', { stdio: 'pipe' });
-      console.log('Skipping test - GitHub CLI is authenticated with read-only token in CI');
-      return;
-    } catch {
-      // GitHub CLI not authenticated, test can proceed
     }
 
     const botToken = process.env.TELEGRAM_BOT_TOKEN!;
@@ -157,12 +147,12 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
 
     // Step 5: Create a test issue in the work repository
     const createOutput = execSync(
-      `node ${binPath} create "E2E Test: Token Auth" --labels test --format json`,
+      `node ${binPath} create "E2E Test: Token Auth ${Date.now()}" --labels test --format json`,
       { encoding: 'utf8' }
     );
     const createData = JSON.parse(createOutput);
     createdIssueId = createData.data.id;
-    expect(createData.data.title).toBe('E2E Test: Token Auth');
+    expect(createData.data.title).toContain('E2E Test: Token Auth');
 
     // Step 6: Add Telegram notification target
     execSync(
