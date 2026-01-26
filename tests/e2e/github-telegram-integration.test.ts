@@ -54,10 +54,9 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
       return;
     }
 
-    // Skip in CI if we don't have write permissions 
-    // This test uses GitHub CLI auth which falls back to GITHUB_TOKEN in CI (read-only)
-    if (process.env.CI === 'true') {
-      console.log('Skipping test - CI environment uses read-only GITHUB_TOKEN for GitHub CLI auth');
+    // Skip in CI if we don't have CI_GITHUB_TOKEN (write permissions)
+    if (process.env.CI === 'true' && !process.env.CI_GITHUB_TOKEN) {
+      console.log('Skipping test - CI environment without CI_GITHUB_TOKEN');
       return;
     }
 
