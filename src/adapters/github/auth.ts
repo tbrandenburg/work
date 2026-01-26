@@ -54,7 +54,7 @@ export function getTokenFromCredentials(
   if (envToken) {
     if (validateToken(envToken)) {
       console.warn(
-        'Using GitHub token from environment variable. Consider using "gh auth login" for better security.'
+        'Using GitHub token from environment variable. Consider running "gh auth login" first for better security.'
       );
       return envToken;
     }
@@ -64,7 +64,7 @@ export function getTokenFromCredentials(
   throw new GitHubAuthError(
     `No GitHub token found. Please authenticate using one of these methods:
 
-1. GitHub CLI (recommended): gh auth login
+1. GitHub CLI (recommended): Run "gh auth login" first, then use work CLI
 2. Environment variable: export GITHUB_TOKEN=your_token
 3. Manual credentials: work context add --tool github --token your_token
 
