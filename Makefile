@@ -24,6 +24,12 @@ install:
 test:
 	npm test -- --coverage
 
+test-unit:
+	npm test -- tests/unit
+
+test-integration:
+	npm test -- tests/integration
+
 build:
 	npm run build
 
