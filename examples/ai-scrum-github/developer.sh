@@ -11,24 +11,21 @@ if [ -z "$WORK_ITEMS" ]; then
     exit 0
 fi
 
-# Simulate developer actions - focus on highest priority tasks
+# Since GitHub doesn't support "active" state, we work with new tasks
+# Process up to 2 tasks: sometimes start, sometimes complete directly
 echo "$WORK_ITEMS" | head -2 | while IFS=':' read -r task_id title state priority; do
     if [ -n "$task_id" ]; then
-        if [ "$state" = "new" ]; then
-            # Start new tasks
+        # 50% chance to complete task directly, 50% to start it
+        if [ $((RANDOM % 2)) -eq 0 ]; then
+            # Complete the task directly
+            work close "$task_id" 2>/dev/null || true
+            work comment "$task_id" "Developer: Task completed" 2>/dev/null || true
+            echo "  ✅ $task_id completed"
+        else
+            # Start the task (though it stays in 'new' state in GitHub)
             work start "$task_id" 2>/dev/null || true
             work comment "$task_id" "Developer: Started working on this task" 2>/dev/null || true
             echo "  ▶️ $task_id started"
-        elif [ "$state" = "active" ]; then
-            # Complete active tasks (50% chance)
-            if [ $((RANDOM % 2)) -eq 0 ]; then
-                work close "$task_id" 2>/dev/null || true
-                work comment "$task_id" "Developer: Task completed" 2>/dev/null || true
-                echo "  ✅ $task_id completed"
-            else
-                work comment "$task_id" "Developer: Making progress" 2>/dev/null || true
-                echo "  🔄 $task_id in progress"
-            fi
         fi
     fi
 done
