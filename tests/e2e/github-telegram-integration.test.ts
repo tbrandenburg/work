@@ -83,12 +83,12 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
 
     // Step 5: Create a test issue in the work repository
     const createOutput = execSync(
-      `node ${binPath} create "E2E Test: GitHub CLI Auth" --format json`,
+      `node ${binPath} create "E2E Test: GitHub CLI Auth ${Date.now()}" --format json`,
       { encoding: 'utf8' }
     );
     const createData = JSON.parse(createOutput);
     createdIssueId = createData.data.id;
-    expect(createData.data.title).toBe('E2E Test: GitHub CLI Auth');
+    expect(createData.data.title).toContain('E2E Test: GitHub CLI Auth');
 
     // Step 6: Add Telegram notification target
     execSync(
@@ -98,7 +98,7 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
 
     // Step 7: Send notification about the created issue
     const notifyOutput = execSync(
-      `node ${binPath} notify send where "title=E2E Test: GitHub CLI Auth" to work-telegram-test`,
+      `node ${binPath} notify send where "title~E2E Test: GitHub CLI Auth" to work-telegram-test`,
       { encoding: 'utf8' }
     );
     expect(notifyOutput).toContain('Notification sent successfully');
@@ -157,12 +157,12 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
 
     // Step 5: Create a test issue in the work repository
     const createOutput = execSync(
-      `node ${binPath} create "E2E Test: Token Auth" --labels test --format json`,
+      `node ${binPath} create "E2E Test: Token Auth ${Date.now()}" --labels test --format json`,
       { encoding: 'utf8' }
     );
     const createData = JSON.parse(createOutput);
     createdIssueId = createData.data.id;
-    expect(createData.data.title).toBe('E2E Test: Token Auth');
+    expect(createData.data.title).toContain('E2E Test: Token Auth');
 
     // Step 6: Add Telegram notification target
     execSync(
