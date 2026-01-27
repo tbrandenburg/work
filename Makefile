@@ -153,7 +153,11 @@ publish-major-internal:
 publish-internal:
 	@NEW_VERSION=$$(node -p "require('./package.json').version"); \
 	echo "📦 Publishing version $$NEW_VERSION..."; \
-	npm publish --access public; \
+	if [ -n "$$NPM_TOKEN" ]; then \
+		npm publish --access public --//registry.npmjs.org/:_authToken=$$NPM_TOKEN; \
+	else \
+		npm publish --access public; \
+	fi; \
 	echo "🏷️  Creating git tag..."; \
 	git push origin --tags; \
 	git push; \
