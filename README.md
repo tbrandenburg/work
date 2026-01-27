@@ -16,6 +16,14 @@ https://github.com/user-attachments/assets/4019fdba-05bc-4008-8c26-75e37c43672f
 <img src="./docs/work-vision.drawio.svg" style="max-width: 100%; height: auto;">
 </div>
 
+<style>
+@media (prefers-color-scheme: dark) {
+  img[src*="drawio.svg"] {
+    filter: invert(1) hue-rotate(180deg);
+  }
+}
+</style>
+
 ## The Innovation
 
 `work` gathers all participants - humans and agents - into one unified system. When `work` runs on schedule, it triggers both humans and agents to work on their tasks. Assignees can be set by anyone, but the engine keeps running autonomously:
