@@ -267,15 +267,15 @@ describe('Notify Target List Command Integration', () => {
     }).toThrow();
   });
 
-  it('should handle engine error gracefully', () => {
-    // Remove .work directory to cause engine error
+  it('should handle missing context directory gracefully', () => {
+    // The CLI automatically creates default context, so this test verifies
+    // that notification target list works even when starting from scratch
     execSync('rm -rf .work', { stdio: 'pipe' });
 
-    expect(() => {
-      execSync(`node ${binPath} notify target list`, {
-        stdio: 'pipe',
-        encoding: 'utf8',
-      });
-    }).toThrow();
+    const result = execSync(`node ${binPath} notify target list`, {
+      stdio: 'pipe',
+      encoding: 'utf8',
+    });
+    expect(result).toContain('No notification targets configured');
   });
 });
