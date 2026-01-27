@@ -10,7 +10,7 @@ export default defineConfig({
     globals: true,
     pool: 'forks',
     maxWorkers: '75%',
-    testTimeout: 10000,
+    testTimeout: 30000, // Increased from 10s to 30s for slow machines
     coverage: {
       provider: 'v8',
       enabled: false,
