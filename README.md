@@ -8,6 +8,42 @@ The work CLI is a unified, stateless command-line tool that bridges AI agents an
 
 **Key Hypothesis**: We believe `work` will enable agents to work in real projects with several developers together. We'll know we're right when agents can not be distinguished from humans in the workflow or when agents involve humans in their workflow.
 
+## Choose Your Path
+
+**🚀 Just want to try it?** → [5-Minute Quick Start](docs/getting-started/quick-start.md)
+
+**📚 New to task management CLIs?** → [Complete GitHub Workflow Tutorial](examples/ai-scrum-github/README.md)
+
+**🔧 Integrating with existing workflow?** → [GitHub Authentication Guide](docs/work-github-auth.md)
+
+**🤖 Setting up AI agents?** → [AI Scrum Examples](examples/)
+
+**❓ Having issues?** → [Documentation Index](docs/README.md)
+
+## Real-World Examples
+
+### For Solo Developers
+```bash
+# Track personal projects across GitHub repos
+work context add my-project --tool github --url https://github.com/me/my-app
+work create "Add dark mode" --kind feature
+```
+
+### For Teams
+```bash
+# Coordinate team work with notifications
+work notify add telegram --chat-id team-chat
+work create "Deploy v2.1" --assignee devops-team
+work notify send DEPLOY-456  # Alerts team
+```
+
+### For AI Agents
+```bash
+# Agents can manage their own work items
+work create "Refactor user service" --assignee ai-agent --automated
+work start TASK-789 --comment "AI agent beginning refactor"
+```
+
 ## Prerequisites
 
 - Node.js 18+ (LTS recommended)
