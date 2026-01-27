@@ -161,4 +161,10 @@ publish-internal:
 	echo "🏷️  Creating git tag..."; \
 	git push origin --tags; \
 	git push; \
+	echo "📋 Creating GitHub release..."; \
+	if command -v gh >/dev/null 2>&1; then \
+		gh release create "v$$NEW_VERSION" --title "v$$NEW_VERSION" --notes "Release v$$NEW_VERSION" --latest; \
+	else \
+		echo "⚠️  GitHub CLI (gh) not found. Install with 'brew install gh' to create releases automatically."; \
+	fi; \
 	echo "🎉 Successfully published $$NEW_VERSION!"
