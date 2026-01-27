@@ -2,6 +2,7 @@
  * Unit tests for ID generator
  */
 
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { generateId } from '../../../../src/adapters/local-fs/id-generator';
@@ -62,5 +63,26 @@ describe('ID Generator', () => {
 
     expect(taskId).toBe('TASK-002');
     expect(bugId).toBe('BUG-002');
+  });
+
+  it('should throw error when counter file read fails (not ENOENT)', async () => {
+    const counterPath = path.join(testDir, '.work', 'counters.json');
+    await fs.mkdir(path.dirname(counterPath), { recursive: true });
+    await fs.writeFile(counterPath, 'valid json', 'utf-8');
+
+    // Mock fs.readFile to throw a permission error (not ENOENT)
+    const originalReadFile = fs.readFile;
+    const readFileSpy = vi
+      .spyOn(fs, 'readFile')
+      .mockRejectedValueOnce(
+        Object.assign(new Error('Permission denied'), { code: 'EACCES' })
+      );
+
+    // This should trigger line 48-49 (throw error)
+    await expect(generateId('task', testDir)).rejects.toThrow(
+      'Permission denied'
+    );
+
+    readFileSpy.mockRestore();
   });
 });

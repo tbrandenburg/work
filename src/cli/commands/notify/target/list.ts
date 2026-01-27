@@ -15,11 +15,13 @@ export default class NotifyTargetList extends BaseCommand {
   };
 
   public async run(): Promise<void> {
+    const { flags } = await this.parse(NotifyTargetList); // Add proper argument parsing for validation
+
     const engine = new WorkEngine();
 
     try {
       const targets = await engine.listNotificationTargets();
-      const isJsonMode = await this.getJsonMode();
+      const isJsonMode = flags.format === 'json';
 
       if (isJsonMode) {
         const output = formatOutput(targets, 'json', {
