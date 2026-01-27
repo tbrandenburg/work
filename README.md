@@ -1,12 +1,25 @@
-# work CLI - Unified Task Management
+# work CLI - Revolutionary Mixed Human-Agent Teams
 
 https://github.com/user-attachments/assets/4019fdba-05bc-4008-8c26-75e37c43672f
 
-The work CLI is a unified, stateless command-line tool that bridges AI agents and task management systems. It provides a consistent interface for managing work items across multiple backends (Jira, GitHub, Linear, Azure DevOps, local filesystem) without vendor lock-in.
+## The Story Twist: From Human-Orchestrated to Equal Partnership
 
-**AI Integration Focus**: Eliminates the need for agents to fiddle with JSON task lists or markdown TODOs. Integrates AI agents into existing task management workflows while enabling essential human-in-the-loop oversight through notification mechanisms.
+**Before**: Human developers orchestrated agents to do their work - mostly one-developer scenarios.
 
-**Key Hypothesis**: We believe `work` will enable agents to work in real projects with several developers together. We'll know we're right when agents can not be distinguished from humans in the workflow or when agents involve humans in their workflow.
+**Now**: `work` enables revolutionary mixed human-agent teams where everyone operates on the same level, using the same communication mechanisms and development processes.
+
+## The Innovation
+
+`work` gathers all participants - humans and agents - into one unified system. When `work` runs on schedule, it triggers both humans and agents to work on their tasks. Assignees can be set by anyone, but the engine keeps running autonomously:
+
+- **Agents get notified** and work on their tasks
+- **Agents can assign tasks to humans** when needed  
+- **Everyone operates on equal footing**
+- **Same development cycle beat** glues everyone together
+- **Interoperability** connects any task management system or notification target
+- **Future A2A networks** for deeper agent-to-agent integration
+
+This is the actual revolution: **true mixed human-agent teams** working together seamlessly.
 
 ## Choose Your Path
 

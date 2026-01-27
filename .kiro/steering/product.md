@@ -1,15 +1,30 @@
 # Product Overview
 
-## Product Purpose
-The work CLI is a unified, stateless command-line tool that bridges the gap between AI agents and task management systems. It enables developers, teams, and AI agents to manage work items across multiple project management backends without being locked into a single tool, providing a consistent interface and mental model for task management whether using Jira, GitHub Issues, Linear, Azure DevOps, or local filesystem storage.
+## Revolutionary Vision: Mixed Human-Agent Teams
 
-**AI Integration Focus**: As AI agents increasingly work in development environments, `work` provides the missing piece for robust agent harnesses - eliminating the need for agents to fiddle with JSON task lists or markdown TODOs. It integrates AI agents into existing task management workflows while enabling essential human-in-the-loop oversight through notification mechanisms.
+### The Story Twist
+**Before**: Human developers orchestrated agents to do their work - mostly one-developer scenarios.
+
+**Now**: `work` enables revolutionary mixed human-agent teams where everyone operates on the same level, using the same communication mechanisms and development processes.
+
+## Product Purpose
+The work CLI is a unified, stateless command-line tool that gathers all participants - humans and agents - into one system. When `work` runs on schedule, it triggers both humans and agents to work on their tasks, creating true equal partnership in development workflows.
+
+**The Innovation**: `work` provides the missing piece for mixed human-agent teams:
+- **Agents get notified** and work on their tasks autonomously
+- **Agents can assign tasks to humans** when needed  
+- **Everyone operates on equal footing** with the same tools and processes
+- **Same development cycle beat** glues everyone together
+- **Interoperability** connects any task management system or notification target
+- **Future A2A networks** for deeper agent-to-agent integration
+
+This is the actual revolution: **true mixed human-agent teams** working together seamlessly.
 
 ## Target Users
-- **Developers and Engineering Teams**: Who work across multiple projects using different project management tools
+- **Applied AI Engineers**: Setting up agent harnesses needing interoperable task management interfaces
+- **Product & Business Owners**: Letting their ideas get reality through autonomous agent teams  
 - **DevOps Engineers**: Who need to integrate task management into CI/CD workflows and automation
 - **Technical Project Managers**: Who need unified visibility across different project management systems
-- **Freelancers and Consultants**: Who work with clients using various project management tools
 
 ## Key Features
 - **Multi-Backend Support**: Unified interface for Jira, GitHub, Linear, Azure DevOps, and local filesystem ([docs/work-adapter-architecture.md](../docs/work-adapter-architecture.md))
