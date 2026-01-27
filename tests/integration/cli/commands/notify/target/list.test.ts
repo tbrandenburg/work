@@ -14,8 +14,8 @@ describe('Notify Target List Command Integration', () => {
     process.chdir(testDir);
     binPath = join(originalCwd, 'bin/run.js');
 
-    // Create .work directory structure for default context
-    execSync('mkdir -p .work/projects/default', { stdio: 'pipe' });
+    // Create .work directory structure
+    execSync('mkdir -p .work', { stdio: 'pipe' });
   });
 
   afterEach(() => {
@@ -44,30 +44,35 @@ describe('Notify Target List Command Integration', () => {
   });
 
   it('should list bash target in table format', () => {
-    // Create a context with a notification target
-    const contextData = {
-      name: 'default',
-      tool: 'local-fs',
-      path: './tasks',
-      authState: 'authenticated',
-      isActive: true,
-      notificationTargets: [
-        {
-          name: 'test-bash',
-          type: 'bash',
-          config: {
-            type: 'bash',
-            script: 'work:log',
-            timeout: 30,
+    // Create a proper contexts.json with notification targets
+    const contextsData = {
+      contexts: [
+        [
+          'default',
+          {
+            name: 'default',
+            tool: 'local-fs',
+            path: './tasks',
+            authState: 'authenticated',
+            isActive: true,
+            notificationTargets: [
+              {
+                name: 'test-bash',
+                type: 'bash',
+                config: {
+                  type: 'bash',
+                  script: 'work:log',
+                  timeout: 30,
+                },
+              },
+            ],
           },
-        },
+        ],
       ],
+      activeContext: 'default',
     };
 
-    writeFileSync(
-      '.work/projects/default/context.json',
-      JSON.stringify(contextData, null, 2)
-    );
+    writeFileSync('.work/contexts.json', JSON.stringify(contextsData, null, 2));
 
     const result = execSync(`node ${binPath} notify target list`, {
       encoding: 'utf8',
@@ -78,30 +83,35 @@ describe('Notify Target List Command Integration', () => {
   });
 
   it('should list telegram target in table format', () => {
-    // Create a context with a telegram notification target
-    const contextData = {
-      name: 'default',
-      tool: 'local-fs',
-      path: './tasks',
-      authState: 'authenticated',
-      isActive: true,
-      notificationTargets: [
-        {
-          name: 'test-telegram',
-          type: 'telegram',
-          config: {
-            type: 'telegram',
-            botToken: 'bot123:ABC',
-            chatId: '123456789',
+    // Create a proper contexts.json with telegram notification target
+    const contextsData = {
+      contexts: [
+        [
+          'default',
+          {
+            name: 'default',
+            tool: 'local-fs',
+            path: './tasks',
+            authState: 'authenticated',
+            isActive: true,
+            notificationTargets: [
+              {
+                name: 'test-telegram',
+                type: 'telegram',
+                config: {
+                  type: 'telegram',
+                  botToken: 'bot123:ABC',
+                  chatId: '123456789',
+                },
+              },
+            ],
           },
-        },
+        ],
       ],
+      activeContext: 'default',
     };
 
-    writeFileSync(
-      '.work/projects/default/context.json',
-      JSON.stringify(contextData, null, 2)
-    );
+    writeFileSync('.work/contexts.json', JSON.stringify(contextsData, null, 2));
 
     const result = execSync(`node ${binPath} notify target list`, {
       encoding: 'utf8',
@@ -114,29 +124,34 @@ describe('Notify Target List Command Integration', () => {
   });
 
   it('should list email target in table format', () => {
-    // Create a context with an email notification target
-    const contextData = {
-      name: 'default',
-      tool: 'local-fs',
-      path: './tasks',
-      authState: 'authenticated',
-      isActive: true,
-      notificationTargets: [
-        {
-          name: 'test-email',
-          type: 'email',
-          config: {
-            type: 'email',
-            to: 'test@example.com',
+    // Create a proper contexts.json with email notification target
+    const contextsData = {
+      contexts: [
+        [
+          'default',
+          {
+            name: 'default',
+            tool: 'local-fs',
+            path: './tasks',
+            authState: 'authenticated',
+            isActive: true,
+            notificationTargets: [
+              {
+                name: 'test-email',
+                type: 'email',
+                config: {
+                  type: 'email',
+                  to: 'test@example.com',
+                },
+              },
+            ],
           },
-        },
+        ],
       ],
+      activeContext: 'default',
     };
 
-    writeFileSync(
-      '.work/projects/default/context.json',
-      JSON.stringify(contextData, null, 2)
-    );
+    writeFileSync('.work/contexts.json', JSON.stringify(contextsData, null, 2));
 
     const result = execSync(`node ${binPath} notify target list`, {
       encoding: 'utf8',
@@ -147,38 +162,43 @@ describe('Notify Target List Command Integration', () => {
   });
 
   it('should list multiple targets in table format', () => {
-    // Create a context with multiple notification targets
-    const contextData = {
-      name: 'default',
-      tool: 'local-fs',
-      path: './tasks',
-      authState: 'authenticated',
-      isActive: true,
-      notificationTargets: [
-        {
-          name: 'test-bash',
-          type: 'bash',
-          config: {
-            type: 'bash',
-            script: 'work:log',
+    // Create a proper contexts.json with multiple notification targets
+    const contextsData = {
+      contexts: [
+        [
+          'default',
+          {
+            name: 'default',
+            tool: 'local-fs',
+            path: './tasks',
+            authState: 'authenticated',
+            isActive: true,
+            notificationTargets: [
+              {
+                name: 'test-bash',
+                type: 'bash',
+                config: {
+                  type: 'bash',
+                  script: 'work:log',
+                },
+              },
+              {
+                name: 'test-telegram',
+                type: 'telegram',
+                config: {
+                  type: 'telegram',
+                  botToken: 'bot123:ABC',
+                  chatId: '123456789',
+                },
+              },
+            ],
           },
-        },
-        {
-          name: 'test-telegram',
-          type: 'telegram',
-          config: {
-            type: 'telegram',
-            botToken: 'bot123:ABC',
-            chatId: '123456789',
-          },
-        },
+        ],
       ],
+      activeContext: 'default',
     };
 
-    writeFileSync(
-      '.work/projects/default/context.json',
-      JSON.stringify(contextData, null, 2)
-    );
+    writeFileSync('.work/contexts.json', JSON.stringify(contextsData, null, 2));
 
     const result = execSync(`node ${binPath} notify target list`, {
       encoding: 'utf8',
@@ -191,30 +211,35 @@ describe('Notify Target List Command Integration', () => {
   });
 
   it('should list targets in JSON format', () => {
-    // Create a context with notification targets
-    const contextData = {
-      name: 'default',
-      tool: 'local-fs',
-      path: './tasks',
-      authState: 'authenticated',
-      isActive: true,
-      notificationTargets: [
-        {
-          name: 'test-bash',
-          type: 'bash',
-          config: {
-            type: 'bash',
-            script: 'work:log',
-            timeout: 30,
+    // Create a proper contexts.json with notification targets
+    const contextsData = {
+      contexts: [
+        [
+          'default',
+          {
+            name: 'default',
+            tool: 'local-fs',
+            path: './tasks',
+            authState: 'authenticated',
+            isActive: true,
+            notificationTargets: [
+              {
+                name: 'test-bash',
+                type: 'bash',
+                config: {
+                  type: 'bash',
+                  script: 'work:log',
+                  timeout: 30,
+                },
+              },
+            ],
           },
-        },
+        ],
       ],
+      activeContext: 'default',
     };
 
-    writeFileSync(
-      '.work/projects/default/context.json',
-      JSON.stringify(contextData, null, 2)
-    );
+    writeFileSync('.work/contexts.json', JSON.stringify(contextsData, null, 2));
 
     const result = execSync(
       `node ${binPath} notify target list --format json`,
@@ -237,6 +262,7 @@ describe('Notify Target List Command Integration', () => {
     expect(() => {
       execSync(`node ${binPath} notify target list --format invalid`, {
         stdio: 'pipe',
+        encoding: 'utf8',
       });
     }).toThrow();
   });
@@ -248,6 +274,7 @@ describe('Notify Target List Command Integration', () => {
     expect(() => {
       execSync(`node ${binPath} notify target list`, {
         stdio: 'pipe',
+        encoding: 'utf8',
       });
     }).toThrow();
   });

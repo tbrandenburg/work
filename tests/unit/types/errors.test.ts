@@ -1,9 +1,13 @@
+import { describe, it, expect } from 'vitest';
 import {
   WorkError,
   WorkItemNotFoundError,
   ContextNotFoundError,
   InvalidQueryError,
   RelationError,
+  QuerySyntaxError,
+  UnsupportedOperatorError,
+  InvalidDateError,
 } from '../../../src/types/errors';
 
 describe('Error Classes', () => {
@@ -77,6 +81,52 @@ describe('Error Classes', () => {
       expect(error.name).toBe('RelationError');
       expect(error instanceof WorkError).toBe(true);
       expect(error instanceof RelationError).toBe(true);
+    });
+  });
+
+  describe('QuerySyntaxError', () => {
+    it('should create a query syntax error', () => {
+      const error = new QuerySyntaxError(
+        'status=open AND',
+        'incomplete expression'
+      );
+
+      expect(error.message).toBe(
+        'Query syntax error in "status=open AND": incomplete expression'
+      );
+      expect(error.code).toBe('QUERY_SYNTAX_ERROR');
+      expect(error.statusCode).toBe(400);
+      expect(error.name).toBe('QuerySyntaxError');
+      expect(error instanceof WorkError).toBe(true);
+      expect(error instanceof QuerySyntaxError).toBe(true);
+    });
+  });
+
+  describe('UnsupportedOperatorError', () => {
+    it('should create an unsupported operator error', () => {
+      const error = new UnsupportedOperatorError('!==');
+
+      expect(error.message).toBe('Unsupported operator: !==');
+      expect(error.code).toBe('UNSUPPORTED_OPERATOR');
+      expect(error.statusCode).toBe(400);
+      expect(error.name).toBe('UnsupportedOperatorError');
+      expect(error instanceof WorkError).toBe(true);
+      expect(error instanceof UnsupportedOperatorError).toBe(true);
+    });
+  });
+
+  describe('InvalidDateError', () => {
+    it('should create an invalid date error', () => {
+      const error = new InvalidDateError('2023-13-45');
+
+      expect(error.message).toBe(
+        'Invalid date format: 2023-13-45. Expected ISO 8601 format (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss)'
+      );
+      expect(error.code).toBe('INVALID_DATE');
+      expect(error.statusCode).toBe(400);
+      expect(error.name).toBe('InvalidDateError');
+      expect(error instanceof WorkError).toBe(true);
+      expect(error instanceof InvalidDateError).toBe(true);
     });
   });
 });

@@ -353,5 +353,16 @@ describe('Storage', () => {
 
       await expect(loadLinks(testWorkDir)).rejects.toThrow();
     });
+
+    it('should throw non-ENOENT errors (lines 114-115)', async () => {
+      const permissionError = new Error(
+        'Permission denied'
+      ) as NodeJS.ErrnoException;
+      permissionError.code = 'EACCES';
+      mockFs.readFile.mockRejectedValue(permissionError);
+
+      // This should trigger lines 114-115 (throw error)
+      await expect(loadLinks(testWorkDir)).rejects.toThrow('Permission denied');
+    });
   });
 });
