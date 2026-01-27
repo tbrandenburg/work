@@ -7,12 +7,10 @@ https://github.com/user-attachments/assets/4019fdba-05bc-4008-8c26-75e37c43672f
 **Before**: Human developers orchestrated agents to do their work - mostly one-developer scenarios.
 
 ![Work Before Diagram](./docs/work-before.drawio.svg)
-<img src="./docs/work-before.drawio.svg">
 
 **Now**: `work` enables revolutionary mixed human-agent teams where everyone operates on the same level, using the same communication mechanisms and development processes.
 
 ![Work Vision](./docs/work-vision.drawio.svg)
-<img src="./docs/work-vision.drawio.svg">
 
 ## The Innovation
 
