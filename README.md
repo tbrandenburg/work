@@ -1,11 +1,10 @@
 # work CLI - Revolutionary Mixed Human-Agent Teams
 
-<div align="center">
-[![npm version](https://img.shields.io/npm/v/@tbrandenburg/work)](https://www.npmjs.com/package/@tbrandenburg/work)
-[![npm downloads](https://img.shields.io/npm/dm/@tbrandenburg/work)](https://www.npmjs.com/package/@tbrandenburg/work)
-[![license](https://img.shields.io/npm/l/@tbrandenburg/work)](https://github.com/tbrandenburg/work/blob/main/LICENSE)
-[![Node.js](https://img.shields.io/node/v/@tbrandenburg/work)](https://nodejs.org)
-</div>
+<p align="center">
+  <a href="https://www.npmjs.com/package/@tbrandenburg/work"><img src="https://img.shields.io/npm/v/@tbrandenburg/work" alt="npm version"></a>
+  <a href="https://nodejs.org"><img src="https://img.shields.io/node/v/@tbrandenburg/work" alt="Node.js"></a>
+  <a href="https://github.com/tbrandenburg/work/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@tbrandenburg/work" alt="license"></a>
+</p>
 
 https://github.com/user-attachments/assets/4019fdba-05bc-4008-8c26-75e37c43672f
 
