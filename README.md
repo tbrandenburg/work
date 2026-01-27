@@ -1,5 +1,12 @@
 # work CLI - Revolutionary Mixed Human-Agent Teams
 
+<div align="center">
+[![npm version](https://img.shields.io/npm/v/@tbrandenburg/work)](https://www.npmjs.com/package/@tbrandenburg/work)
+[![npm downloads](https://img.shields.io/npm/dm/@tbrandenburg/work)](https://www.npmjs.com/package/@tbrandenburg/work)
+[![license](https://img.shields.io/npm/l/@tbrandenburg/work)](https://github.com/tbrandenburg/work/blob/main/LICENSE)
+[![Node.js](https://img.shields.io/node/v/@tbrandenburg/work)](https://nodejs.org)
+</div>
+
 https://github.com/user-attachments/assets/4019fdba-05bc-4008-8c26-75e37c43672f
 
 ## The Story Twist: From Human-Orchestrated to Equal Partnership
