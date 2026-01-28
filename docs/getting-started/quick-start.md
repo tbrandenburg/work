@@ -117,6 +117,9 @@ gh auth login
 # Connect to your repo (replace with your GitHub repo)
 work context add my-project --tool github --url https://github.com/YOUR-USERNAME/YOUR-REPO
 work context set my-project
+
+# Authenticate work CLI with GitHub
+work auth login
 ```
 
 ### Step 3: Create Your First Work Item (30 seconds)
