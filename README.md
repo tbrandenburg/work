@@ -35,6 +35,8 @@ https://github.com/user-attachments/assets/4019fdba-05bc-4008-8c26-75e37c43672f
 
 This is the actual revolution: **true mixed human-agent teams** working together seamlessly.
 
+> 💡 **Stay tuned**: The UI for work is in development at https://github.com/tbrandenburg/workui
+
 ## Choose Your Path
 
 **🚀 Just want to try it?** → [5-Minute Quick Start](docs/getting-started/quick-start.md)
