@@ -146,6 +146,25 @@ The work CLI skill provides comprehensive guidance on:
 
 This enables AI agents to effectively use the work CLI for mixed human-agent team coordination.
 
+## Upcoming Features
+
+### Task Management Adapters
+- **Linear**: Native Linear API integration for issue tracking
+- **Azure DevOps**: Full Azure DevOps work item management
+- **Jira**: Complete Jira project and issue support
+
+### Notification Targets
+- **Claude Code**: Direct integration with Claude coding assistants
+- **Codex**: OpenAI Codex model notifications
+- **Opencode**: Open-source code generation models
+- **GitHub Copilot**: GitHub Copilot workspace integration
+- **A2A**: Agent-to-Agent communication protocols
+- **ACP**: Agent Client Protocol for standardized agent interactions
+
+### Automation Features
+- **Webhook Triggering**: HTTP webhook support for external system integration
+- **Cron Helper**: Built-in scheduling utilities for automated task management
+
 ## Development
 
 ### Setup Development Environment
