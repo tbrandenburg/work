@@ -27,7 +27,7 @@ https://github.com/user-attachments/assets/4019fdba-05bc-4008-8c26-75e37c43672f
 `work` gathers all participants - humans and agents - into one unified system. When `work` runs on schedule, it triggers both humans and agents to work on their tasks. Assignees can be set by anyone, but the engine keeps running autonomously:
 
 - **Agents get notified** and work on their tasks
-- **Agents can assign tasks to humans** when needed  
+- **Agents can assign tasks to humans** when needed
 - **Everyone operates on equal footing**
 - **Same development cycle beat** glues everyone together
 - **Interoperability** connects any task management system or notification target
@@ -52,6 +52,7 @@ This is the actual revolution: **true mixed human-agent teams** working together
 ## Real-World Examples
 
 ### For Solo Developers
+
 ```bash
 # Set up GitHub authentication
 gh auth login
@@ -67,6 +68,7 @@ work list
 ```
 
 ### For Teams
+
 ```bash
 # Set up GitHub authentication
 gh auth login
@@ -85,6 +87,7 @@ work notify send DEPLOY-456  # Alerts team via Telegram
 ```
 
 ### For AI Agents
+
 ```bash
 #!/bin/bash
 # AI agent workflow script
@@ -116,6 +119,32 @@ work notify send where priority=critical to ai-agent
 - Node.js 18+ (LTS recommended)
 - npm or yarn package manager
 - Git
+
+## AI Agent Skills Installation
+
+For AI agents using the work CLI, install both the CLI tool and the comprehensive usage skill:
+
+```bash
+# Install the work CLI globally
+npm install -g @tbrandenburg/work
+
+# Install the work CLI usage skill for your AI agent
+npx ai-agent-skills install tbrandenburg/work/work-skill
+
+# Or install for a specific agent
+npx ai-agent-skills install tbrandenburg/work/work-skill --agent [YOUR_AGENT]
+```
+
+The work CLI skill provides comprehensive guidance on:
+
+- Quick setup for local filesystem and GitHub backends
+- All command categories with practical examples
+- Context management and authentication
+- Notification system integration patterns
+- Advanced workflows for team coordination and CI/CD
+- Troubleshooting common issues
+
+This enables AI agents to effectively use the work CLI for mixed human-agent team coordination.
 
 ## Development
 
@@ -189,19 +218,19 @@ This project maintains high code quality standards:
 
 ### Available Scripts
 
-| Script | Description |
-|--------|-------------|
-| `npm test` | Run all tests |
-| `npm run build` | Build TypeScript to JavaScript |
-| `npm run lint` | Run ESLint |
-| `npm run format` | Format code with Prettier |
-| `npm run type-check` | Run TypeScript type checking |
-| `npm run clean` | Clean build artifacts |
+| Script               | Description                    |
+| -------------------- | ------------------------------ |
+| `npm test`           | Run all tests                  |
+| `npm run build`      | Build TypeScript to JavaScript |
+| `npm run lint`       | Run ESLint                     |
+| `npm run format`     | Format code with Prettier      |
+| `npm run type-check` | Run TypeScript type checking   |
+| `npm run clean`      | Clean build artifacts          |
 
 ## Target Users
 
 - **Applied AI Engineers**: Setting up agent harnesses needing interoperable task management interfaces
-- **Product & Business Owners**: Letting their ideas get reality through autonomous agent teams  
+- **Product & Business Owners**: Letting their ideas get reality through autonomous agent teams
 - **DevOps Engineers**: Who need to integrate task management into CI/CD workflows and automation
 - **Technical Project Managers**: Who need unified visibility across different project management systems
 
