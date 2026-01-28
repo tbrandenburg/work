@@ -13,13 +13,13 @@ https://github.com/user-attachments/assets/4019fdba-05bc-4008-8c26-75e37c43672f
 **Before**: Human developers orchestrated agents to do their work - mostly one-developer scenarios.
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/tbrandenburg/work/main/docs/work-before.drawio.svg" style="max-width: 100%; height: auto;">
+<img src="https://raw.githubusercontent.com/tbrandenburg/work/main/docs/work-before.drawio.svg" style="max-width: 100%; height: 480px">
 </div>
 
 **Now**: `work` enables revolutionary mixed human-agent teams where everyone operates on the same level, using the same communication mechanisms and development processes.
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/tbrandenburg/work/main/docs/work-vision.drawio.svg" style="max-width: 100%; height: auto;">
+<img src="https://raw.githubusercontent.com/tbrandenburg/work/main/docs/work-vision.drawio.svg" style="max-width: 100%; height: 480px">
 </div>
 
 ## The Innovation
@@ -68,18 +68,48 @@ work list
 
 ### For Teams
 ```bash
-# Coordinate team work with notifications
-work notify add telegram --chat-id team-chat
+# Set up GitHub authentication
+gh auth login
+
+# Create team context and authenticate
+work context add team-project --tool github --url https://github.com/team/project
+work context set team-project
+work auth login
+
+# Set up Telegram notifications for team coordination
+work notify add telegram --bot-token YOUR_BOT_TOKEN --chat-id YOUR_CHAT_ID
+
+# Create and assign work with notifications
 work create "Deploy v2.1" --assignee devops-team
-work notify send DEPLOY-456  # Alerts team
+work notify send DEPLOY-456  # Alerts team via Telegram
 ```
 
 ### For AI Agents
 ```bash
-# Agents can manage their own work items
-work create "Refactor user service" --assignee ai-agent --automated
-work start TASK-789 --comment "AI agent beginning refactor"
+#!/bin/bash
+# AI agent workflow script
+
+# Set up context (run once)
+work context add ai-project --tool github --url https://github.com/team/ai-project
+work context set ai-project
+work auth login
+
+# Set up AI agent notification target
+work notify target add ai-agent --type bash --script ./ai-agent-handler.sh
+
+# Agent creates and manages work items
+work create "Refactor user service" --assignee ai-agent --kind task --priority critical
+
+# Notify AI agent about critical tasks
+work notify send where priority=critical to ai-agent
+
+# Agent does its work in background...
+# Add work notify to cron and let it work continuously on tasks...
+# Example: */5 * * * * cd /path/to/project && work notify send where priority=critical to ai-agent
+
 ```
+
+> 💡 **Coming Soon**: Agent-to-Agent (A2A) and Agent Client Protocol (ACP) notification targets for deeper AI agent network integration.
 
 ## Prerequisites
 
@@ -152,7 +182,7 @@ work-cli/
 This project maintains high code quality standards:
 
 - **TypeScript**: Strict mode with explicit types
-- **Testing**: Jest with >80% coverage requirement
+- **Testing**: Vitest with >60% coverage requirement
 - **Linting**: ESLint with TypeScript rules
 - **Formatting**: Prettier for consistent code style
 - **CI/CD**: GitHub Actions for automated testing
@@ -190,7 +220,7 @@ Comprehensive technical documentation is available in [docs/](docs/):
 1. Follow the coding standards in [AGENTS.md](AGENTS.md)
 2. Write tests following the 70/20/10 pyramid
 3. Update documentation for new features
-4. Ensure all tests pass and coverage remains >80%
+4. Ensure all tests pass and coverage remains >60%
 
 ## License
 

@@ -99,7 +99,7 @@ If exhaustion is impossible:
 
 ### Testing Requirements
 - Write tests following 70/20/10 pyramid (unit/integration/e2e)
-- Maintain >80% test coverage
+- Maintain >60% test coverage
 - Mock external dependencies in unit tests
 - Test files: `*.test.ts` or `*.spec.ts`
 - Hard rule: after a coding session, before reporting back to the user run `make ci` to test the changes and fix issues until the test suite passes.
@@ -121,7 +121,7 @@ If exhaustion is impossible:
 - List operations: <2s for up to 1,000 items
 - CLI startup: <500ms
 - Memory usage: <100MB per command
-- Test coverage: >80%
+- Test coverage: >60%
 
 ### File Naming Conventions
 - TypeScript files: camelCase with `.ts` extension
