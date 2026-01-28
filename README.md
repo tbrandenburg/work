@@ -53,9 +53,17 @@ This is the actual revolution: **true mixed human-agent teams** working together
 
 ### For Solo Developers
 ```bash
+# Set up GitHub authentication
+gh auth login
+
 # Track personal projects across GitHub repos
 work context add my-project --tool github --url https://github.com/me/my-app
+work context set my-project
+work auth login
+
+# Create and manage work items
 work create "Add dark mode" --kind feature
+work list
 ```
 
 ### For Teams
@@ -78,53 +86,6 @@ work start TASK-789 --comment "AI agent beginning refactor"
 - Node.js 18+ (LTS recommended)
 - npm or yarn package manager
 - Git
-
-## Quick Start
-
-1. **Clone and setup**
-   ```bash
-   git clone https://github.com/username/work-cli
-   cd work-cli
-   npm install
-   ```
-
-2. **Build the project**
-   ```bash
-   npm run build
-   ```
-
-3. **Install globally**
-   ```bash
-   npm install -g .
-   ```
-
-4. **Run the CLI**
-   ```bash
-   work hello world --from oclif
-   ```
-
-## GitHub Authentication
-
-The work CLI provides seamless GitHub integration with a three-tier authentication hierarchy:
-
-### Quick Setup (Recommended)
-
-```bash
-# If you already use GitHub CLI
-gh auth login  # (if not already authenticated)
-work context add my-project --tool github --url https://github.com/owner/repo
-
-# Start working immediately - no token management needed!
-work list
-```
-
-### Authentication Methods
-
-1. **GitHub CLI** (Recommended) - Uses your existing `gh auth login` credentials
-2. **Manual Token** - Explicit token via `--token` parameter  
-3. **Environment Variable** - `GITHUB_TOKEN` for CI/CD workflows
-
-For detailed setup instructions, troubleshooting, and security best practices, see the [GitHub Authentication Guide](docs/work-github-auth.md).
 
 ## Development
 
