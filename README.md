@@ -19,7 +19,7 @@ https://github.com/user-attachments/assets/4019fdba-05bc-4008-8c26-75e37c43672f
 **Now**: `work` enables revolutionary mixed human-agent teams where everyone operates on the same level, using the same communication mechanisms and development processes.
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/tbrandenburg/work/main/docs/work-vision.drawio.svg" style="max-width: 100%; height: 480px">
+<img src="https://raw.githubusercontent.com/tbrandenburg/work/main/docs/work-vision.drawio.png" style="max-width: 100%;">
 </div>
 
 ## The Innovation
