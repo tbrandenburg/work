@@ -54,17 +54,19 @@ This is the actual revolution: **true mixed human-agent teams** working together
 ### For Solo Developers
 
 ```bash
-# Set up GitHub authentication
-gh auth login
-
-# Track personal projects across GitHub repos
-work context add my-project --tool github --url https://github.com/me/my-app
+# Track tasks in local filesystem
+work context add my-project --tool local-fs --path .
 work context set my-project
-work auth login
+
+# Set up Telegram notification target
+work notify target add telegram --type telegram --bot-token YOUR_BOT_TOKEN --chat-id YOUR_CHAT_ID
 
 # Create and manage work items
-work create "Add dark mode" --kind feature
+work create "Add dark mode" --kind task
 work list
+
+# Send Telegram notification
+work notify send where kind=task to telegram
 ```
 
 ### For Teams
@@ -79,11 +81,11 @@ work context set team-project
 work auth login
 
 # Set up Telegram notifications for team coordination
-work notify add telegram --bot-token YOUR_BOT_TOKEN --chat-id YOUR_CHAT_ID
+work notify add telegram --type telegram --bot-token YOUR_BOT_TOKEN --chat-id YOUR_CHAT_ID
 
 # Create and assign work with notifications
 work create "Deploy v2.1" --assignee devops-team
-work notify send DEPLOY-456  # Alerts team via Telegram
+work notify send where assignee=devops-team to telegram  # Alerts team via Telegram
 ```
 
 ### For AI Agents
