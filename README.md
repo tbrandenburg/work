@@ -49,6 +49,17 @@ This is the actual revolution: **true mixed human-agent teams** working together
 
 **❓ Having issues?** → [Documentation Index](docs/README.md)
 
+## Installation
+
+```bash
+npm install -g @tbrandenburg/work
+```
+
+Alternatively with `npx` leveraging the stateless nature of `work`:
+```bash
+npx @tbrandenburg/work
+```
+
 ## Real-World Examples
 
 ### For Solo Developers
