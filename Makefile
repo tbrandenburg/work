@@ -50,11 +50,13 @@ dev:
 	npm run dev
 
 # Installation targets
-install-global:
-	npm install -g .
+install-global: build
+	npm pack
+	npm install -g ./tbrandenburg-work-*.tgz
+	rm -f ./tbrandenburg-work-*.tgz
 
 uninstall-global:
-	npm uninstall -g work-cli
+	npm uninstall -g @tbrandenburg/work
 
 # Validation targets (from plan)
 validate-cli:

@@ -61,7 +61,8 @@
   },
   "files": [
     "dist",
-    "bin"
+    "bin",
+    "package.json"
   ],
   "oclif": {
     "bin": "work",
