@@ -50,7 +50,7 @@ dev:
 	npm run dev
 
 # Installation targets
-install-global: build
+install-global: install build
 	npm pack
 	npm install -g ./tbrandenburg-work-*.tgz
 	rm -f ./tbrandenburg-work-*.tgz
