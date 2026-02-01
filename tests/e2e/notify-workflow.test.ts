@@ -92,6 +92,34 @@ describe('Notify Workflow E2E', () => {
     expect(logData.items).toHaveLength(0);
   });
 
+  it('should support shorthand syntax for work item IDs', async () => {
+    const binPath = join(originalCwd, 'bin/run.js');
+
+    // Add notification target
+    execSync(
+      `node ${binPath} notify target add alerts --type bash --script work:log`,
+      { stdio: 'pipe' }
+    );
+
+    // Test shorthand syntax: work notify send TASK-001 to alerts
+    const sendOutput = execSync(
+      `node ${binPath} notify send TASK-001 to alerts`,
+      { encoding: 'utf8' }
+    );
+
+    expect(sendOutput).toContain('Notification sent successfully');
+    expect(sendOutput).toContain('0 items'); // No work items with that ID, but syntax is valid
+
+    // Verify notification log file was created
+    const notificationsDir = join(os.homedir(), '.work', 'notifications');
+    const files = await fs.readdir(notificationsDir);
+    const logFiles = files.filter(
+      f => f.startsWith('notification-') && f.endsWith('.json')
+    );
+
+    expect(logFiles.length).toBeGreaterThan(0);
+  });
+
   it('should handle human-in-the-loop workflow', async () => {
     const binPath = join(originalCwd, 'bin/run.js');
 
