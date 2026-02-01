@@ -65,6 +65,11 @@ export default class NotifySend extends BaseCommand {
           'Invalid syntax. Use: work notify send TASK-001 to <target> OR work notify send where <query> to <target>'
         );
       }
+      
+      if (!args[0]) {
+        this.error('Task ID cannot be empty');
+      }
+      
       // Convert shorthand to query format
       query = `id=${args[0]}`;
       target = args.slice(2).join(' ');
