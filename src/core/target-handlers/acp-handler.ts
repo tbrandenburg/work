@@ -172,7 +172,11 @@ export class ACPTargetHandler implements TargetHandler {
     process: ChildProcess,
     config: ACPTargetConfig
   ): Promise<string> {
-    // Initialize protocol
+    // NOTE: Session creation typically takes 5-7 seconds on first run
+    // as the ACP client bootstraps the environment. Subsequent sessions
+    // with persisted sessionId are much faster.
+
+    // Initialize protocol (fast, < 1s)
     await this.sendRequest(
       process,
       'initialize',
@@ -187,7 +191,7 @@ export class ACPTargetHandler implements TargetHandler {
       config.timeout || 30
     );
 
-    // Create session
+    // Create session (slow, 5-7s on first run)
     const sessionResult = (await this.sendRequest(
       process,
       'session/new',
