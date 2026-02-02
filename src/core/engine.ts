@@ -36,6 +36,7 @@ export class WorkEngine {
   private activeContext: string | null = null;
   private notificationService = new NotificationService();
   private contextsLoaded = false;
+  private acpHandler: ACPTargetHandler | null = null;
 
   constructor() {
     // Register built-in adapters
@@ -44,6 +45,9 @@ export class WorkEngine {
 
     // Register built-in notification handlers synchronously
     this.registerNotificationHandlerSync();
+
+    // Register cleanup on process exit
+    this.registerExitHandlers();
   }
 
   /**
@@ -59,7 +63,36 @@ export class WorkEngine {
       'telegram',
       new TelegramTargetHandler()
     );
-    this.notificationService.registerHandler('acp', new ACPTargetHandler());
+
+    // Keep reference to ACP handler for cleanup
+    this.acpHandler = new ACPTargetHandler();
+    this.notificationService.registerHandler('acp', this.acpHandler);
+  }
+
+  /**
+   * Register process exit handlers to cleanup resources
+   */
+  private registerExitHandlers(): void {
+    const cleanup = () => {
+      if (this.acpHandler) {
+        this.acpHandler.cleanup();
+      }
+    };
+
+    // Handle normal exit
+    process.on('exit', cleanup);
+
+    // Handle Ctrl+C
+    process.on('SIGINT', () => {
+      cleanup();
+      process.exit(130);
+    });
+
+    // Handle kill
+    process.on('SIGTERM', () => {
+      cleanup();
+      process.exit(143);
+    });
   }
 
   /**

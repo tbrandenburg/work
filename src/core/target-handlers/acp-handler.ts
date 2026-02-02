@@ -5,11 +5,12 @@
 
 import { spawn, ChildProcess } from 'child_process';
 import { WorkItem } from '../../types/work-item.js';
-import { TargetConfig, NotificationResult } from '../../types/notification.js';
 import {
-  ACPError,
-  ACPTimeoutError,
-} from '../../types/errors.js';
+  TargetConfig,
+  NotificationResult,
+  ACPTargetConfig,
+} from '../../types/notification.js';
+import { ACPError, ACPTimeoutError } from '../../types/errors.js';
 import { TargetHandler } from '../notification-service.js';
 
 interface ACPMessage {
@@ -19,14 +20,6 @@ interface ACPMessage {
   params?: unknown;
   result?: unknown;
   error?: { code: number; message: string };
-}
-
-interface ACPTargetConfig {
-  type: 'acp';
-  cmd: string;
-  cwd?: string;
-  timeout?: number;
-  sessionId?: string;
 }
 
 export class ACPTargetHandler implements TargetHandler {
@@ -57,14 +50,22 @@ export class ACPTargetHandler implements TargetHandler {
       const prompt = this.formatWorkItems(workItems);
       const response = await this.sendPrompt(process, sessionId, prompt);
 
-      // Update config with session ID for persistence
-      (config as ACPTargetConfig).sessionId = sessionId;
+      // NOTE: sessionId is NOT persisted to config (readonly).
+      // Process reuse means same session within a command, but not across commands.
+      // TODO: Update context manager to allow handlers to persist state
+
+      // For CLI use case: cleanup process after sending
+      // This allows the CLI to exit cleanly
+      setImmediate(() => this.cleanup());
 
       return {
         success: true,
         message: `AI response: ${JSON.stringify(response).substring(0, 200)}...`,
       };
     } catch (error) {
+      // Clean up on error too
+      setImmediate(() => this.cleanup());
+
       return {
         success: false,
         error: error instanceof Error ? error.message : String(error),
@@ -203,7 +204,12 @@ export class ACPTargetHandler implements TargetHandler {
       'session/prompt',
       {
         sessionId,
-        content,
+        prompt: [
+          {
+            type: 'text',
+            text: content,
+          },
+        ],
       },
       60
     ); // Longer timeout for prompts
