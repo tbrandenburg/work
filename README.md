@@ -6,6 +6,9 @@
   <a href="https://github.com/tbrandenburg/work/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@tbrandenburg/work" alt="license"></a>
 </p>
 
+> 👨🏻‍💻 **Dynamous Kiro Hackathon Submission**: The submission was released on Jan 30, 2026 as [v0.2.7](https://github.com/tbrandenburg/work/releases/tag/v0.2.7)
+> and can be cloned as `git clone --branch v0.2.7 https://github.com/tbrandenburg/work.git`
+
 https://github.com/user-attachments/assets/4019fdba-05bc-4008-8c26-75e37c43672f
 
 ## The Story Twist: From Human-Orchestrated to Equal Partnership
