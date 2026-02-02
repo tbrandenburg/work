@@ -26,9 +26,16 @@ describe('ACPTargetHandler', () => {
   let mockProcess: any;
   const mockSpawn = spawn as any;
 
+  let savedDebug: string | undefined;
+  let savedWorkDebug: string | undefined;
+
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
+
+    // Save environment variables for restoration
+    savedDebug = process.env['DEBUG'];
+    savedWorkDebug = process.env['WORK_DEBUG'];
 
     // Create a more realistic mock process
     mockProcess = {
@@ -70,6 +77,18 @@ describe('ACPTargetHandler', () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    
+    // Restore environment variables
+    if (savedDebug !== undefined) {
+      process.env['DEBUG'] = savedDebug;
+    } else {
+      delete process.env['DEBUG'];
+    }
+    if (savedWorkDebug !== undefined) {
+      process.env['WORK_DEBUG'] = savedWorkDebug;
+    } else {
+      delete process.env['WORK_DEBUG'];
+    }
   });
 
   describe('formatWorkItems', () => {
@@ -387,15 +406,15 @@ describe('ACPTargetHandler', () => {
 
     it('should not log parse errors when DEBUG is not set', () => {
       const consoleWarnSpy = vi.spyOn(console, 'warn');
-      delete process.env.DEBUG;
-      delete process.env.WORK_DEBUG;
+      delete process.env['DEBUG'];
+      delete process.env['WORK_DEBUG'];
 
       (handler as any).ensureProcess(mockConfig);
 
       // Send invalid JSON
       mockProcess.stdout.emit('data', 'invalid json\n');
 
-      // Should not log
+      // Should not log anything
       expect(consoleWarnSpy).not.toHaveBeenCalled();
 
       consoleWarnSpy.mockRestore();
@@ -403,53 +422,57 @@ describe('ACPTargetHandler', () => {
 
     it('should log parse errors when DEBUG is set', () => {
       const consoleWarnSpy = vi.spyOn(console, 'warn');
-      process.env.DEBUG = '1';
+      process.env['DEBUG'] = '1';
 
       (handler as any).ensureProcess(mockConfig);
 
       // Send invalid JSON
       mockProcess.stdout.emit('data', 'invalid json\n');
 
-      // Should log error message and problematic line
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
+      // Should log error message first, then problematic line
+      expect(consoleWarnSpy).toHaveBeenCalledTimes(2);
+      expect(consoleWarnSpy).toHaveBeenNthCalledWith(
+        1,
         'ACP message parse error:',
         expect.stringContaining('JSON')
       );
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
+      expect(consoleWarnSpy).toHaveBeenNthCalledWith(
+        2,
         'Problematic line:',
         'invalid json'
       );
 
-      delete process.env.DEBUG;
       consoleWarnSpy.mockRestore();
     });
 
     it('should log parse errors when WORK_DEBUG is set', () => {
       const consoleWarnSpy = vi.spyOn(console, 'warn');
-      process.env.WORK_DEBUG = '1';
+      process.env['WORK_DEBUG'] = '1';
 
       (handler as any).ensureProcess(mockConfig);
 
       // Send invalid JSON
       mockProcess.stdout.emit('data', 'invalid json\n');
 
-      // Should log error message and problematic line
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
+      // Should log error message first, then problematic line
+      expect(consoleWarnSpy).toHaveBeenCalledTimes(2);
+      expect(consoleWarnSpy).toHaveBeenNthCalledWith(
+        1,
         'ACP message parse error:',
         expect.stringContaining('JSON')
       );
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
+      expect(consoleWarnSpy).toHaveBeenNthCalledWith(
+        2,
         'Problematic line:',
         'invalid json'
       );
 
-      delete process.env.WORK_DEBUG;
       consoleWarnSpy.mockRestore();
     });
 
     it('should truncate long problematic lines to 200 characters', () => {
       const consoleWarnSpy = vi.spyOn(console, 'warn');
-      process.env.DEBUG = '1';
+      process.env['DEBUG'] = '1';
 
       (handler as any).ensureProcess(mockConfig);
 
@@ -458,12 +481,12 @@ describe('ACPTargetHandler', () => {
       mockProcess.stdout.emit('data', longInvalidJson);
 
       // Should log truncated line (200 chars max)
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
+      expect(consoleWarnSpy).toHaveBeenNthCalledWith(
+        2,
         'Problematic line:',
         'x'.repeat(200)
       );
 
-      delete process.env.DEBUG;
       consoleWarnSpy.mockRestore();
     });
   });
