@@ -35,6 +35,26 @@ export interface EmailTargetConfig {
   readonly smtpHost?: string;
 }
 
+/**
+ * ACP client capabilities for permission control
+ * @see dev/poc-opencode-server/README.md:111-133 for protocol examples
+ */
+export interface ACPCapabilities {
+  fileSystem?: {
+    readTextFile?: boolean;
+    writeTextFile?: boolean;
+    listDirectory?: boolean;
+  };
+  terminal?: {
+    create?: boolean;
+    sendText?: boolean;
+  };
+  editor?: {
+    applyDiff?: boolean;
+    openFile?: boolean;
+  };
+}
+
 export interface ACPTargetConfig {
   readonly type: 'acp';
   readonly cmd: string;
@@ -42,6 +62,7 @@ export interface ACPTargetConfig {
   readonly timeout?: number;
   sessionId?: string; // Mutable to allow session persistence
   onNotification?: (method: string, params: unknown) => void; // Optional streaming callback
+  capabilities?: ACPCapabilities; // Optional client capabilities for permission control
 }
 
 export interface NotificationRequest {

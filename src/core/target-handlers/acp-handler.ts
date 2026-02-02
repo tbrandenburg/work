@@ -191,7 +191,7 @@ export class ACPTargetHandler implements TargetHandler {
           name: 'work-cli',
           version: '0.2.7',
         },
-        capabilities: {}, // Minimal capabilities for MVP
+        capabilities: config.capabilities || {}, // Use configured capabilities or default to minimal
       },
       config.timeout || 30
     );
