@@ -384,6 +384,88 @@ describe('ACPTargetHandler', () => {
       // Should not throw
       expect(true).toBe(true);
     });
+
+    it('should not log parse errors when DEBUG is not set', () => {
+      const consoleWarnSpy = vi.spyOn(console, 'warn');
+      delete process.env.DEBUG;
+      delete process.env.WORK_DEBUG;
+
+      (handler as any).ensureProcess(mockConfig);
+
+      // Send invalid JSON
+      mockProcess.stdout.emit('data', 'invalid json\n');
+
+      // Should not log
+      expect(consoleWarnSpy).not.toHaveBeenCalled();
+
+      consoleWarnSpy.mockRestore();
+    });
+
+    it('should log parse errors when DEBUG is set', () => {
+      const consoleWarnSpy = vi.spyOn(console, 'warn');
+      process.env.DEBUG = '1';
+
+      (handler as any).ensureProcess(mockConfig);
+
+      // Send invalid JSON
+      mockProcess.stdout.emit('data', 'invalid json\n');
+
+      // Should log error message and problematic line
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        'ACP message parse error:',
+        expect.stringContaining('JSON')
+      );
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        'Problematic line:',
+        'invalid json'
+      );
+
+      delete process.env.DEBUG;
+      consoleWarnSpy.mockRestore();
+    });
+
+    it('should log parse errors when WORK_DEBUG is set', () => {
+      const consoleWarnSpy = vi.spyOn(console, 'warn');
+      process.env.WORK_DEBUG = '1';
+
+      (handler as any).ensureProcess(mockConfig);
+
+      // Send invalid JSON
+      mockProcess.stdout.emit('data', 'invalid json\n');
+
+      // Should log error message and problematic line
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        'ACP message parse error:',
+        expect.stringContaining('JSON')
+      );
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        'Problematic line:',
+        'invalid json'
+      );
+
+      delete process.env.WORK_DEBUG;
+      consoleWarnSpy.mockRestore();
+    });
+
+    it('should truncate long problematic lines to 200 characters', () => {
+      const consoleWarnSpy = vi.spyOn(console, 'warn');
+      process.env.DEBUG = '1';
+
+      (handler as any).ensureProcess(mockConfig);
+
+      // Send invalid JSON that's longer than 200 characters
+      const longInvalidJson = 'x'.repeat(300) + '\n';
+      mockProcess.stdout.emit('data', longInvalidJson);
+
+      // Should log truncated line (200 chars max)
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        'Problematic line:',
+        'x'.repeat(200)
+      );
+
+      delete process.env.DEBUG;
+      consoleWarnSpy.mockRestore();
+    });
   });
 
   describe('cleanup', () => {
