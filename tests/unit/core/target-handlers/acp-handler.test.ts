@@ -714,4 +714,223 @@ describe('ACPTargetHandler', () => {
       expect(mockResolve).toHaveBeenCalledWith('ok');
     });
   });
+
+  describe('Capability Configuration', () => {
+    it('should send configured capabilities to ACP client', async () => {
+      // Arrange: Config with specific capabilities
+      const configWithCapabilities: ACPTargetConfig = {
+        type: 'acp',
+        cmd: 'opencode acp',
+        cwd: process.cwd(),
+        timeout: 30,
+        capabilities: {
+          fileSystem: {
+            readTextFile: true,
+            writeTextFile: false,
+          },
+          terminal: {
+            create: true,
+          },
+        },
+      };
+
+      // Start the send operation
+      const sendPromise = handler.send(mockWorkItems, configWithCapabilities);
+
+      // Mock initialize response
+      setTimeout(() => {
+        mockProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            result: { protocolVersion: 1, serverInfo: { name: 'test', version: '1.0' } },
+          }) + '\n'
+        );
+      }, 10);
+
+      // Mock session/create response
+      setTimeout(() => {
+        mockProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 2,
+            result: { sessionId: 'test-session-123' },
+          }) + '\n'
+        );
+      }, 20);
+
+      // Mock session/prompt response
+      setTimeout(() => {
+        mockProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 3,
+            result: { text: 'AI analysis response' },
+          }) + '\n'
+        );
+      }, 30);
+
+      // Advance timers
+      await vi.advanceTimersByTimeAsync(100);
+
+      const result = await sendPromise;
+
+      // Assert: Check that initialize request includes capabilities
+      const initializeCall = (mockProcess.stdin.write as any).mock.calls.find((call: any) => {
+        const data = call[0];
+        return data.includes('"method":"initialize"');
+      });
+
+      expect(initializeCall).toBeDefined();
+      const initializeData = JSON.parse(initializeCall[0]);
+      expect(initializeData.params.capabilities).toEqual({
+        fileSystem: {
+          readTextFile: true,
+          writeTextFile: false,
+        },
+        terminal: {
+          create: true,
+        },
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should default to empty capabilities when not configured', async () => {
+      // Arrange: Config without capabilities
+      const configNoCapabilities: ACPTargetConfig = {
+        type: 'acp',
+        cmd: 'opencode acp',
+        cwd: process.cwd(),
+        timeout: 30,
+      };
+
+      // Start the send operation
+      const sendPromise = handler.send(mockWorkItems, configNoCapabilities);
+
+      // Mock responses (same pattern as above)
+      setTimeout(() => {
+        mockProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            result: { protocolVersion: 1, serverInfo: { name: 'test', version: '1.0' } },
+          }) + '\n'
+        );
+      }, 10);
+
+      setTimeout(() => {
+        mockProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 2,
+            result: { sessionId: 'test-session-123' },
+          }) + '\n'
+        );
+      }, 20);
+
+      setTimeout(() => {
+        mockProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 3,
+            result: { text: 'AI analysis response' },
+          }) + '\n'
+        );
+      }, 30);
+
+      // Advance timers
+      await vi.advanceTimersByTimeAsync(100);
+
+      const result = await sendPromise;
+
+      // Assert: Should default to empty object (current MVP behavior)
+      const initializeCall = (mockProcess.stdin.write as any).mock.calls.find((call: any) => {
+        const data = call[0];
+        return data.includes('"method":"initialize"');
+      });
+
+      expect(initializeCall).toBeDefined();
+      const initializeData = JSON.parse(initializeCall[0]);
+      expect(initializeData.params.capabilities).toEqual({});
+      expect(result.success).toBe(true);
+    });
+
+    it('should handle partial capability configuration', async () => {
+      // Arrange: Config with only fileSystem capabilities
+      const configPartialCapabilities: ACPTargetConfig = {
+        type: 'acp',
+        cmd: 'opencode acp',
+        cwd: process.cwd(),
+        timeout: 30,
+        capabilities: {
+          fileSystem: {
+            readTextFile: true,
+          },
+        },
+      };
+
+      // Start the send operation
+      const sendPromise = handler.send(mockWorkItems, configPartialCapabilities);
+
+      // Mock responses
+      setTimeout(() => {
+        mockProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            result: { protocolVersion: 1, serverInfo: { name: 'test', version: '1.0' } },
+          }) + '\n'
+        );
+      }, 10);
+
+      setTimeout(() => {
+        mockProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 2,
+            result: { sessionId: 'test-session-123' },
+          }) + '\n'
+        );
+      }, 20);
+
+      setTimeout(() => {
+        mockProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 3,
+            result: { text: 'AI analysis response' },
+          }) + '\n'
+        );
+      }, 30);
+
+      // Advance timers
+      await vi.advanceTimersByTimeAsync(100);
+
+      const result = await sendPromise;
+
+      // Assert: Should pass through partial config as-is
+      const initializeCall = (mockProcess.stdin.write as any).mock.calls.find((call: any) => {
+        const data = call[0];
+        return data.includes('"method":"initialize"');
+      });
+
+      expect(initializeCall).toBeDefined();
+      const initializeData = JSON.parse(initializeCall[0]);
+      expect(initializeData.params.capabilities).toEqual({
+        fileSystem: {
+          readTextFile: true,
+        },
+      });
+      expect(result.success).toBe(true);
+    });
+  });
 });
