@@ -31,6 +31,13 @@ export class TelegramTargetHandler implements TargetHandler {
   }
 
   private formatMessage(workItems: WorkItem[]): string {
+    // Detect plain message marker
+    if (workItems.length === 1 && workItems[0]?.id === '__plain_message__') {
+      const message = workItems[0].title;
+      return this.formatPlainMessage(message);
+    }
+
+    // Regular work items formatting
     if (workItems.length === 0) {
       return '<b>📋 Work Items Update</b>\n\nNo items to report.';
     }
@@ -70,6 +77,21 @@ export class TelegramTargetHandler implements TargetHandler {
     }
 
     return fullMessage;
+  }
+
+  /**
+   * Format a plain text message with HTML markup
+   */
+  private formatPlainMessage(message: string): string {
+    const escapedMessage = this.escapeHtml(message);
+    
+    // Check character limit
+    if (escapedMessage.length > 4000) {
+      const truncated = escapedMessage.substring(0, 3950);
+      return `<b>📬 Message</b>\n\n${truncated}\n\n<i>... (message truncated)</i>`;
+    }
+    
+    return `<b>📬 Message</b>\n\n${escapedMessage}`;
   }
 
   private getStateEmoji(state: string): string {

@@ -96,6 +96,47 @@ describe('Telegram Notification E2E', () => {
     expect(result).toContain('Notification sent successfully');
   });
 
+  it('should send plain multi-line message to telegram', () => {
+    const binPath = join(originalCwd, 'bin/run.js');
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const isCI = process.env.CI === 'true';
+
+    if (!botToken || !chatId) {
+      if (isCI) {
+        throw new Error(
+          'TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID environment variables are required in CI'
+        );
+      }
+      console.log(
+        'Skipping real Telegram test - missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID env vars'
+      );
+      return;
+    }
+
+    // Add telegram target with real credentials
+    execSync(
+      `node ${binPath} notify target add test-telegram --type telegram --bot-token ${botToken} --chat-id ${chatId}`,
+      { stdio: 'pipe' }
+    );
+
+    // Send plain multi-line message
+    // Use a message with spaces (no newlines needed for detection)
+    const multiLineMessage = 'This is a test message with multiple words';
+    
+    const result = execSync(
+      `node ${binPath} notify send '${multiLineMessage}' to test-telegram`,
+      { encoding: 'utf8' }
+    );
+
+    expect(result).toContain('Message sent successfully');
+    
+    // Clean up
+    execSync(`node ${binPath} notify target remove test-telegram`, {
+      stdio: 'pipe',
+    });
+  });
+
   it('should validate telegram target configuration', () => {
     const binPath = join(originalCwd, 'bin/run.js');
 

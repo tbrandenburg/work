@@ -57,6 +57,44 @@ export class NotificationService {
   }
 
   /**
+   * Send a plain text message to a notification target
+   * Uses a special marker work item to signal plain message mode
+   */
+  async sendPlainNotification(
+    message: string,
+    target: NotificationTarget
+  ): Promise<NotificationResult> {
+    const handler = this.targetHandlers.get(target.type);
+    if (!handler) {
+      return {
+        success: false,
+        error: `No handler registered for target type: ${target.type}`,
+      };
+    }
+
+    // Create special marker work item for plain messages
+    const messageWorkItem: WorkItem = {
+      id: '__plain_message__',
+      kind: 'task',
+      title: message,
+      state: 'new',
+      priority: 'medium',
+      labels: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    try {
+      return await handler.send([messageWorkItem], target.config);
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
+  }
+
+  /**
    * Get list of supported target types
    */
   getSupportedTypes(): TargetType[] {
