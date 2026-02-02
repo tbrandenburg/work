@@ -121,8 +121,12 @@ export class ACPTargetHandler implements TargetHandler {
           try {
             const msg = JSON.parse(line) as ACPMessage;
             this.handleMessage(msg);
-          } catch {
-            // Ignore parse errors (partial messages)
+          } catch (err) {
+            // Log parse errors in debug mode
+            if (process.env['DEBUG'] || process.env['WORK_DEBUG']) {
+              console.warn('ACP message parse error:', err instanceof Error ? err.message : String(err));
+              console.warn('Problematic line:', line.substring(0, 200));
+            }
           }
         }
       }
