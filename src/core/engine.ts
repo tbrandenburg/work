@@ -507,6 +507,29 @@ export class WorkEngine {
   }
 
   /**
+   * Send a plain text message to a notification target (no work items)
+   */
+  async sendPlainNotification(
+    message: string,
+    targetName: string
+  ): Promise<NotificationResult> {
+    await this.ensureDefaultContext();
+    const context = this.getActiveContext();
+
+    const targets = context.notificationTargets || [];
+    const target = targets.find(t => t.name === targetName);
+
+    if (!target) {
+      return {
+        success: false,
+        error: `Notification target '${targetName}' not found`,
+      };
+    }
+
+    return this.notificationService.sendPlainNotification(message, target);
+  }
+
+  /**
    * Get contexts file path
    *
    * Context Persistence: Notification targets and other context data are persisted
