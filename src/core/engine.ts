@@ -73,7 +73,7 @@ export class WorkEngine {
    * Register process exit handlers to cleanup resources
    */
   private registerExitHandlers(): void {
-    const cleanup = () => {
+    const cleanup = (): void => {
       if (this.acpHandler) {
         this.acpHandler.cleanup();
       }
