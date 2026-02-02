@@ -452,4 +452,129 @@ describe('ACPTargetHandler', () => {
       expect(true).toBe(true);
     });
   });
+
+  describe('notification handling', () => {
+    it('should invoke onNotification callback for session/update', () => {
+      const notifications: Array<{ method: string; params: unknown }> = [];
+
+      const configWithCallback: ACPTargetConfig = {
+        ...mockConfig,
+        onNotification: (method, params) => {
+          notifications.push({ method, params });
+        },
+      };
+
+      (handler as any).ensureProcess(configWithCallback);
+      (handler as any).currentConfig = configWithCallback;
+
+      // Simulate notification from ACP client
+      const notification = {
+        jsonrpc: '2.0',
+        method: 'session/update',
+        params: { progress: 50, message: 'Processing...' },
+      };
+
+      mockProcess.stdout.emit('data', JSON.stringify(notification) + '\n');
+
+      // Verify callback was invoked
+      expect(notifications).toHaveLength(1);
+      expect(notifications[0].method).toBe('session/update');
+      expect(notifications[0].params).toEqual({
+        progress: 50,
+        message: 'Processing...',
+      });
+    });
+
+    it('should handle multiple notifications in sequence', () => {
+      const notifications: Array<{ method: string; params: unknown }> = [];
+
+      const configWithCallback: ACPTargetConfig = {
+        ...mockConfig,
+        onNotification: (method, params) => {
+          notifications.push({ method, params });
+        },
+      };
+
+      (handler as any).ensureProcess(configWithCallback);
+      (handler as any).currentConfig = configWithCallback;
+
+      // Send multiple notifications
+      const notif1 = {
+        jsonrpc: '2.0',
+        method: 'session/update',
+        params: { step: 1 },
+      };
+      const notif2 = {
+        jsonrpc: '2.0',
+        method: 'session/update',
+        params: { step: 2 },
+      };
+
+      mockProcess.stdout.emit(
+        'data',
+        JSON.stringify(notif1) + '\n' + JSON.stringify(notif2) + '\n'
+      );
+
+      expect(notifications).toHaveLength(2);
+      expect(notifications[0].params).toEqual({ step: 1 });
+      expect(notifications[1].params).toEqual({ step: 2 });
+    });
+
+    it('should ignore notifications when no callback registered', () => {
+      // Use config without onNotification callback
+      (handler as any).ensureProcess(mockConfig);
+      (handler as any).currentConfig = mockConfig;
+
+      const notification = {
+        jsonrpc: '2.0',
+        method: 'session/update',
+        params: { progress: 50 },
+      };
+
+      // Should not throw
+      expect(() => {
+        mockProcess.stdout.emit('data', JSON.stringify(notification) + '\n');
+      }).not.toThrow();
+    });
+
+    it('should handle notifications alongside RPC responses', () => {
+      const notifications: Array<{ method: string }> = [];
+
+      const configWithCallback: ACPTargetConfig = {
+        ...mockConfig,
+        onNotification: (method) => {
+          notifications.push({ method });
+        },
+      };
+
+      (handler as any).ensureProcess(configWithCallback);
+      (handler as any).currentConfig = configWithCallback;
+
+      // Set up a pending request so the RPC response can be handled
+      const mockResolve = vi.fn();
+      const mockReject = vi.fn();
+      (handler as any).pendingRequests.set(1, {
+        resolve: mockResolve,
+        reject: mockReject,
+      });
+
+      // Send interleaved notification and RPC response
+      const notification = {
+        jsonrpc: '2.0',
+        method: 'session/update',
+        params: {},
+      };
+      const response = { jsonrpc: '2.0', id: 1, result: 'ok' };
+
+      mockProcess.stdout.emit(
+        'data',
+        JSON.stringify(notification) + '\n' + JSON.stringify(response) + '\n'
+      );
+
+      // Both should be handled without interference
+      expect(notifications).toHaveLength(1);
+      expect(notifications[0].method).toBe('session/update');
+      expect(mockResolve).toHaveBeenCalledWith('ok');
+    });
+  });
 });
