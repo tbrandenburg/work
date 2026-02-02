@@ -28,6 +28,7 @@ import { parseQuery, executeQuery } from './query.js';
 import { NotificationService } from './notification-service.js';
 import { BashTargetHandler } from './target-handlers/bash-handler.js';
 import { TelegramTargetHandler } from './target-handlers/telegram-handler.js';
+import { ACPTargetHandler } from './target-handlers/acp-handler.js';
 
 export class WorkEngine {
   private adapters = new Map<string, WorkAdapter>();
@@ -58,6 +59,7 @@ export class WorkEngine {
       'telegram',
       new TelegramTargetHandler()
     );
+    this.notificationService.registerHandler('acp', new ACPTargetHandler());
   }
 
   /**

@@ -2,7 +2,7 @@
  * Notification system type definitions
  */
 
-export type TargetType = 'bash' | 'telegram' | 'email';
+export type TargetType = 'bash' | 'telegram' | 'email' | 'acp';
 
 export interface NotificationTarget {
   readonly name: string;
@@ -13,7 +13,8 @@ export interface NotificationTarget {
 export type TargetConfig =
   | BashTargetConfig
   | TelegramTargetConfig
-  | EmailTargetConfig;
+  | EmailTargetConfig
+  | ACPTargetConfig;
 
 export interface BashTargetConfig {
   readonly type: 'bash';
@@ -32,6 +33,14 @@ export interface EmailTargetConfig {
   readonly to: string;
   readonly from?: string;
   readonly smtpHost?: string;
+}
+
+export interface ACPTargetConfig {
+  readonly type: 'acp';
+  readonly cmd: string;
+  readonly cwd?: string;
+  readonly timeout?: number;
+  readonly sessionId?: string;
 }
 
 export interface NotificationRequest {
