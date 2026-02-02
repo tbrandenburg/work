@@ -41,6 +41,7 @@ export interface ACPTargetConfig {
   readonly cwd?: string;
   readonly timeout?: number;
   sessionId?: string; // Mutable to allow session persistence
+  onNotification?: (method: string, params: unknown) => void; // Optional streaming callback
 }
 
 export interface NotificationRequest {

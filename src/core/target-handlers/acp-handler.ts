@@ -32,6 +32,7 @@ export class ACPTargetHandler implements TargetHandler {
       reject: (error: Error) => void;
     }
   >();
+  private currentConfig: ACPTargetConfig | null = null;
 
   async send(
     workItems: WorkItem[],
@@ -40,6 +41,8 @@ export class ACPTargetHandler implements TargetHandler {
     if (config.type !== 'acp') {
       throw new ACPError('Invalid config type');
     }
+
+    this.currentConfig = config; // Store config for callback access
 
     try {
       const process = this.ensureProcess(config);
@@ -136,8 +139,11 @@ export class ACPTargetHandler implements TargetHandler {
       } else {
         resolve(msg.result);
       }
+    } else if (msg.method && this.currentConfig?.onNotification) {
+      // Handle notifications by invoking callback
+      this.currentConfig.onNotification(msg.method, msg.params);
     }
-    // Ignore notifications (no id)
+    // Otherwise ignore unhandled notifications
   }
 
   private setupErrorHandler(child: ChildProcess, key: string): void {
