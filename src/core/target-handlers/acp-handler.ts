@@ -145,7 +145,12 @@ export class ACPTargetHandler implements TargetHandler {
       }
     } else if (msg.method && this.currentConfig?.onNotification) {
       // Handle notifications by invoking callback
-      this.currentConfig.onNotification(msg.method, msg.params);
+      try {
+        this.currentConfig.onNotification(msg.method, msg.params);
+      } catch (error) {
+        console.error('Error in notification callback:', error);
+        // Continue processing - don't let callback errors crash the handler
+      }
     }
     // Otherwise ignore unhandled notifications
   }

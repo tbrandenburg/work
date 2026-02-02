@@ -642,6 +642,38 @@ describe('ACPTargetHandler', () => {
       }).not.toThrow();
     });
 
+    it('should handle callback exceptions gracefully', () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const configWithThrowingCallback: ACPTargetConfig = {
+        ...mockConfig,
+        onNotification: () => {
+          throw new Error('Callback error');
+        },
+      };
+
+      (handler as any).ensureProcess(configWithThrowingCallback);
+      (handler as any).currentConfig = configWithThrowingCallback;
+
+      const notification = {
+        jsonrpc: '2.0',
+        method: 'session/update',
+        params: { test: true },
+      };
+
+      // Should not throw - error should be caught and logged
+      expect(() => {
+        mockProcess.stdout.emit('data', JSON.stringify(notification) + '\n');
+      }).not.toThrow();
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Error in notification callback:',
+        expect.any(Error)
+      );
+
+      consoleErrorSpy.mockRestore();
+    });
+
     it('should handle notifications alongside RPC responses', () => {
       const notifications: Array<{ method: string }> = [];
 
