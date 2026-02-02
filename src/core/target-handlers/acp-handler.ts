@@ -207,6 +207,15 @@ export class ACPTargetHandler implements TargetHandler {
       config.timeout || 30
     )) as { sessionId: string };
 
+    // Send system prompt if configured
+    if (config.systemPrompt) {
+      await this.sendPrompt(
+        process,
+        sessionResult.sessionId,
+        config.systemPrompt
+      );
+    }
+
     return sessionResult.sessionId;
   }
 

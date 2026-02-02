@@ -933,4 +933,228 @@ describe('ACPTargetHandler', () => {
       expect(result.success).toBe(true);
     });
   });
+
+  describe('system prompt initialization', () => {
+    function createMockProcess() {
+      return {
+        stdin: {
+          write: vi.fn(),
+        },
+        stdout: new EventEmitter(),
+        stderr: new EventEmitter(),
+        killed: false,
+        kill: vi.fn(),
+        on: vi.fn(),
+      };
+    }
+
+    it('should send system prompt during session initialization', async () => {
+      const configWithPrompt: ACPTargetConfig = {
+        ...mockConfig,
+        systemPrompt: 'You are a security expert focused on vulnerability detection.',
+      };
+
+      const testProcess = createMockProcess();
+      mockSpawn.mockReturnValue(testProcess);
+
+      // Setup response pipeline
+      const sendPromise = handler.send(mockWorkItems, configWithPrompt);
+
+      // Simulate initialize response
+      setTimeout(() => {
+        testProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            result: { protocolVersion: 1, serverInfo: { name: 'test', version: '1.0.0' } },
+          }) + '\n'
+        );
+      }, 10);
+
+      // Simulate session/new response
+      setTimeout(() => {
+        testProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 2,
+            result: { sessionId: 'test-session-123' },
+          }) + '\n'
+        );
+      }, 20);
+
+      // Simulate system prompt response
+      setTimeout(() => {
+        testProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 3,
+            result: { text: 'System prompt received' },
+          }) + '\n'
+        );
+      }, 30);
+
+      // Simulate work items prompt response
+      setTimeout(() => {
+        testProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 4,
+            result: { text: 'Security analysis complete' },
+          }) + '\n'
+        );
+      }, 40);
+
+      await vi.advanceTimersByTimeAsync(100);
+      const result = await sendPromise;
+
+      // Verify three prompts sent: initialize, session/new, system prompt, work items
+      expect(testProcess.stdin.write).toHaveBeenCalledTimes(4);
+      
+      // Verify system prompt content
+      const calls = (testProcess.stdin.write as any).mock.calls;
+      const systemPromptCall = calls.find((call: any) => {
+        const msg = JSON.parse(call[0]);
+        return msg.method === 'session/prompt' && 
+               msg.params?.prompt?.[0]?.text === 'You are a security expert focused on vulnerability detection.';
+      });
+      expect(systemPromptCall).toBeDefined();
+      expect(result.success).toBe(true);
+    });
+
+    it('should skip system prompt if not configured', async () => {
+      const configWithoutPrompt: ACPTargetConfig = {
+        ...mockConfig,
+        // No systemPrompt field
+      };
+
+      const testProcess = createMockProcess();
+      mockSpawn.mockReturnValue(testProcess);
+
+      const sendPromise = handler.send(mockWorkItems, configWithoutPrompt);
+
+      // Simulate initialize response
+      setTimeout(() => {
+        testProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            result: { protocolVersion: 1, serverInfo: { name: 'test', version: '1.0.0' } },
+          }) + '\n'
+        );
+      }, 10);
+
+      // Simulate session/new response
+      setTimeout(() => {
+        testProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 2,
+            result: { sessionId: 'test-session-123' },
+          }) + '\n'
+        );
+      }, 20);
+
+      // Simulate work items prompt response
+      setTimeout(() => {
+        testProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 3,
+            result: { text: 'Analysis complete' },
+          }) + '\n'
+        );
+      }, 30);
+
+      await vi.advanceTimersByTimeAsync(100);
+      const result = await sendPromise;
+
+      // Verify only 3 requests sent: initialize, session/new, work items (no system prompt)
+      expect(testProcess.stdin.write).toHaveBeenCalledTimes(3);
+      expect(result.success).toBe(true);
+    });
+
+    it('should send system prompt before work items in conversation history', async () => {
+      const configWithPrompt: ACPTargetConfig = {
+        ...mockConfig,
+        systemPrompt: 'You are a code reviewer.',
+      };
+
+      const testProcess = createMockProcess();
+      mockSpawn.mockReturnValue(testProcess);
+
+      const sendPromise = handler.send(mockWorkItems, configWithPrompt);
+
+      // Simulate all responses
+      setTimeout(() => {
+        testProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            result: { protocolVersion: 1, serverInfo: { name: 'test', version: '1.0.0' } },
+          }) + '\n'
+        );
+      }, 10);
+
+      setTimeout(() => {
+        testProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 2,
+            result: { sessionId: 'test-session-123' },
+          }) + '\n'
+        );
+      }, 20);
+
+      setTimeout(() => {
+        testProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 3,
+            result: { text: 'System prompt received' },
+          }) + '\n'
+        );
+      }, 30);
+
+      setTimeout(() => {
+        testProcess.stdout.emit(
+          'data',
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: 4,
+            result: { text: 'Review complete' },
+          }) + '\n'
+        );
+      }, 40);
+
+      await vi.advanceTimersByTimeAsync(100);
+      await sendPromise;
+
+      // Verify ordering: initialize, session/new, system prompt, work items
+      const calls = (testProcess.stdin.write as any).mock.calls;
+      const methods = calls.map((call: any) => {
+        const msg = JSON.parse(call[0]);
+        return msg.method;
+      });
+      
+      expect(methods).toEqual(['initialize', 'session/new', 'session/prompt', 'session/prompt']);
+      
+      // First prompt is system, second is work items
+      const prompts = calls.filter((call: any) => {
+        const msg = JSON.parse(call[0]);
+        return msg.method === 'session/prompt';
+      });
+      expect(prompts[0][0]).toContain('You are a code reviewer.');
+      expect(prompts[1][0]).toContain('Task:'); // Work item formatting
+    });
+  });
 });

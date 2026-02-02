@@ -105,6 +105,45 @@ work notify target add ai --type acp --cmd "opencode acp" --timeout 120
 
 **Process hangs**: The CLI automatically cleans up spawned processes after notifications complete. If you see hung processes, please report an issue.
 
+#### System Prompts and Conversation History
+
+ACP targets support system prompts that establish the AI's role and behavior:
+
+```bash
+# Set up AI with specific expertise
+work notify target add security-reviewer \
+  --type acp \
+  --cmd "opencode acp" \
+  --system-prompt "You are a security expert. Focus on identifying vulnerabilities, auth issues, and data exposure risks."
+
+# All notifications use this context
+work notify send where kind=feature to security-reviewer
+# AI analyzes with security mindset
+```
+
+**Conversation Continuity**: The ACP protocol maintains conversation history within
+a session. When you reuse the same target:
+
+```bash
+work notify send TASK-1 to security-reviewer  # First message
+work notify send TASK-2 to security-reviewer  # AI remembers TASK-1
+work notify send TASK-3 to security-reviewer  # AI remembers TASK-1 and TASK-2
+```
+
+The system prompt is sent once during session creation and persists throughout
+the conversation. Each subsequent notification adds to the accumulated context.
+
+**Best Practices for System Prompts:**
+- **Define role clearly**: "You are a [role] focused on [expertise area]"
+- **Set boundaries**: "Focus only on [scope], ignore [out-of-scope]"
+- **Specify output format**: "Provide analysis in bullet points with severity ratings"
+- **Keep concise**: Aim for 2-3 sentences that establish clear context
+
+**Example System Prompts:**
+- Code Review: `"You are a senior code reviewer. Analyze code for bugs, performance issues, and maintainability. Provide specific line-by-line feedback."`
+- Security Audit: `"You are a security expert. Identify vulnerabilities, authentication flaws, and data exposure risks. Rate severity as critical/high/medium/low."`
+- Architecture Review: `"You are a software architect. Evaluate design patterns, scalability, and system integration. Focus on long-term maintainability."`
+
 ### Bash Script Targets
 
 Bash scripts receive notification data as JSON via stdin and can integrate with any external service.
