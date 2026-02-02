@@ -1,0 +1,33 @@
+{
+  "port_assignment": "Auto-assigned: 4096",
+  "endpoints": {
+    "/api/status": {
+      "status": 200,
+      "hasJson": false
+    },
+    "/api/sessions": {
+      "status": 200,
+      "hasJson": false
+    },
+    "/api/models": {
+      "status": 200,
+      "hasJson": false
+    },
+    "/api/config": {
+      "status": 200,
+      "hasJson": false
+    },
+    "/api/agents": {
+      "status": 200,
+      "hasJson": false
+    },
+    "/health": {
+      "status": 200,
+      "hasJson": false
+    },
+    "/info": {
+      "status": 200,
+      "hasJson": false
+    }
+  }
+}

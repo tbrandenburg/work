@@ -1,0 +1,66 @@
+{
+  "totalSessions": 13,
+  "sessions": [
+    {
+      "sessionId": "ses_3e2adcf9fffe9vR8n4558GTlEN",
+      "cwd": "/home/tom/workspace/ai/made/workspace/work/dev/poc-opencode-server",
+      "title": "ACP Session 049e26ab-3315-49a7-b39f-c39a2424d8de",
+      "updatedAt": "2026-02-02T07:47:31.552Z"
+    },
+    {
+      "sessionId": "ses_3e2c326eaffe4ZhBh2prTWAEOn",
+      "cwd": "/home/tom/workspace/ai/made/workspace/work/dev/poc-opencode-server",
+      "title": "ACP Session f84345fd-ffcd-43bc-9c47-9f34935e0c10",
+      "updatedAt": "2026-02-02T07:24:12.949Z"
+    },
+    {
+      "sessionId": "ses_3e2c6b74dffebBvmrSVfM1Y2iB",
+      "cwd": "/home/tom/workspace/ai/made/workspace/work/dev/poc-opencode-server",
+      "title": "ACP Session 4fe5d341-e307-41e4-85a1-7f1a18a83f88",
+      "updatedAt": "2026-02-02T07:20:19.378Z"
+    },
+    {
+      "sessionId": "ses_3e2c71c00ffegzgoVoJ2IrmACf",
+      "cwd": "/home/tom/workspace/ai/made/workspace/work/dev/poc-opencode-server",
+      "title": "ACP Session e430510d-7d07-4402-94ea-ad98236737eb",
+      "updatedAt": "2026-02-02T07:19:53.600Z"
+    },
+    {
+      "sessionId": "ses_3e2c75959ffex3Pi6CKL6y2C9c",
+      "cwd": "/home/tom/workspace/ai/made/workspace/work/dev/poc-opencode-server",
+      "title": "ACP Session 200c4e3e-5667-409b-b5b0-7af6575e301c",
+      "updatedAt": "2026-02-02T07:19:37.894Z"
+    },
+    {
+      "sessionId": "ses_3faf89b24ffef0JgNSH5uGnU73",
+      "cwd": "/home/tom/workspace/ai/made/workspace/work",
+      "title": "Prime: Load Project Context",
+      "updatedAt": "2026-01-28T15:39:55.517Z"
+    },
+    {
+      "sessionId": "ses_3fb0580cdffeMEU7w43ha3yF3x",
+      "cwd": "/home/tom/workspace/ai/made/workspace/work",
+      "title": "Greeting check-in",
+      "updatedAt": "2026-01-28T14:32:24.430Z"
+    },
+    {
+      "sessionId": "ses_4009f0a9dffec8RkUqHDsML2Ax",
+      "cwd": "/home/tom/workspace/ai/made/workspace/work",
+      "title": "Optimizing work-cli with local-fs subset bottlenecks analysis",
+      "updatedAt": "2026-01-27T12:24:49.555Z"
+    },
+    {
+      "sessionId": "ses_4018e8c4affeeaNqWU6a4PKG8F",
+      "cwd": "/home/tom/workspace/ai/made/workspace/work",
+      "title": "Execute improve-test-coverage-60% plan",
+      "updatedAt": "2026-01-27T11:13:07.249Z"
+    },
+    {
+      "sessionId": "ses_4018f554affeR2sx9T7afkD4II",
+      "cwd": "/home/tom/workspace/ai/made/workspace/work",
+      "title": "Greeting and quick check-in",
+      "updatedAt": "2026-01-27T07:52:38.408Z"
+    }
+  ],
+  "resumedSession": null
+}
