@@ -1,6 +1,6 @@
 # Work CLI Notifications User Guide
 
-The work CLI provides a flexible notification system that allows you to send work item updates to external services via bash scripts or Telegram.
+The work CLI provides a flexible notification system that allows you to send work item updates to external services via bash scripts, Telegram, or AI coding agents via the Agent Client Protocol (ACP).
 
 ## Overview
 
@@ -10,6 +10,100 @@ Notifications in work CLI are:
 - **Explicit**: Triggered manually, not automated
 
 ## Notification Targets
+
+### ACP (Agent Client Protocol) Targets
+
+Send work items to AI coding agents that support the Agent Client Protocol (ACP) such as OpenCode, Cursor, Cody, and other ACP-compliant tools.
+
+#### Setup
+
+```bash
+# Add an ACP target (generic, works with any ACP client)
+work notify target add ai --type acp --cmd "opencode acp"
+
+# With custom working directory
+work notify target add ai --type acp --cmd "opencode acp" --cwd /path/to/project
+
+# With timeout (default: 30 seconds)
+work notify target add ai --type acp --cmd "cursor acp" --timeout 60
+```
+
+#### Supported ACP Clients
+
+Any tool that implements the [Agent Client Protocol](https://agentclientprotocol.com/):
+- **OpenCode**: `opencode acp`
+- **Cursor**: `cursor acp`
+- **Cody**: `cody acp`
+- **Custom ACP servers**: Any command that accepts JSON-RPC 2.0 over stdio
+
+#### Usage
+
+```bash
+# Send a specific task to AI for analysis
+work notify send TASK-123 to ai
+
+# Send all open tasks
+work notify send where state=open to ai
+
+# Send high-priority bugs
+work notify send where kind=bug and priority=high to ai
+```
+
+#### How It Works
+
+1. Work CLI spawns the ACP client as a subprocess
+2. Establishes JSON-RPC 2.0 communication over stdio
+3. Initializes a new ACP session
+4. Formats work items as a prompt
+5. Sends prompt to ACP client
+6. Returns AI response
+7. Cleans up subprocess
+
+#### Known Limitations
+
+**Session Persistence**: Sessions are NOT persisted across CLI invocations. Each `work notify send` command creates a new ACP session.
+
+**Impact**: Multi-turn conversations with the AI require manual session management or using a single command with multiple work items.
+
+**Example**:
+```bash
+# ❌ These create SEPARATE sessions (no conversation context)
+work notify send TASK-1 to ai
+work notify send TASK-2 to ai  # AI doesn't remember TASK-1
+
+# ✅ Workaround: Send multiple items in one command
+work notify send where id in (TASK-1,TASK-2) to ai
+```
+
+**Why**: The `TargetConfig` type is readonly for immutability. Handlers cannot modify config to save session IDs.
+
+**Resolution**: See [Issue #963](https://github.com/tbrandenburg/work/issues/963) for planned enhancement.
+
+#### Authentication
+
+ACP clients must be authenticated before use. For OpenCode:
+
+```bash
+# Check authentication status
+opencode auth status
+
+# Login if needed (follow prompts)
+opencode auth login
+```
+
+#### Troubleshooting
+
+**"ACP client not found"**: Ensure the client is installed and in PATH
+```bash
+which opencode  # Should return path to executable
+```
+
+**Timeout errors**: Increase timeout for slow AI responses
+```bash
+work notify target add ai --type acp --cmd "opencode acp" --timeout 120
+```
+
+**Process hangs**: The CLI automatically cleans up spawned processes after notifications complete. If you see hung processes, please report an issue.
 
 ### Bash Script Targets
 
