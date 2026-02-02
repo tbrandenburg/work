@@ -5,7 +5,7 @@ import { formatOutput } from '../../../formatter.js';
 import { TargetConfig } from '../../../../types/notification.js';
 
 interface ParsedFlags {
-  type: 'bash' | 'telegram' | 'email';
+  type: 'bash' | 'telegram' | 'email' | 'acp';
   script?: string;
   timeout?: number;
   'bot-token'?: string;
@@ -13,6 +13,8 @@ interface ParsedFlags {
   to?: string;
   from?: string;
   'smtp-host'?: string;
+  cmd?: string;
+  cwd?: string;
 }
 
 export default class NotifyTargetAdd extends BaseCommand {
@@ -28,6 +30,7 @@ export default class NotifyTargetAdd extends BaseCommand {
   static override examples = [
     '<%= config.bin %> notify target <%= command.id %> alerts --type bash --script work:log',
     '<%= config.bin %> notify target <%= command.id %> team --type bash --script /usr/local/bin/notify-team.sh',
+    '<%= config.bin %> notify target <%= command.id %> ai --type acp --cmd "opencode acp"',
   ];
 
   static override flags = {
@@ -35,7 +38,7 @@ export default class NotifyTargetAdd extends BaseCommand {
     type: Flags.string({
       char: 't',
       description: 'target type',
-      options: ['bash', 'telegram', 'email'],
+      options: ['bash', 'telegram', 'email', 'acp'],
       required: true,
     }),
     script: Flags.string({
@@ -58,6 +61,15 @@ export default class NotifyTargetAdd extends BaseCommand {
       description: 'email recipient (for email type)',
       dependsOn: ['type'],
     }),
+    cmd: Flags.string({
+      description:
+        'Command to spawn ACP client (e.g., "opencode acp", "cursor acp")',
+      dependsOn: ['type'],
+    }),
+    cwd: Flags.string({
+      description: 'Working directory for ACP client context',
+      dependsOn: ['type'],
+    }),
   };
 
   public async run(): Promise<void> {
@@ -78,12 +90,16 @@ export default class NotifyTargetAdd extends BaseCommand {
       this.error('--to is required for email targets');
     }
 
+    if (flags.type === 'acp' && !flags.cmd) {
+      this.error('--cmd is required for acp targets');
+    }
+
     const engine = new WorkEngine();
 
     try {
       await engine.addNotificationTarget(args.name, {
         name: args.name,
-        type: flags.type as 'bash' | 'telegram' | 'email',
+        type: flags.type as 'bash' | 'telegram' | 'email' | 'acp',
         config: this.buildConfig(flags as ParsedFlags),
       });
 
@@ -118,6 +134,16 @@ export default class NotifyTargetAdd extends BaseCommand {
         return {
           type: 'email' as const,
           to: flags.to!,
+        };
+      case 'acp':
+        if (!flags.cmd) {
+          throw new Error('cmd is required for acp target');
+        }
+        return {
+          type: 'acp' as const,
+          cmd: flags.cmd,
+          cwd: flags.cwd || process.cwd(),
+          timeout: 30,
         };
       default:
         throw new Error(`Unsupported target type: ${flags.type as string}`);

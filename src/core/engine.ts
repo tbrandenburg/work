@@ -28,6 +28,7 @@ import { parseQuery, executeQuery } from './query.js';
 import { NotificationService } from './notification-service.js';
 import { BashTargetHandler } from './target-handlers/bash-handler.js';
 import { TelegramTargetHandler } from './target-handlers/telegram-handler.js';
+import { ACPTargetHandler } from './target-handlers/acp-handler.js';
 
 export class WorkEngine {
   private adapters = new Map<string, WorkAdapter>();
@@ -35,6 +36,7 @@ export class WorkEngine {
   private activeContext: string | null = null;
   private notificationService = new NotificationService();
   private contextsLoaded = false;
+  private acpHandler: ACPTargetHandler | null = null;
 
   constructor() {
     // Register built-in adapters
@@ -43,6 +45,9 @@ export class WorkEngine {
 
     // Register built-in notification handlers synchronously
     this.registerNotificationHandlerSync();
+
+    // Register cleanup on process exit
+    this.registerExitHandlers();
   }
 
   /**
@@ -58,6 +63,36 @@ export class WorkEngine {
       'telegram',
       new TelegramTargetHandler()
     );
+
+    // Keep reference to ACP handler for cleanup
+    this.acpHandler = new ACPTargetHandler();
+    this.notificationService.registerHandler('acp', this.acpHandler);
+  }
+
+  /**
+   * Register process exit handlers to cleanup resources
+   */
+  private registerExitHandlers(): void {
+    const cleanup = (): void => {
+      if (this.acpHandler) {
+        this.acpHandler.cleanup();
+      }
+    };
+
+    // Handle normal exit
+    process.on('exit', cleanup);
+
+    // Handle Ctrl+C
+    process.on('SIGINT', () => {
+      cleanup();
+      process.exit(130);
+    });
+
+    // Handle kill
+    process.on('SIGTERM', () => {
+      cleanup();
+      process.exit(143);
+    });
   }
 
   /**
@@ -503,7 +538,15 @@ export class WorkEngine {
       };
     }
 
-    return this.notificationService.sendNotification(workItems, target);
+    const result = await this.notificationService.sendNotification(
+      workItems,
+      target
+    );
+
+    // Save context after notification (handlers may update mutable config fields like sessionId)
+    await this.saveContexts();
+
+    return result;
   }
 
   /**
@@ -526,7 +569,15 @@ export class WorkEngine {
       };
     }
 
-    return this.notificationService.sendPlainNotification(message, target);
+    const result = await this.notificationService.sendPlainNotification(
+      message,
+      target
+    );
+
+    // Save context after notification (handlers may update mutable config fields like sessionId)
+    await this.saveContexts();
+
+    return result;
   }
 
   /**

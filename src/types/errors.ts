@@ -80,3 +80,43 @@ export class InvalidDateError extends WorkError {
     Object.setPrototypeOf(this, InvalidDateError.prototype);
   }
 }
+
+export class ACPError extends WorkError {
+  constructor(
+    message: string,
+    code: string = 'ACP_ERROR',
+    statusCode: number = 500
+  ) {
+    super(message, code, statusCode);
+    this.name = 'ACPError';
+    Object.setPrototypeOf(this, ACPError.prototype);
+  }
+}
+
+export class ACPTimeoutError extends ACPError {
+  constructor(timeout: number) {
+    super(`ACP process timed out after ${timeout} seconds`, 'ACP_TIMEOUT', 408);
+    this.name = 'ACPTimeoutError';
+    Object.setPrototypeOf(this, ACPTimeoutError.prototype);
+  }
+}
+
+export class ACPInitError extends ACPError {
+  constructor(message: string) {
+    super(
+      `Failed to initialize ACP connection: ${message}`,
+      'ACP_INIT_ERROR',
+      500
+    );
+    this.name = 'ACPInitError';
+    Object.setPrototypeOf(this, ACPInitError.prototype);
+  }
+}
+
+export class ACPSessionError extends ACPError {
+  constructor(message: string) {
+    super(`ACP session error: ${message}`, 'ACP_SESSION_ERROR', 500);
+    this.name = 'ACPSessionError';
+    Object.setPrototypeOf(this, ACPSessionError.prototype);
+  }
+}

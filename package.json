@@ -39,6 +39,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@agentclientprotocol/sdk": "^0.13.1",
     "@oclif/core": "^4.0.0",
     "@oclif/plugin-help": "^6.0.0",
     "@octokit/plugin-throttling": "^11.0.3",
