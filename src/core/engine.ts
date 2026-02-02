@@ -538,7 +538,15 @@ export class WorkEngine {
       };
     }
 
-    return this.notificationService.sendNotification(workItems, target);
+    const result = await this.notificationService.sendNotification(
+      workItems,
+      target
+    );
+
+    // Save context after notification (handlers may update mutable config fields like sessionId)
+    await this.saveContexts();
+
+    return result;
   }
 
   /**
@@ -561,7 +569,15 @@ export class WorkEngine {
       };
     }
 
-    return this.notificationService.sendPlainNotification(message, target);
+    const result = await this.notificationService.sendPlainNotification(
+      message,
+      target
+    );
+
+    // Save context after notification (handlers may update mutable config fields like sessionId)
+    await this.saveContexts();
+
+    return result;
   }
 
   /**

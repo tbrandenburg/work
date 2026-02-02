@@ -113,19 +113,25 @@ describe('ACP Integration E2E (OpenCode)', () => {
     expect(result.data).toContain('sent successfully');
     expect(result.data).toContain('ai');
 
-    // Verify session was persisted (Note: currently NOT persisted due to readonly config)
-    // This is a known limitation - sessionId won't persist across commands
-    // TODO: Once context manager allows handler state persistence, re-enable this check
-    // const contextData = JSON.parse(
-    //   readFileSync(join(tempDir, '.work/contexts.json'), 'utf-8')
-    // );
-    //
-    // const target = contextData.contexts[0].notificationTargets.find(
-    //   (t: any) => t.name === 'ai'
-    // );
-    //
-    // expect(target.config.sessionId).toBeDefined();
-    // expect(target.config.sessionId).toMatch(/^session-/);
+    // Verify session was persisted
+    const contextData = JSON.parse(
+      readFileSync(join(tempDir, '.work/contexts.json'), 'utf-8')
+    );
+
+    // contexts is serialized as Map: [[name, context], ...]
+    const contextEntry = contextData.contexts.find(
+      (entry: any) => entry[0] === 'default'
+    );
+    expect(contextEntry).toBeDefined();
+
+    const context = contextEntry[1];
+    const target = context?.notificationTargets?.find(
+      (t: any) => t.name === 'ai'
+    );
+
+    expect(target).toBeDefined();
+    expect(target.config.sessionId).toBeDefined();
+    expect(target.config.sessionId).toMatch(/^ses_/); // OpenCode uses ses_ prefix
   },
     180000
   ); // 3 minute test timeout

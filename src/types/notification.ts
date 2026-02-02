@@ -40,7 +40,7 @@ export interface ACPTargetConfig {
   readonly cmd: string;
   readonly cwd?: string;
   readonly timeout?: number;
-  readonly sessionId?: string;
+  sessionId?: string; // Mutable to allow session persistence
 }
 
 export interface NotificationRequest {

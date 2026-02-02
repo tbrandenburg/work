@@ -46,13 +46,14 @@ export class ACPTargetHandler implements TargetHandler {
       const sessionId =
         config.sessionId || (await this.initializeSession(process, config));
 
+      // Persist sessionId for reuse across CLI invocations
+      if (!config.sessionId && sessionId) {
+        config.sessionId = sessionId;
+      }
+
       // Send prompt with work items
       const prompt = this.formatWorkItems(workItems);
       const response = await this.sendPrompt(process, sessionId, prompt);
-
-      // NOTE: sessionId is NOT persisted to config (readonly).
-      // Process reuse means same session within a command, but not across commands.
-      // TODO: Update context manager to allow handlers to persist state
 
       // For CLI use case: cleanup process after sending
       // This allows the CLI to exit cleanly
