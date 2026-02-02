@@ -1,0 +1,19 @@
+{
+  "name": "poc-opencode-server",
+  "version": "1.0.0",
+  "description": "This PoC demonstrates how to programmatically integrate with OpenCode using the Agent Client Protocol (ACP). It answers key questions about spawning servers, port management, JSON APIs, and message handling.",
+  "main": "03-demos/complete-acp-test.js",
+  "scripts": {
+    "demo": "node 03-demos/complete-acp-test.js",
+    "demo:sdk": "node 03-demos/test-sdk.js",
+    "demo:resume": "node 03-demos/session-resume-WORKING.js",
+    "verify": "bash 04-scripts/VERIFY.sh"
+  },
+  "keywords": ["opencode", "acp", "agent-client-protocol", "poc"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@agentclientprotocol/sdk": "^0.13.1"
+  }
+}

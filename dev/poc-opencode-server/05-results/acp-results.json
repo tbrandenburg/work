@@ -1,0 +1,379 @@
+{
+  "server_start": null,
+  "initialize": {
+    "protocolVersion": 1,
+    "agentCapabilities": {
+      "loadSession": true,
+      "mcpCapabilities": {
+        "http": true,
+        "sse": true
+      },
+      "promptCapabilities": {
+        "embeddedContext": true,
+        "image": true
+      },
+      "sessionCapabilities": {
+        "fork": {},
+        "list": {},
+        "resume": {}
+      }
+    },
+    "authMethods": [
+      {
+        "description": "Run `opencode auth login` in the terminal",
+        "name": "Login with opencode",
+        "id": "opencode-login"
+      }
+    ],
+    "agentInfo": {
+      "name": "OpenCode",
+      "version": "1.1.36"
+    }
+  },
+  "session_new": {
+    "sessionId": "ses_3e2c326eaffe4ZhBh2prTWAEOn",
+    "models": {
+      "currentModelId": "openai/gpt-5.2-codex",
+      "availableModels": [
+        {
+          "modelId": "github-copilot/gemini-3-pro-preview",
+          "name": "GitHub Copilot/Gemini 3 Pro Preview"
+        },
+        {
+          "modelId": "github-copilot/claude-sonnet-4.5",
+          "name": "GitHub Copilot/Claude Sonnet 4.5"
+        },
+        {
+          "modelId": "github-copilot/claude-sonnet-4",
+          "name": "GitHub Copilot/Claude Sonnet 4"
+        },
+        {
+          "modelId": "github-copilot/gpt-5.2-codex",
+          "name": "GitHub Copilot/GPT-5.2-Codex"
+        },
+        {
+          "modelId": "github-copilot/gpt-5.2",
+          "name": "GitHub Copilot/GPT-5.2"
+        },
+        {
+          "modelId": "github-copilot/gpt-5.1-codex-mini",
+          "name": "GitHub Copilot/GPT-5.1-Codex-mini"
+        },
+        {
+          "modelId": "github-copilot/gpt-5.1-codex-max",
+          "name": "GitHub Copilot/GPT-5.1-Codex-max"
+        },
+        {
+          "modelId": "github-copilot/gpt-5.1-codex",
+          "name": "GitHub Copilot/GPT-5.1-Codex"
+        },
+        {
+          "modelId": "github-copilot/gpt-5.1",
+          "name": "GitHub Copilot/GPT-5.1"
+        },
+        {
+          "modelId": "github-copilot/gpt-5-mini",
+          "name": "GitHub Copilot/GPT-5-mini"
+        },
+        {
+          "modelId": "github-copilot/gpt-5",
+          "name": "GitHub Copilot/GPT-5"
+        },
+        {
+          "modelId": "github-copilot/grok-code-fast-1",
+          "name": "GitHub Copilot/Grok Code Fast 1"
+        },
+        {
+          "modelId": "github-copilot/gpt-4o",
+          "name": "GitHub Copilot/GPT-4o"
+        },
+        {
+          "modelId": "github-copilot/gpt-4.1",
+          "name": "GitHub Copilot/GPT-4.1"
+        },
+        {
+          "modelId": "github-copilot/gemini-3-flash-preview",
+          "name": "GitHub Copilot/Gemini 3 Flash"
+        },
+        {
+          "modelId": "github-copilot/gemini-2.5-pro",
+          "name": "GitHub Copilot/Gemini 2.5 Pro"
+        },
+        {
+          "modelId": "github-copilot/claude-opus-41",
+          "name": "GitHub Copilot/Claude Opus 4.1"
+        },
+        {
+          "modelId": "github-copilot/claude-opus-4.5",
+          "name": "GitHub Copilot/Claude Opus 4.5"
+        },
+        {
+          "modelId": "github-copilot/claude-haiku-4.5",
+          "name": "GitHub Copilot/Claude Haiku 4.5"
+        },
+        {
+          "modelId": "openai/gpt-5.2-codex",
+          "name": "OpenAI/GPT 5.2 Codex (OAuth)"
+        },
+        {
+          "modelId": "openai/gpt-5.2",
+          "name": "OpenAI/GPT 5.2 (OAuth)"
+        },
+        {
+          "modelId": "openai/gpt-5.1-codex-mini",
+          "name": "OpenAI/GPT 5.1 Codex Mini (OAuth)"
+        },
+        {
+          "modelId": "openai/gpt-5.1-codex-max",
+          "name": "OpenAI/GPT 5.1 Codex Max (OAuth)"
+        },
+        {
+          "modelId": "openai/gpt-5.1-codex",
+          "name": "OpenAI/GPT 5.1 Codex (OAuth)"
+        },
+        {
+          "modelId": "opencode/big-pickle",
+          "name": "OpenCode Zen/Big Pickle"
+        },
+        {
+          "modelId": "opencode/gpt-5-nano",
+          "name": "OpenCode Zen/GPT-5 Nano"
+        },
+        {
+          "modelId": "opencode/trinity-large-preview-free",
+          "name": "OpenCode Zen/Trinity Large Preview"
+        },
+        {
+          "modelId": "opencode/minimax-m2.1-free",
+          "name": "OpenCode Zen/MiniMax M2.1 Free"
+        },
+        {
+          "modelId": "opencode/kimi-k2.5-free",
+          "name": "OpenCode Zen/Kimi K2.5 Free"
+        },
+        {
+          "modelId": "opencode/glm-4.7-free",
+          "name": "OpenCode Zen/GLM-4.7 Free"
+        }
+      ]
+    },
+    "modes": {
+      "availableModes": [
+        {
+          "id": "build",
+          "name": "build"
+        },
+        {
+          "id": "plan",
+          "name": "plan"
+        }
+      ],
+      "currentModeId": "build"
+    },
+    "_meta": {}
+  },
+  "session_prompt": null,
+  "responses": [
+    {
+      "id": 1,
+      "result": {
+        "protocolVersion": 1,
+        "agentCapabilities": {
+          "loadSession": true,
+          "mcpCapabilities": {
+            "http": true,
+            "sse": true
+          },
+          "promptCapabilities": {
+            "embeddedContext": true,
+            "image": true
+          },
+          "sessionCapabilities": {
+            "fork": {},
+            "list": {},
+            "resume": {}
+          }
+        },
+        "authMethods": [
+          {
+            "description": "Run `opencode auth login` in the terminal",
+            "name": "Login with opencode",
+            "id": "opencode-login"
+          }
+        ],
+        "agentInfo": {
+          "name": "OpenCode",
+          "version": "1.1.36"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "result": {
+        "sessionId": "ses_3e2c326eaffe4ZhBh2prTWAEOn",
+        "models": {
+          "currentModelId": "openai/gpt-5.2-codex",
+          "availableModels": [
+            {
+              "modelId": "github-copilot/gemini-3-pro-preview",
+              "name": "GitHub Copilot/Gemini 3 Pro Preview"
+            },
+            {
+              "modelId": "github-copilot/claude-sonnet-4.5",
+              "name": "GitHub Copilot/Claude Sonnet 4.5"
+            },
+            {
+              "modelId": "github-copilot/claude-sonnet-4",
+              "name": "GitHub Copilot/Claude Sonnet 4"
+            },
+            {
+              "modelId": "github-copilot/gpt-5.2-codex",
+              "name": "GitHub Copilot/GPT-5.2-Codex"
+            },
+            {
+              "modelId": "github-copilot/gpt-5.2",
+              "name": "GitHub Copilot/GPT-5.2"
+            },
+            {
+              "modelId": "github-copilot/gpt-5.1-codex-mini",
+              "name": "GitHub Copilot/GPT-5.1-Codex-mini"
+            },
+            {
+              "modelId": "github-copilot/gpt-5.1-codex-max",
+              "name": "GitHub Copilot/GPT-5.1-Codex-max"
+            },
+            {
+              "modelId": "github-copilot/gpt-5.1-codex",
+              "name": "GitHub Copilot/GPT-5.1-Codex"
+            },
+            {
+              "modelId": "github-copilot/gpt-5.1",
+              "name": "GitHub Copilot/GPT-5.1"
+            },
+            {
+              "modelId": "github-copilot/gpt-5-mini",
+              "name": "GitHub Copilot/GPT-5-mini"
+            },
+            {
+              "modelId": "github-copilot/gpt-5",
+              "name": "GitHub Copilot/GPT-5"
+            },
+            {
+              "modelId": "github-copilot/grok-code-fast-1",
+              "name": "GitHub Copilot/Grok Code Fast 1"
+            },
+            {
+              "modelId": "github-copilot/gpt-4o",
+              "name": "GitHub Copilot/GPT-4o"
+            },
+            {
+              "modelId": "github-copilot/gpt-4.1",
+              "name": "GitHub Copilot/GPT-4.1"
+            },
+            {
+              "modelId": "github-copilot/gemini-3-flash-preview",
+              "name": "GitHub Copilot/Gemini 3 Flash"
+            },
+            {
+              "modelId": "github-copilot/gemini-2.5-pro",
+              "name": "GitHub Copilot/Gemini 2.5 Pro"
+            },
+            {
+              "modelId": "github-copilot/claude-opus-41",
+              "name": "GitHub Copilot/Claude Opus 4.1"
+            },
+            {
+              "modelId": "github-copilot/claude-opus-4.5",
+              "name": "GitHub Copilot/Claude Opus 4.5"
+            },
+            {
+              "modelId": "github-copilot/claude-haiku-4.5",
+              "name": "GitHub Copilot/Claude Haiku 4.5"
+            },
+            {
+              "modelId": "openai/gpt-5.2-codex",
+              "name": "OpenAI/GPT 5.2 Codex (OAuth)"
+            },
+            {
+              "modelId": "openai/gpt-5.2",
+              "name": "OpenAI/GPT 5.2 (OAuth)"
+            },
+            {
+              "modelId": "openai/gpt-5.1-codex-mini",
+              "name": "OpenAI/GPT 5.1 Codex Mini (OAuth)"
+            },
+            {
+              "modelId": "openai/gpt-5.1-codex-max",
+              "name": "OpenAI/GPT 5.1 Codex Max (OAuth)"
+            },
+            {
+              "modelId": "openai/gpt-5.1-codex",
+              "name": "OpenAI/GPT 5.1 Codex (OAuth)"
+            },
+            {
+              "modelId": "opencode/big-pickle",
+              "name": "OpenCode Zen/Big Pickle"
+            },
+            {
+              "modelId": "opencode/gpt-5-nano",
+              "name": "OpenCode Zen/GPT-5 Nano"
+            },
+            {
+              "modelId": "opencode/trinity-large-preview-free",
+              "name": "OpenCode Zen/Trinity Large Preview"
+            },
+            {
+              "modelId": "opencode/minimax-m2.1-free",
+              "name": "OpenCode Zen/MiniMax M2.1 Free"
+            },
+            {
+              "modelId": "opencode/kimi-k2.5-free",
+              "name": "OpenCode Zen/Kimi K2.5 Free"
+            },
+            {
+              "modelId": "opencode/glm-4.7-free",
+              "name": "OpenCode Zen/GLM-4.7 Free"
+            }
+          ]
+        },
+        "modes": {
+          "availableModes": [
+            {
+              "id": "build",
+              "name": "build"
+            },
+            {
+              "id": "plan",
+              "name": "plan"
+            }
+          ],
+          "currentModeId": "build"
+        },
+        "_meta": {}
+      }
+    },
+    {
+      "notification": "session/update",
+      "params": {
+        "sessionId": "ses_3e2c326eaffe4ZhBh2prTWAEOn",
+        "update": {
+          "sessionUpdate": "available_commands_update",
+          "availableCommands": [
+            {
+              "name": "init",
+              "description": "create/update AGENTS.md"
+            },
+            {
+              "name": "review",
+              "description": "review changes [commit|branch|pr], defaults to uncommitted"
+            },
+            {
+              "name": "compact",
+              "description": "compact the session"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

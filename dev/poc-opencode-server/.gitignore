@@ -1,0 +1,12 @@
+# Node modules
+node_modules/
+
+# Logs (keep structured logs in 05-results/logs/)
+*.log
+
+# npm debug logs
+npm-debug.log*
+
+# Test results (unless in 05-results/)
+*.tmp
+*.temp

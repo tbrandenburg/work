@@ -1,0 +1,7 @@
+INFO  2026-02-02T07:14:13 +39ms service=models.dev file={} refreshing
+INFO  2026-02-02T07:14:14 +735ms service=default version=1.1.36 args=["serve","--port","0","--print-logs"] opencode
+Warning: OPENCODE_SERVER_PASSWORD is not set; server is unsecured.
+INFO  2026-02-02T07:14:14 +2ms service=config path=/home/tom/.config/opencode/config.json loading
+INFO  2026-02-02T07:14:14 +1ms service=config path=/home/tom/.config/opencode/opencode.json loading
+INFO  2026-02-02T07:14:14 +1ms service=config path=/home/tom/.config/opencode/opencode.jsonc loading
+opencode server listening on http://127.0.0.1:35373
