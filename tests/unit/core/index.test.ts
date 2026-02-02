@@ -5,5 +5,6 @@ describe('Core Index', () => {
     expect(WorkEngine).toBeDefined();
     const engine = new WorkEngine();
     expect(engine).toBeInstanceOf(WorkEngine);
+    engine.destroy();
   });
 });

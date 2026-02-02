@@ -36,6 +36,11 @@ describe('WorkEngine', () => {
     engine = new WorkEngine();
   });
 
+  afterEach(() => {
+    // Clean up event listeners
+    engine.destroy();
+  });
+
   describe('createWorkItem', () => {
     it('should create a work item through adapter', async () => {
       const request = {

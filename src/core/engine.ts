@@ -37,6 +37,9 @@ export class WorkEngine {
   private notificationService = new NotificationService();
   private contextsLoaded = false;
   private acpHandler: ACPTargetHandler | null = null;
+  private exitHandler: (() => void) | null = null;
+  private sigintHandler: (() => void) | null = null;
+  private sigtermHandler: (() => void) | null = null;
 
   constructor() {
     // Register built-in adapters
@@ -79,20 +82,46 @@ export class WorkEngine {
       }
     };
 
-    // Handle normal exit
-    process.on('exit', cleanup);
-
-    // Handle Ctrl+C
-    process.on('SIGINT', () => {
+    // Store handler references for cleanup
+    this.exitHandler = cleanup;
+    this.sigintHandler = (): void => {
       cleanup();
       process.exit(130);
-    });
-
-    // Handle kill
-    process.on('SIGTERM', () => {
+    };
+    this.sigtermHandler = (): void => {
       cleanup();
       process.exit(143);
-    });
+    };
+
+    // Handle normal exit
+    process.on('exit', this.exitHandler);
+
+    // Handle Ctrl+C
+    process.on('SIGINT', this.sigintHandler);
+
+    // Handle kill
+    process.on('SIGTERM', this.sigtermHandler);
+  }
+
+  /**
+   * Remove process exit handlers - useful for testing
+   */
+  public destroy(): void {
+    if (this.exitHandler) {
+      process.removeListener('exit', this.exitHandler);
+      this.exitHandler = null;
+    }
+    if (this.sigintHandler) {
+      process.removeListener('SIGINT', this.sigintHandler);
+      this.sigintHandler = null;
+    }
+    if (this.sigtermHandler) {
+      process.removeListener('SIGTERM', this.sigtermHandler);
+      this.sigtermHandler = null;
+    }
+    if (this.acpHandler) {
+      this.acpHandler.cleanup();
+    }
   }
 
   /**

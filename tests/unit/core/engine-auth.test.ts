@@ -35,6 +35,7 @@ describe('WorkEngine Auth Methods', () => {
   });
 
   afterEach(() => {
+    engine.destroy();
     vi.restoreAllMocks();
   });
 
