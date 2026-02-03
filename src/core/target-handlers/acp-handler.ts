@@ -60,9 +60,17 @@ export class ACPTargetHandler implements TargetHandler {
     this.currentConfig = config; // Store config for callback access
 
     try {
+      this.debug('ACPHandler.send: Starting notification');
+      this.debug(`ACPHandler.send: Work items count: ${workItems.length}`);
+      this.debug(`ACPHandler.send: Config: ${JSON.stringify(config)}`);
+      this.debug(`ACPHandler.send: Timeout: ${this.getTimeout(config)}s`);
+      
       const process = this.ensureProcess(config);
+      this.debug('ACPHandler.send: Process ensured');
+      
       const sessionId =
         config.sessionId || (await this.initializeSession(process, config));
+      this.debug(`ACPHandler.send: Session ID: ${sessionId}`);
 
       // Persist sessionId for reuse across CLI invocations
       if (!config.sessionId && sessionId) {
@@ -71,7 +79,9 @@ export class ACPTargetHandler implements TargetHandler {
 
       // Send prompt with work items
       const prompt = this.formatWorkItems(workItems);
+      this.debug(`ACPHandler.send: Sending prompt (length: ${prompt.length})`);
       const response = await this.sendPrompt(process, sessionId, prompt, config);
+      this.debug('ACPHandler.send: Got response from prompt');
 
       // For CLI use case: cleanup process after sending
       // This allows the CLI to exit cleanly
@@ -82,6 +92,7 @@ export class ACPTargetHandler implements TargetHandler {
         message: `AI response: ${JSON.stringify(response).substring(0, 200)}...`,
       };
     } catch (error) {
+      this.debug(`ACPHandler.send: Error: ${error instanceof Error ? error.message : String(error)}`);
       // Clean up on error too
       setImmediate(() => this.cleanup());
 
@@ -89,6 +100,12 @@ export class ACPTargetHandler implements TargetHandler {
         success: false,
         error: error instanceof Error ? error.message : String(error),
       };
+    }
+  }
+
+  private debug(message: string): void {
+    if (process.env['DEBUG'] || process.env['WORK_DEBUG']) {
+      console.error(`[ACP DEBUG] ${message}`);
     }
   }
 
@@ -200,7 +217,12 @@ export class ACPTargetHandler implements TargetHandler {
     // as the ACP client bootstraps the environment. Subsequent sessions
     // with persisted sessionId are much faster.
 
+    this.debug('initializeSession: Starting');
+    const timeout = this.getTimeout(config);
+    this.debug(`initializeSession: Timeout set to ${timeout}s`);
+
     // Initialize protocol (fast, < 1s)
+    this.debug('initializeSession: Sending initialize request');
     await this.sendRequest(
       process,
       'initialize',
@@ -212,10 +234,12 @@ export class ACPTargetHandler implements TargetHandler {
         },
         capabilities: config.capabilities || {}, // Use configured capabilities or default to minimal
       },
-      this.getTimeout(config)
+      timeout
     );
+    this.debug('initializeSession: Initialize complete');
 
     // Create session (slow, 5-7s on first run)
+    this.debug('initializeSession: Sending session/new request');
     const sessionResult = (await this.sendRequest(
       process,
       'session/new',
@@ -223,19 +247,23 @@ export class ACPTargetHandler implements TargetHandler {
         cwd: config.cwd || global.process.cwd(),
         mcpServers: [],
       },
-      this.getTimeout(config)
+      timeout
     )) as { sessionId: string };
+    this.debug(`initializeSession: Session created: ${sessionResult.sessionId}`);
 
     // Send system prompt if configured
     if (config.systemPrompt) {
+      this.debug('initializeSession: Sending system prompt');
       await this.sendPrompt(
         process,
         sessionResult.sessionId,
         config.systemPrompt,
         config
       );
+      this.debug('initializeSession: System prompt sent');
     }
 
+    this.debug('initializeSession: Complete');
     return sessionResult.sessionId;
   }
 
@@ -245,11 +273,12 @@ export class ACPTargetHandler implements TargetHandler {
     content: string,
     config: ACPTargetConfig
   ): Promise<unknown> {
+    this.debug(`sendPrompt: Sending prompt (length: ${content.length})`);
     // NOTE: OpenCode supports multiple prompt formats:
     // - prompt: [{ type: 'text', text: '...' }] (our format)
     // - content: [{ role: 'user', content: '...' }] (alternative)
     // Both are valid per ACP spec.
-    return this.sendRequest(
+    const result = await this.sendRequest(
       process,
       'session/prompt',
       {
@@ -263,6 +292,8 @@ export class ACPTargetHandler implements TargetHandler {
       },
       this.getTimeout(config)
     );
+    this.debug('sendPrompt: Complete');
+    return result;
   }
 
   private async sendRequest(
@@ -279,24 +310,31 @@ export class ACPTargetHandler implements TargetHandler {
       params,
     };
 
+    this.debug(`sendRequest: ${method} (id=${id}, timeout=${timeoutSeconds}s)`);
+
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
+        this.debug(`sendRequest: Timeout after ${timeoutSeconds}s for ${method} (id=${id})`);
         this.pendingRequests.delete(id);
         reject(new ACPTimeoutError(timeoutSeconds));
       }, timeoutSeconds * 1000);
 
       this.pendingRequests.set(id, {
         resolve: (result: unknown) => {
+          this.debug(`sendRequest: Response received for ${method} (id=${id})`);
           clearTimeout(timeout);
           resolve(result);
         },
         reject: (error: Error) => {
+          this.debug(`sendRequest: Error for ${method} (id=${id}): ${error.message}`);
           clearTimeout(timeout);
           reject(error);
         },
       });
 
-      process.stdin?.write(JSON.stringify(message) + '\n');
+      const json = JSON.stringify(message);
+      this.debug(`sendRequest: Writing to stdin: ${json}`);
+      process.stdin?.write(json + '\n');
     });
   }
 
