@@ -326,7 +326,7 @@ describe('ACPTargetHandler', () => {
       vi.clearAllTimers();
     });
 
-    it.skip('should handle JSON-RPC error response', async () => {
+    it('should handle JSON-RPC error response', async () => {
       // Use fresh process and handler to avoid interference
       const freshHandler = new ACPTargetHandler();
       const freshProcess = {
@@ -337,6 +337,9 @@ describe('ACPTargetHandler', () => {
         kill: vi.fn(),
         on: vi.fn(),
       };
+
+      // Wire up the message handler
+      (freshHandler as any).setupMessageHandler(freshProcess);
 
       const requestPromise = (freshHandler as any).sendRequest(
         freshProcess,
