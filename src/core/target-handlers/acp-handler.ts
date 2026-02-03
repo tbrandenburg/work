@@ -228,6 +228,10 @@ export class ACPTargetHandler implements TargetHandler {
     sessionId: string,
     content: string
   ): Promise<unknown> {
+    // NOTE: OpenCode supports multiple prompt formats:
+    // - prompt: [{ type: 'text', text: '...' }] (our format)
+    // - content: [{ role: 'user', content: '...' }] (alternative)
+    // Both are valid per ACP spec.
     return this.sendRequest(
       process,
       'session/prompt',
