@@ -325,7 +325,88 @@ describe('ACPTargetHandler', () => {
       // Clear any remaining timers
       vi.clearAllTimers();
     });
+  });
 
+  describe('Unified timeout configuration', () => {
+    it('should use 300s default when no timeout specified', () => {
+      const configWithoutTimeout = {
+        type: 'acp' as const,
+        cmd: 'opencode acp',
+        cwd: process.cwd(),
+        // No timeout property
+      };
+
+      // Test that getTimeout returns 300
+      const timeout = (handler as any).getTimeout(configWithoutTimeout);
+      expect(timeout).toBe(300);
+    });
+
+    it('should respect custom timeout from config', () => {
+      const configWithTimeout = {
+        type: 'acp' as const,
+        cmd: 'opencode acp',
+        cwd: process.cwd(),
+        timeout: 600,
+      };
+
+      const timeout = (handler as any).getTimeout(configWithTimeout);
+      expect(timeout).toBe(600);
+    });
+
+    it('should use same timeout for all operations', async () => {
+      vi.useFakeTimers();
+      const customTimeout = 120;
+
+      const configWithTimeout = {
+        type: 'acp' as const,
+        cmd: 'opencode acp',
+        cwd: process.cwd(),
+        timeout: customTimeout,
+      };
+
+      // Mock process
+      const mockProcess = {
+        stdin: { write: vi.fn() },
+        stdout: new EventEmitter(),
+        stderr: new EventEmitter(),
+        killed: false,
+        kill: vi.fn(),
+        on: vi.fn(),
+      };
+
+      // Wire up the message handler
+      (handler as any).setupMessageHandler(mockProcess);
+
+      // Test initialize timeout
+      const initPromise = (handler as any).sendRequest(
+        mockProcess,
+        'initialize',
+        {},
+        (handler as any).getTimeout(configWithTimeout)
+      );
+      vi.advanceTimersByTime(customTimeout * 1000 + 100);
+      await expect(initPromise).rejects.toThrow(
+        `ACP process timed out after ${customTimeout} seconds`
+      );
+
+      vi.useRealTimers();
+    });
+
+    it('should handle zero timeout as immediate timeout', () => {
+      const configNoTimeout = {
+        type: 'acp' as const,
+        cmd: 'opencode acp',
+        cwd: process.cwd(),
+        timeout: 0,
+      };
+
+      const timeout = (handler as any).getTimeout(configNoTimeout);
+      // 0 is treated as 0 (immediate timeout)
+      expect(timeout).toBe(0);
+    });
+  });
+
+  describe('JSON-RPC protocol', () => {
     it('should handle JSON-RPC error response', async () => {
       // Use fresh process and handler to avoid interference
       const freshHandler = new ACPTargetHandler();

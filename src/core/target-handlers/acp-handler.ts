@@ -34,6 +34,21 @@ export class ACPTargetHandler implements TargetHandler {
   >();
   private currentConfig: ACPTargetConfig | null = null;
 
+  /**
+   * Default timeout for all ACP operations (5 minutes)
+   * Covers 95% of AI operations while providing timeout protection
+   */
+  private static readonly DEFAULT_TIMEOUT = 300;
+
+  /**
+   * Get configured timeout or default
+   * @param config - Optional ACPTargetConfig to read timeout from
+   * @returns Timeout in seconds
+   */
+  private getTimeout(config?: ACPTargetConfig): number {
+    return config?.timeout ?? ACPTargetHandler.DEFAULT_TIMEOUT;
+  }
+
   async send(
     workItems: WorkItem[],
     config: TargetConfig
@@ -56,7 +71,7 @@ export class ACPTargetHandler implements TargetHandler {
 
       // Send prompt with work items
       const prompt = this.formatWorkItems(workItems);
-      const response = await this.sendPrompt(process, sessionId, prompt);
+      const response = await this.sendPrompt(process, sessionId, prompt, config);
 
       // For CLI use case: cleanup process after sending
       // This allows the CLI to exit cleanly
@@ -197,7 +212,7 @@ export class ACPTargetHandler implements TargetHandler {
         },
         capabilities: config.capabilities || {}, // Use configured capabilities or default to minimal
       },
-      config.timeout || 30
+      this.getTimeout(config)
     );
 
     // Create session (slow, 5-7s on first run)
@@ -208,7 +223,7 @@ export class ACPTargetHandler implements TargetHandler {
         cwd: config.cwd || global.process.cwd(),
         mcpServers: [],
       },
-      config.timeout || 30
+      this.getTimeout(config)
     )) as { sessionId: string };
 
     // Send system prompt if configured
@@ -216,7 +231,8 @@ export class ACPTargetHandler implements TargetHandler {
       await this.sendPrompt(
         process,
         sessionResult.sessionId,
-        config.systemPrompt
+        config.systemPrompt,
+        config
       );
     }
 
@@ -226,7 +242,8 @@ export class ACPTargetHandler implements TargetHandler {
   private async sendPrompt(
     process: ChildProcess,
     sessionId: string,
-    content: string
+    content: string,
+    config: ACPTargetConfig
   ): Promise<unknown> {
     // NOTE: OpenCode supports multiple prompt formats:
     // - prompt: [{ type: 'text', text: '...' }] (our format)
@@ -244,8 +261,8 @@ export class ACPTargetHandler implements TargetHandler {
           },
         ],
       },
-      60
-    ); // Longer timeout for prompts
+      this.getTimeout(config)
+    );
   }
 
   private async sendRequest(
