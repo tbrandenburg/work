@@ -2,6 +2,12 @@
 
 This example demonstrates using the `work` CLI with GitHub Issues and OpenCode ACP to automatically assess and prioritize work items based on business value.
 
+## ⚠️ Known Issue
+
+**OpenCode ACP Response Timeout**: The first run with a new session can take 60+ seconds (initialize + session creation + system prompt + work items prompt). This currently exceeds the 60-second timeout, causing the notification to fail.
+
+**Workaround**: This is a known limitation documented in [Issue #1361](https://github.com/tbrandenburg/work/issues/1361). The script correctly demonstrates the workflow but requires ACP handler improvements for production use.
+
 ## What It Does
 
 The `prioritize.sh` script:
@@ -9,8 +15,10 @@ The `prioritize.sh` script:
 1. **Sets up GitHub context** - Connects to the work CLI repository
 2. **Authenticates** - Logs into GitHub using existing credentials
 3. **Configures OpenCode ACP agent** - Sets up an AI agent to analyze work items
-4. **Lists open items** - Shows current new/active work items
+4. **Lists open items** - Shows current new/active work items  
 5. **Triggers prioritization** - Sends work items to the AI agent for business value assessment
+
+**Note**: Due to GitHub adapter pagination limits ([Issue #1361](https://github.com/tbrandenburg/work/issues/1361)), only the 100 most recent issues are accessible. Some older open issues may not appear in the list.
 
 ## Prerequisites
 
