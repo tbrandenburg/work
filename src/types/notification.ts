@@ -63,6 +63,7 @@ export interface ACPTargetConfig {
   sessionId?: string; // Mutable to allow session persistence
   onNotification?: (method: string, params: unknown) => void; // Optional streaming callback
   capabilities?: ACPCapabilities; // Optional client capabilities for permission control
+  systemPrompt?: string; // Optional system prompt for AI role and behavior definition
 }
 
 export interface NotificationRequest {

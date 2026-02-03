@@ -113,14 +113,23 @@ work context add ai-project --tool github --url https://github.com/team/ai-proje
 work context set ai-project
 work auth login
 
-# Set up AI agent notification target
+# Option 1: Bash script handler
 work notify target add ai-agent --type bash --script ./ai-agent-handler.sh
+
+# Option 2: ACP-compliant AI coding assistant
+work notify target add code-reviewer \
+  --type acp \
+  --cmd "opencode acp" \
+  --system-prompt "You are a senior code reviewer. Focus on code quality, security, and best practices."
 
 # Agent creates and manages work items
 work create "Refactor user service" --assignee ai-agent --kind task --priority critical
 
-# Notify AI agent about critical tasks
+# Notify AI agents about critical tasks
 work notify send where priority=critical to ai-agent
+
+# Send features for AI code review
+work notify send where kind=feature and state=new to code-reviewer
 
 # Agent does its work in background...
 # Add work notify to cron and let it work continuously on tasks...
@@ -128,7 +137,7 @@ work notify send where priority=critical to ai-agent
 
 ```
 
-> 💡 **Coming Soon**: Agent-to-Agent (A2A) and Agent Client Protocol (ACP) notification targets for deeper AI agent network integration.
+> 💡 **Coming Soon**: Agent-to-Agent (A2A) notification targets for deeper AI agent network integration.
 
 ## Prerequisites
 
@@ -175,7 +184,6 @@ This enables AI agents to effectively use the work CLI for mixed human-agent tea
 - **Opencode**: Open-source code generation models
 - **GitHub Copilot**: GitHub Copilot workspace integration
 - **A2A**: Agent-to-Agent communication protocols
-- **ACP**: Agent Client Protocol for standardized agent interactions
 
 ### Automation Features
 - **Webhook Triggering**: HTTP webhook support for external system integration

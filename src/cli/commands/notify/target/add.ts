@@ -15,6 +15,7 @@ interface ParsedFlags {
   'smtp-host'?: string;
   cmd?: string;
   cwd?: string;
+  'system-prompt'?: string;
 }
 
 export default class NotifyTargetAdd extends BaseCommand {
@@ -68,6 +69,10 @@ export default class NotifyTargetAdd extends BaseCommand {
     }),
     cwd: Flags.string({
       description: 'Working directory for ACP client context',
+      dependsOn: ['type'],
+    }),
+    'system-prompt': Flags.string({
+      description: 'System prompt for ACP agent behavior and role definition',
       dependsOn: ['type'],
     }),
   };
@@ -144,6 +149,9 @@ export default class NotifyTargetAdd extends BaseCommand {
           cmd: flags.cmd,
           cwd: flags.cwd || process.cwd(),
           timeout: 30,
+          ...(flags['system-prompt'] && {
+            systemPrompt: flags['system-prompt'],
+          }),
         };
       default:
         throw new Error(`Unsupported target type: ${flags.type as string}`);
