@@ -7,6 +7,7 @@ export default class NotifySend extends BaseCommand {
     'Send work item notifications to configured targets';
 
   static override examples = [
+    '<%= config.bin %> notify <%= command.id %> to alerts',
     '<%= config.bin %> notify <%= command.id %> "This is a multi-line\nstatus update" to alerts',
     '<%= config.bin %> notify <%= command.id %> TASK-001 to alerts',
     '<%= config.bin %> notify <%= command.id %> where state=new to alerts',
@@ -26,9 +27,9 @@ export default class NotifySend extends BaseCommand {
     // Parse arguments from argv
     const args = argv as string[];
 
-    if (args.length < 3) {
+    if (args.length < 2) {
       this.error(
-        'Invalid syntax. Use: work notify send "message" to <target> OR work notify send TASK-001 to <target> OR work notify send where <query> to <target>'
+        'Invalid syntax. Use: work notify send to <target> OR work notify send "message" to <target> OR work notify send TASK-001 to <target> OR work notify send where <query> to <target>'
       );
     }
 
@@ -36,14 +37,25 @@ export default class NotifySend extends BaseCommand {
     let query: string | null = null;
     let target: string;
 
-    // Support three syntaxes:
-    // 1. Message: work notify send "message content" to alerts
+    // Support four syntaxes:
+    // 1. All items: work notify send to alerts
+    //    args = ['to', 'alerts']
+    // 2. Message: work notify send "message content" to alerts
     //    args = ['message content', 'to', 'alerts']
-    // 2. Shorthand: work notify send TASK-001 to alerts
+    // 3. Shorthand: work notify send TASK-001 to alerts
     //    args = ['TASK-001', 'to', 'alerts']
-    // 3. Full: work notify send where id=TASK-001 to alerts
+    // 4. Full: work notify send where id=TASK-001 to alerts
     //    args = ['where', 'id=TASK-001', 'to', 'alerts']
-    if (args[0] === 'where') {
+    if (args[0] === 'to') {
+      // All items syntax: work notify send to <target>
+      target = args.slice(1).join(' ');
+      
+      if (!target) {
+        this.error('Expected target name after "to"');
+      }
+      
+      // query remains null - will send all items
+    } else if (args[0] === 'where') {
       // Full syntax: where <query> to <target>
       if (args.length < 4) {
         this.error('Expected: work notify send where <query> to <target>');
@@ -95,7 +107,7 @@ export default class NotifySend extends BaseCommand {
       }
     } else {
       this.error(
-        'Invalid syntax. Use: work notify send "message" to <target> OR work notify send TASK-001 to <target> OR work notify send where <query> to <target>'
+        'Invalid syntax. Use: work notify send to <target> OR work notify send "message" to <target> OR work notify send TASK-001 to <target> OR work notify send where <query> to <target>'
       );
     }
 
@@ -117,8 +129,8 @@ export default class NotifySend extends BaseCommand {
         
         this.log(output);
       } else {
-        // Execute query to get work items
-        const workItems = await engine.listWorkItems(query!);
+        // Execute query to get work items (undefined = all items)
+        const workItems = await engine.listWorkItems(query || undefined);
 
         // Send notification
         const result = await engine.sendNotification(workItems, target);

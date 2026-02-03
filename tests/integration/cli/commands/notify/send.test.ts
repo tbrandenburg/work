@@ -59,4 +59,22 @@ describe('Notify Send Command', () => {
     expect(output).toContain('where');
     expect(output).toContain('to');
   });
+
+  it('should support sending all items without WHERE clause', () => {
+    const binPath = join(originalCwd, 'bin/run.js');
+    
+    // This tests that the syntax is accepted (even though it will fail without a configured target)
+    // The actual notification functionality is tested elsewhere
+    expect(() => {
+      execSync(`node ${binPath} notify send to nonexistent`, {
+        stdio: 'pipe',
+      });
+    }).toThrow(/Notification target 'nonexistent' not found/);
+    
+    // Verify help shows the new syntax
+    const helpOutput = execSync(`node ${binPath} notify send --help`, {
+      encoding: 'utf8',
+    });
+    expect(helpOutput).toContain('send to alerts');
+  });
 });
