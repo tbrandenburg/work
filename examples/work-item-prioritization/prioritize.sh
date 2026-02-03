@@ -22,11 +22,12 @@ echo ""
 
 # Step 3: Set up OpenCode ACP notification target for prioritization
 echo "🤖 Step 3: Setting up OpenCode ACP prioritization agent..."
+# Remove old target if exists (to ensure fresh timeout configuration)
+work notify target remove prioritizer 2>/dev/null || true
 work notify target add prioritizer \
   --type acp \
   --cmd "opencode acp" \
-  --system-prompt "You are a business value analyst. Analyze the passed work items and assess their priority based on business impact, user value, and urgency. Use 'work set <id> priority=<low|medium|high|critical>' to update priorities. Provide brief reasoning for each change." \
-  2>/dev/null || echo "   Target already exists, continuing..."
+  --system-prompt "You are a business value analyst. Analyze the passed work items and assess their priority based on business impact, user value, and urgency. Use 'work set <id> priority=<low|medium|high|critical>' to update priorities. Provide brief reasoning for each change."
 echo "   ✓ OpenCode ACP prioritizer configured"
 echo ""
 
@@ -44,6 +45,7 @@ echo ""
 echo "✅ Prioritization workflow complete!"
 echo ""
 echo "💡 Next steps:"
-echo "   - Review the prioritization changes made by the agent"
-echo "   - Run 'work list' to see updated priorities"
-echo "   - Adjust manually if needed with 'work set <id> priority=<value>'"
+echo "   - Check applied priorities: work get <id> (look for priority:* labels)"
+echo "   - View all with labels: work list where 'state=new'"
+echo "   - See the AI's reasoning: opencode session list (then export latest session)"
+echo "   - Adjust manually if needed: work set <id> --labels priority:high"
