@@ -47,7 +47,7 @@ export default class NotifyTargetAdd extends BaseCommand {
       dependsOn: ['type'],
     }),
     timeout: Flags.integer({
-      description: 'script timeout in seconds (for bash type)',
+      description: 'timeout in seconds (for bash and acp types, default: 300 for acp)',
       dependsOn: ['type'],
     }),
     'bot-token': Flags.string({
@@ -148,7 +148,7 @@ export default class NotifyTargetAdd extends BaseCommand {
           type: 'acp' as const,
           cmd: flags.cmd,
           cwd: flags.cwd || process.cwd(),
-          timeout: 30,
+          ...(flags.timeout && { timeout: flags.timeout }),
           ...(flags['system-prompt'] && {
             systemPrompt: flags['system-prompt'],
           }),
