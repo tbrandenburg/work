@@ -250,8 +250,8 @@ export class GitHubAdapter implements WorkAdapter {
       // Initialize API client
       this.apiClient = new GitHubApiClient(this.config);
 
-      // Test authentication by making a simple API call
-      await this.apiClient.listIssues();
+      // Test authentication by making a simple API call (only first page)
+      await this.apiClient.listIssues({ maxPages: 1 });
 
       return {
         state: 'authenticated' as const,
