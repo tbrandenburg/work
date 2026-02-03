@@ -38,16 +38,32 @@ export class GitHubApiClient {
     });
   }
 
-  async listIssues(): Promise<GitHubIssue[]> {
-    try {
-      const response = await this.octokit.rest.issues.listForRepo({
-        owner: this.config.owner,
-        repo: this.config.repo,
-        state: 'all',
-        per_page: 100,
-      });
+  async listIssues(options: { maxPages?: number } = {}): Promise<GitHubIssue[]> {
+    const { maxPages = 20 } = options; // Default: up to 2,000 issues
 
-      return response.data as GitHubIssue[];
+    try {
+      const allIssues: GitHubIssue[] = [];
+      let page = 1;
+      let hasMore = true;
+
+      while (hasMore && page <= maxPages) {
+        const response = await this.octokit.rest.issues.listForRepo({
+          owner: this.config.owner,
+          repo: this.config.repo,
+          state: 'all',
+          per_page: 100,
+          page,
+        });
+
+        const pageData = response.data as GitHubIssue[];
+        allIssues.push(...pageData);
+
+        // Stop if we got fewer than 100 results (last page)
+        hasMore = pageData.length === 100;
+        page++;
+      }
+
+      return allIssues;
     } catch (error: unknown) {
       const apiError = error as { message: string; status?: number };
       throw new GitHubApiError(apiError.message, apiError.status || 500);

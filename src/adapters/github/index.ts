@@ -190,7 +190,8 @@ export class GitHubAdapter implements WorkAdapter {
       );
     }
 
-    const githubIssues = await this.apiClient.listIssues();
+    // Fetch all issues with pagination (up to 2,000 by default)
+    const githubIssues = await this.apiClient.listIssues({ maxPages: 20 });
     let workItems = githubIssues.map(githubIssueToWorkItem);
 
     if (query) {

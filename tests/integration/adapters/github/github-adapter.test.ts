@@ -54,7 +54,7 @@ describe('GitHub Adapter Integration', () => {
 
     // Authenticate with CI_GITHUB_TOKEN (preferred) or fallback to GITHUB_TOKEN
     await adapter.authenticate({ token });
-  });
+  }, 30000); // 30 second timeout for initialization
 
   afterAll(async () => {
     if (skipTests) return;
@@ -69,7 +69,7 @@ describe('GitHub Adapter Integration', () => {
         }
       }
     }
-  });
+  }, 30000); // 30 second timeout for cleanup
 
   it.skipIf(skipTests)('should authenticate successfully', async () => {
     const authStatus = await adapter.getAuthStatus();
@@ -106,6 +106,10 @@ describe('GitHub Adapter Integration', () => {
     expect(Array.isArray(workItems)).toBe(true);
     // Allow for variations due to parallel CI jobs modifying the repository
     expect(workItems.length).toBeGreaterThanOrEqual(0);
+
+    // Note: Test repo may have >100 issues but we test with defaults
+    // Full pagination is tested in unit tests
+    // For repos with 1,295+ issues, this should now fetch all (up to maxPages limit)
 
     // Check that each work item has required properties
     for (const item of workItems.slice(0, 5)) {
