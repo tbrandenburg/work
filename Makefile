@@ -52,7 +52,7 @@ dev:
 # Installation targets
 install-global: install build
 	npm pack
-	npm install -g ./tbrandenburg-work-*.tgz
+	npm install -g --force ./tbrandenburg-work-*.tgz
 	rm -f ./tbrandenburg-work-*.tgz
 
 uninstall-global:
