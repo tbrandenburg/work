@@ -72,7 +72,8 @@ describe('NotificationService', () => {
 
       expect(mockHandler.send).toHaveBeenCalledWith(
         mockWorkItems,
-        mockTarget.config
+        mockTarget.config,
+        undefined
       );
       expect(result).toEqual(expectedResult);
     });

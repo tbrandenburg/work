@@ -13,7 +13,8 @@ import { TargetHandler } from '../notification-service.js';
 export class BashTargetHandler implements TargetHandler {
   async send(
     workItems: WorkItem[],
-    config: TargetConfig
+    config: TargetConfig,
+    _options?: { async?: boolean }
   ): Promise<NotificationResult> {
     if (config.type !== 'bash') {
       return {

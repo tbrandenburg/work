@@ -8,7 +8,8 @@ import { TargetConfig, NotificationResult } from '../../types/notification.js';
 export class TelegramTargetHandler implements TargetHandler {
   async send(
     workItems: WorkItem[],
-    config: TargetConfig
+    config: TargetConfig,
+    _options?: { async?: boolean }
   ): Promise<NotificationResult> {
     if (config.type !== 'telegram') {
       return {
