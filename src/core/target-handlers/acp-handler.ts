@@ -111,8 +111,10 @@ export class ACPTargetHandler implements TargetHandler {
       }
     } catch (error) {
       this.debug(`ACPHandler.send: Error: ${error instanceof Error ? error.message : String(error)}`);
-      // Clean up on error too
-      setImmediate(() => this.cleanup());
+      // Only cleanup if not in async mode - let async processes continue working
+      if (!options?.async) {
+        setImmediate(() => this.cleanup());
+      }
 
       return {
         success: false,

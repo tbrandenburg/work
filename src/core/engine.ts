@@ -570,7 +570,11 @@ export class WorkEngine {
 
     if (options?.async) {
       // Fire-and-forget: don't await result, but still save sessionId
-      void this.notificationService.sendNotification(workItems, target, options);
+      void this.notificationService.sendNotification(workItems, target, options)
+        .catch((error) => {
+          // Log but don't fail - this is fire-and-forget
+          console.error(`Async notification error: ${error instanceof Error ? error.message : String(error)}`);
+        });
       
       // Save contexts to persist sessionId for next invocation
       await this.saveContexts();
