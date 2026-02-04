@@ -51,7 +51,8 @@ export class ACPTargetHandler implements TargetHandler {
 
   async send(
     workItems: WorkItem[],
-    config: TargetConfig
+    config: TargetConfig,
+    options?: { async?: boolean }
   ): Promise<NotificationResult> {
     if (config.type !== 'acp') {
       throw new ACPError('Invalid config type');
@@ -80,17 +81,34 @@ export class ACPTargetHandler implements TargetHandler {
       // Send prompt with work items
       const prompt = this.formatWorkItems(workItems);
       this.debug(`ACPHandler.send: Sending prompt (length: ${prompt.length})`);
-      const response = await this.sendPrompt(process, sessionId, prompt, config);
-      this.debug('ACPHandler.send: Got response from prompt');
+      
+      if (options?.async) {
+        // Async mode: fire-and-forget
+        this.debug('ACPHandler.send: Async mode - sending prompt without waiting');
+        this.sendPromptAsync(process, sessionId, prompt, config);
+        
+        // DON'T cleanup - keep process alive for agent to work
+        // DON'T await response - return immediately
+        
+        return {
+          success: true,
+          message: `Notification sent to agent (${workItems.length} items, working asynchronously)`,
+        };
+      } else {
+        // Sync mode: wait for response (current behavior)
+        this.debug('ACPHandler.send: Sync mode - waiting for response');
+        const response = await this.sendPrompt(process, sessionId, prompt, config);
+        this.debug('ACPHandler.send: Got response from prompt');
 
-      // For CLI use case: cleanup process after sending
-      // This allows the CLI to exit cleanly
-      setImmediate(() => this.cleanup());
+        // For CLI use case: cleanup process after sending
+        // This allows the CLI to exit cleanly
+        setImmediate(() => this.cleanup());
 
-      return {
-        success: true,
-        message: `AI response: ${JSON.stringify(response).substring(0, 200)}...`,
-      };
+        return {
+          success: true,
+          message: `AI response: ${JSON.stringify(response).substring(0, 200)}...`,
+        };
+      }
     } catch (error) {
       this.debug(`ACPHandler.send: Error: ${error instanceof Error ? error.message : String(error)}`);
       // Clean up on error too
@@ -294,6 +312,33 @@ export class ACPTargetHandler implements TargetHandler {
     );
     this.debug('sendPrompt: Complete');
     return result;
+  }
+
+  /**
+   * Send prompt without waiting for response (fire-and-forget)
+   */
+  private sendPromptAsync(
+    process: ChildProcess,
+    sessionId: string,
+    content: string,
+    _config: TargetConfig
+  ): void {
+    const request: ACPMessage = {
+      jsonrpc: '2.0',
+      id: this.nextId++,
+      method: 'session/prompt',
+      params: {
+        sessionId,
+        prompt: [{ type: 'text', text: content }],
+      },
+    };
+    
+    this.debug(`Sending async prompt: ${JSON.stringify(request)}`);
+    process.stdin?.write(JSON.stringify(request) + '\n');
+    
+    // Note: Response will come back asynchronously and be handled by existing
+    // message handler, but we don't wait for it. Process stays alive to handle
+    // response and continue working.
   }
 
   private async sendRequest(

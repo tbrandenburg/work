@@ -13,7 +13,8 @@ import {
 export interface TargetHandler {
   send(
     workItems: WorkItem[],
-    config: TargetConfig
+    config: TargetConfig,
+    options?: { async?: boolean }
   ): Promise<NotificationResult>;
 }
 
@@ -36,7 +37,8 @@ export class NotificationService {
    */
   async sendNotification(
     workItems: WorkItem[],
-    target: NotificationTarget
+    target: NotificationTarget,
+    options?: { async?: boolean }
   ): Promise<NotificationResult> {
     const handler = this.targetHandlers.get(target.type);
     if (!handler) {
@@ -47,7 +49,7 @@ export class NotificationService {
     }
 
     try {
-      return await handler.send(workItems, target.config);
+      return await handler.send(workItems, target.config, options);
     } catch (error) {
       return {
         success: false,

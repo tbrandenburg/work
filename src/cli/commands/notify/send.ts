@@ -1,3 +1,4 @@
+import { Flags } from '@oclif/core';
 import { WorkEngine } from '../../../core/index.js';
 import { BaseCommand } from '../../base-command.js';
 import { formatOutput } from '../../formatter.js';
@@ -19,10 +20,14 @@ export default class NotifySend extends BaseCommand {
 
   static override flags = {
     ...BaseCommand.baseFlags,
+    async: Flags.boolean({
+      description: 'Send notification asynchronously (fire-and-forget, agent works independently)',
+      default: false,
+    }),
   };
 
   public async run(): Promise<void> {
-    const { argv } = await this.parse(NotifySend);
+    const { argv, flags } = await this.parse(NotifySend);
 
     // Parse arguments from argv
     const args = argv as string[];
@@ -133,7 +138,9 @@ export default class NotifySend extends BaseCommand {
         const workItems = await engine.listWorkItems(query || undefined);
 
         // Send notification
-        const result = await engine.sendNotification(workItems, target);
+        const result = await engine.sendNotification(workItems, target, {
+          async: flags.async || false,
+        });
 
         if (!result.success) {
           this.error(result.error || 'Notification failed');

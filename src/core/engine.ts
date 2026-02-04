@@ -552,7 +552,8 @@ export class WorkEngine {
    */
   async sendNotification(
     workItems: WorkItem[],
-    targetName: string
+    targetName: string,
+    options?: { async?: boolean }
   ): Promise<NotificationResult> {
     await this.ensureDefaultContext();
     const context = this.getActiveContext();
@@ -567,15 +568,31 @@ export class WorkEngine {
       };
     }
 
-    const result = await this.notificationService.sendNotification(
-      workItems,
-      target
-    );
+    if (options?.async) {
+      // Fire-and-forget: don't await result, but still save sessionId
+      void this.notificationService.sendNotification(workItems, target, options);
+      
+      // Save contexts to persist sessionId for next invocation
+      await this.saveContexts();
+      
+      // Return immediately without waiting for handler
+      return {
+        success: true,
+        message: `Notification sent to ${targetName} (${workItems.length} items, working asynchronously)`,
+      };
+    } else {
+      // Synchronous: wait for result (current behavior)
+      const result = await this.notificationService.sendNotification(
+        workItems,
+        target,
+        options
+      );
 
-    // Save context after notification (handlers may update mutable config fields like sessionId)
-    await this.saveContexts();
+      // Save context after notification (handlers may update mutable config fields like sessionId)
+      await this.saveContexts();
 
-    return result;
+      return result;
+    }
   }
 
   /**
