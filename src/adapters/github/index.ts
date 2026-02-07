@@ -84,7 +84,8 @@ export class GitHubAdapter implements WorkAdapter {
     const githubIssue = await this.apiClient.createIssue(
       issueParams.title,
       issueParams.body,
-      issueParams.labels
+      issueParams.labels,
+      issueParams.assignees
     );
 
     return githubIssueToWorkItem(githubIssue);
@@ -128,7 +129,7 @@ export class GitHubAdapter implements WorkAdapter {
       throw new WorkItemNotFoundError(id);
     }
 
-    const updates: { title?: string; body?: string; labels?: string[] } = {};
+    const updates: { title?: string; body?: string; labels?: string[]; assignees?: string[] } = {};
 
     if (request.title !== undefined) {
       updates.title = request.title;
@@ -140,6 +141,10 @@ export class GitHubAdapter implements WorkAdapter {
 
     if (request.labels !== undefined) {
       updates.labels = [...request.labels];
+    }
+
+    if (request.assignee !== undefined) {
+      updates.assignees = request.assignee ? [request.assignee] : [];
     }
 
     try {

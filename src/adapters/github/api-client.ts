@@ -88,7 +88,8 @@ export class GitHubApiClient {
   async createIssue(
     title: string,
     body?: string,
-    labels?: string[]
+    labels?: string[],
+    assignees?: string[]
   ): Promise<GitHubIssue> {
     try {
       const response = await this.octokit.rest.issues.create({
@@ -97,6 +98,7 @@ export class GitHubApiClient {
         title,
         body: body || '',
         labels: labels || [],
+        assignees: assignees || [],
       });
 
       return response.data as GitHubIssue;
@@ -113,6 +115,7 @@ export class GitHubApiClient {
       body?: string;
       state?: 'open' | 'closed';
       labels?: string[];
+      assignees?: string[];
     }
   ): Promise<GitHubIssue> {
     try {

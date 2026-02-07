@@ -115,7 +115,36 @@ describe('GitHub Mapper', () => {
         title: 'New Task',
         body: 'Task description',
         labels: ['feature', 'urgent'],
+        assignees: ['developer'],
       });
+    });
+
+    it('should not include assignees field when assignee is undefined', () => {
+      const request: CreateWorkItemRequest = {
+        kind: 'task',
+        title: 'Unassigned Task',
+        labels: ['feature'],
+      };
+
+      const githubParams = workItemToGitHubIssue(request);
+
+      expect(githubParams).toEqual({
+        title: 'Unassigned Task',
+        labels: ['feature'],
+      });
+      expect(githubParams).not.toHaveProperty('assignees');
+    });
+
+    it('should convert assignee to assignees array', () => {
+      const request: CreateWorkItemRequest = {
+        kind: 'task',
+        title: 'Assigned Task',
+        assignee: 'tbrandenburg',
+      };
+
+      const githubParams = workItemToGitHubIssue(request);
+
+      expect(githubParams.assignees).toEqual(['tbrandenburg']);
     });
 
     it('should handle optional fields', () => {
