@@ -196,7 +196,8 @@ describe('GitHubAdapter', () => {
       expect(mockApiClient.createIssue).toHaveBeenCalledWith(
         'Test Issue',
         'Test description',
-        []
+        [],
+        undefined
       );
       expect(githubIssueToWorkItem).toHaveBeenCalledWith(mockGitHubIssue);
       expect(result).toEqual(mockWorkItem);

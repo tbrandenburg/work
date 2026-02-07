@@ -226,4 +226,61 @@ describe('GitHub Adapter Integration', () => {
     const workItem = await adapter.getWorkItem(issueId);
     expect(workItem.state).toBe('closed');
   });
+
+  describe('Assignee operations', () => {
+    it.skipIf(skipTests)('should create issue with assignee', async () => {
+      const request: CreateWorkItemRequest = {
+        kind: 'task',
+        title: 'Test: Assignee on create',
+        description: 'Testing assignee functionality',
+        assignee: 'tbrandenburg',
+      };
+
+      const workItem = await adapter.createWorkItem(request);
+
+      expect(workItem.assignee).toBe('tbrandenburg');
+
+      // Store for cleanup
+      createdIssueIds.push(workItem.id);
+    });
+
+    it.skipIf(skipTests)('should update issue assignee', async () => {
+      // Create unassigned issue
+      const created = await adapter.createWorkItem({
+        kind: 'task',
+        title: 'Test: Assignee update',
+      });
+
+      // Store for cleanup
+      createdIssueIds.push(created.id);
+
+      // Update with assignee
+      const updated = await adapter.updateWorkItem(created.id, {
+        assignee: 'tbrandenburg',
+      });
+
+      expect(updated.assignee).toBe('tbrandenburg');
+    });
+
+    it.skipIf(skipTests)('should clear assignee with empty string', async () => {
+      // Create assigned issue
+      const created = await adapter.createWorkItem({
+        kind: 'task',
+        title: 'Test: Clear assignee',
+        assignee: 'tbrandenburg',
+      });
+
+      expect(created.assignee).toBe('tbrandenburg');
+
+      // Store for cleanup
+      createdIssueIds.push(created.id);
+
+      // Clear assignee
+      const updated = await adapter.updateWorkItem(created.id, {
+        assignee: '',
+      });
+
+      expect(updated.assignee).toBeUndefined();
+    });
+  });
 });

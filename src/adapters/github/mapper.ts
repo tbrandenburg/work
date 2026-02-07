@@ -31,8 +31,9 @@ export function workItemToGitHubIssue(request: CreateWorkItemRequest): {
   title: string;
   body?: string;
   labels?: string[];
+  assignees?: string[];
 } {
-  const result: { title: string; body?: string; labels?: string[] } = {
+  const result: { title: string; body?: string; labels?: string[]; assignees?: string[] } = {
     title: request.title,
   };
 
@@ -42,6 +43,10 @@ export function workItemToGitHubIssue(request: CreateWorkItemRequest): {
 
   if (request.labels && request.labels.length > 0) {
     result.labels = [...request.labels];
+  }
+
+  if (request.assignee) {
+    result.assignees = [request.assignee];
   }
 
   return result;
