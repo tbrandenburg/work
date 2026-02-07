@@ -45,6 +45,7 @@ describe('WorkItem Types', () => {
       state: 'new',
       priority: 'medium',
       assignee: 'testuser',
+      agent: 'test-agent',
       labels: ['test', 'unit'],
       createdAt: '2024-01-01T00:00:00Z',
       updatedAt: '2024-01-01T00:00:00Z',
@@ -55,6 +56,7 @@ describe('WorkItem Types', () => {
     expect(workItem.title).toBe('Test task');
     expect(workItem.state).toBe('new');
     expect(workItem.priority).toBe('medium');
+    expect(workItem.agent).toBe('test-agent');
     expect(workItem.labels).toEqual(['test', 'unit']);
   });
 });

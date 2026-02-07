@@ -321,4 +321,71 @@ describe('Query System', () => {
       expect(result).toHaveLength(0);
     });
   });
+
+  describe('Agent field support', () => {
+    const itemsWithAgent = [
+      {
+        id: 'TASK-001',
+        kind: 'task' as const,
+        title: 'Task 1',
+        state: 'new' as const,
+        priority: 'high' as const,
+        assignee: 'human',
+        agent: 'code-reviewer',
+        labels: [] as readonly string[],
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
+      },
+      {
+        id: 'TASK-002',
+        kind: 'task' as const,
+        title: 'Task 2',
+        state: 'new' as const,
+        priority: 'medium' as const,
+        assignee: 'human2',
+        agent: undefined,
+        labels: [] as readonly string[],
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
+      },
+      {
+        id: 'TASK-003',
+        kind: 'task' as const,
+        title: 'Task 3',
+        state: 'active' as const,
+        priority: 'high' as const,
+        assignee: 'human',
+        agent: 'test-agent',
+        labels: [] as readonly string[],
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
+      },
+    ];
+
+    it('should filter by agent', () => {
+      const query = parseQuery('where agent=code-reviewer');
+      const result = executeQuery(itemsWithAgent, query);
+      
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('TASK-001');
+      expect(result[0].agent).toBe('code-reviewer');
+    });
+
+    it('should combine agent and assignee filters', () => {
+      const query = parseQuery('where agent=code-reviewer AND assignee=human');
+      const result = executeQuery(itemsWithAgent, query);
+      
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('TASK-001');
+    });
+
+    it('should filter by multiple agents using OR', () => {
+      const query = parseQuery('where agent=code-reviewer OR agent=test-agent');
+      const result = executeQuery(itemsWithAgent, query);
+      
+      expect(result).toHaveLength(2);
+      expect(result[0].agent).toBe('code-reviewer');
+      expect(result[1].agent).toBe('test-agent');
+    });
+  });
 });

@@ -459,6 +459,8 @@ function getFieldValue(item: WorkItem, field: string): string | number | Date {
     }
     case 'assignee':
       return item.assignee || '';
+    case 'agent':
+      return item.agent || '';
     case 'createdAt':
       return item.createdAt; // Return as string, conversion handled in evaluateCondition
     case 'updatedAt':
@@ -632,6 +634,8 @@ function filterWorkItems(
           return item.priority === value;
         case 'assignee':
           return item.assignee === value;
+        case 'agent':
+          return item.agent === value;
         case 'id':
           return item.id === value;
         default:

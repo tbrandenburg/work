@@ -41,6 +41,9 @@ export default class Create extends BaseCommand {
       char: 'a',
       description: 'assignee username',
     }),
+    agent: Flags.string({
+      description: 'agent identifier',
+    }),
     labels: Flags.string({
       char: 'l',
       description: 'comma-separated labels',
@@ -63,6 +66,7 @@ export default class Create extends BaseCommand {
         priority: flags.priority as Priority,
         description: flags.description,
         assignee: flags.assignee,
+        agent: flags.agent,
         labels,
       });
 

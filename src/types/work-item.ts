@@ -25,6 +25,7 @@ export interface WorkItem {
   readonly state: WorkItemState;
   readonly priority: Priority;
   readonly assignee?: string | undefined;
+  readonly agent?: string | undefined;
   readonly labels: readonly string[];
   readonly createdAt: string;
   readonly updatedAt: string;
@@ -43,6 +44,7 @@ export interface CreateWorkItemRequest {
   readonly description?: string | undefined;
   readonly priority?: Priority | undefined;
   readonly assignee?: string | undefined;
+  readonly agent?: string | undefined;
   readonly labels?: readonly string[] | undefined;
 }
 
@@ -51,5 +53,6 @@ export interface UpdateWorkItemRequest {
   readonly description?: string | undefined;
   readonly priority?: Priority | undefined;
   readonly assignee?: string | undefined;
+  readonly agent?: string | undefined;
   readonly labels?: readonly string[] | undefined;
 }

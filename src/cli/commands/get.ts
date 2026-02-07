@@ -46,6 +46,7 @@ export default class Get extends BaseCommand {
       this.log(`State:       ${workItem.state}`);
       this.log(`Priority:    ${workItem.priority}`);
       this.log(`Assignee:    ${workItem.assignee || 'Unassigned'}`);
+      this.log(`Agent:       ${workItem.agent || 'None'}`);
       this.log(`Labels:      ${workItem.labels.join(', ') || 'None'}`);
       this.log(`Created:     ${workItem.createdAt}`);
       this.log(`Updated:     ${workItem.updatedAt}`);

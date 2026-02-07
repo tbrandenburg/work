@@ -55,6 +55,7 @@ export class LocalFsAdapter implements WorkAdapter {
       state: 'new',
       priority: request.priority || 'medium',
       assignee: request.assignee,
+      agent: request.agent,
       labels: request.labels || [],
       createdAt: now,
       updatedAt: now,
@@ -85,6 +86,7 @@ export class LocalFsAdapter implements WorkAdapter {
       description: request.description ?? existing.description,
       priority: request.priority ?? existing.priority,
       assignee: request.assignee ?? existing.assignee,
+      agent: request.agent ?? existing.agent,
       labels: request.labels ?? existing.labels,
       updatedAt: now,
     };

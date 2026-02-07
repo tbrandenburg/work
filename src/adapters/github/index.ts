@@ -139,7 +139,22 @@ export class GitHubAdapter implements WorkAdapter {
       updates.body = request.description;
     }
 
-    if (request.labels !== undefined) {
+    // Handle agent field updates by managing agent:* labels
+    if (request.agent !== undefined) {
+      // Fetch current issue to get existing labels
+      const currentIssue = await this.apiClient.getIssue(issueNumber);
+      const currentLabels = currentIssue.labels.map(l => l.name);
+      
+      // Remove all agent:* labels
+      const labelsWithoutAgent = currentLabels.filter(name => !name.startsWith('agent:'));
+      
+      // Add new agent label if provided (clearing if null/undefined)
+      if (request.agent) {
+        labelsWithoutAgent.push(`agent:${request.agent}`);
+      }
+      
+      updates.labels = labelsWithoutAgent;
+    } else if (request.labels !== undefined) {
       updates.labels = [...request.labels];
     }
 
