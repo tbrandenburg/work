@@ -36,6 +36,9 @@ export default class Set extends BaseCommand {
     assignee: Flags.string({
       description: 'update work item assignee',
     }),
+    agent: Flags.string({
+      description: 'update work item agent',
+    }),
     labels: Flags.string({
       description: 'update work item labels (comma-separated)',
     }),
@@ -53,12 +56,14 @@ export default class Set extends BaseCommand {
         description?: string;
         priority?: Priority;
         assignee?: string;
+        agent?: string;
         labels?: string[];
       } = {};
       if (flags.title) updateRequest.title = flags.title;
       if (flags.description) updateRequest.description = flags.description;
       if (flags.priority) updateRequest.priority = flags.priority as Priority;
       if (flags.assignee) updateRequest.assignee = flags.assignee;
+      if (flags.agent) updateRequest.agent = flags.agent;
       if (flags.labels)
         updateRequest.labels = flags.labels.split(',').map(l => l.trim());
 

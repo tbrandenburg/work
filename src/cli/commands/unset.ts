@@ -9,7 +9,7 @@ export default class Unset extends BaseCommand {
     field: Args.string({
       description: 'field to clear',
       required: true,
-      options: ['assignee', 'description'],
+      options: ['assignee', 'agent', 'description'],
     }),
   };
 
@@ -33,11 +33,14 @@ export default class Unset extends BaseCommand {
       // Build update request to clear the field
       const updateRequest: {
         assignee?: string | undefined;
+        agent?: string | undefined;
         description?: string | undefined;
       } = {};
 
       if (args.field === 'assignee') {
         updateRequest.assignee = undefined;
+      } else if (args.field === 'agent') {
+        updateRequest.agent = undefined;
       } else if (args.field === 'description') {
         updateRequest.description = undefined;
       }

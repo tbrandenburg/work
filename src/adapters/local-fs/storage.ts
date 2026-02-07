@@ -38,6 +38,7 @@ export async function saveWorkItem(
     state: workItem.state,
     priority: workItem.priority,
     assignee: workItem.assignee,
+    agent: workItem.agent,
     labels: workItem.labels,
     createdAt: workItem.createdAt,
     updatedAt: workItem.updatedAt,

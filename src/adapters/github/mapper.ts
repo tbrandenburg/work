@@ -9,6 +9,15 @@ import { GitHubIssue } from './types.js';
  * Converts GitHub Issue to WorkItem
  */
 export function githubIssueToWorkItem(issue: GitHubIssue): WorkItem {
+  // Extract agent from agent:* label pattern
+  const agentLabel = issue.labels.find(label => label.name.startsWith('agent:'));
+  const agent = agentLabel ? agentLabel.name.substring(6) : undefined;
+  
+  // Filter out agent:* labels from the labels array
+  const filteredLabels = issue.labels
+    .map(label => label.name)
+    .filter(name => !name.startsWith('agent:'));
+  
   return {
     id: issue.number.toString(),
     kind: 'task', // Default kind, could be enhanced with label mapping
@@ -17,7 +26,8 @@ export function githubIssueToWorkItem(issue: GitHubIssue): WorkItem {
     state: issue.state === 'open' ? 'new' : 'closed',
     priority: 'medium', // Default priority, could be enhanced with label mapping
     assignee: issue.assignee?.login,
-    labels: [...issue.labels.map(label => label.name)], // Convert readonly to mutable
+    agent,
+    labels: [...filteredLabels], // Convert readonly to mutable
     createdAt: issue.created_at,
     updatedAt: issue.updated_at,
     closedAt: issue.closed_at || undefined,
@@ -43,6 +53,12 @@ export function workItemToGitHubIssue(request: CreateWorkItemRequest): {
 
   if (request.labels && request.labels.length > 0) {
     result.labels = [...request.labels];
+  }
+
+  if (request.agent) {
+    // Add agent:* label
+    result.labels = result.labels || [];
+    result.labels.push(`agent:${request.agent}`);
   }
 
   if (request.assignee) {
