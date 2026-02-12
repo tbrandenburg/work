@@ -1,6 +1,6 @@
 /**
  * End-to-end test for GitHub authentication with Telegram notifications
- * 
+ *
  * This test demonstrates two authentication scenarios:
  * 1. gh CLI authentication with current repository (tbrandenburg/work)
  * 2. Token-based authentication with external repository (tbrandenburg/playground)
@@ -45,135 +45,157 @@ describe('GitHub Auth + Telegram Notification E2E', () => {
     rmSync(testDir, { recursive: true, force: true });
   });
 
-  it('should complete GitHub CLI auth workflow with current repository', async () => {
-    // Skip if we don't have required environment variables
-    const hasRequiredEnvVars = process.env.TELEGRAM_BOT_TOKEN && 
-                              process.env.TELEGRAM_CHAT_ID;
-    if (!hasRequiredEnvVars) {
-      console.log('Skipping test - missing Telegram credentials');
-      return;
+  it(
+    'should complete GitHub CLI auth workflow with current repository',
+    { timeout: 60000 },
+    async () => {
+      // Skip if we don't have required environment variables
+      const hasRequiredEnvVars =
+        process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID;
+      if (!hasRequiredEnvVars) {
+        console.log('Skipping test - missing Telegram credentials');
+        return;
+      }
+
+      // Skip in CI if we don't have CI_GITHUB_TOKEN (write permissions)
+      if (process.env.CI === 'true' && !process.env.CI_GITHUB_TOKEN) {
+        console.log('Skipping test - CI environment without CI_GITHUB_TOKEN');
+        return;
+      }
+
+      const botToken = process.env.TELEGRAM_BOT_TOKEN!;
+      const chatId = process.env.TELEGRAM_CHAT_ID!;
+
+      // Step 1: Add GitHub context using current work repository
+      execSync(
+        `node ${binPath} context add work-repo --tool github --url https://github.com/tbrandenburg/work`,
+        { stdio: 'pipe' }
+      );
+
+      // Step 2: Set the GitHub context as active
+      execSync(`node ${binPath} context set work-repo`, { stdio: 'pipe' });
+
+      // Step 3: Authenticate with GitHub CLI (uses tokens from previous gh auth login)
+      execSync(`node ${binPath} auth login`, { stdio: 'pipe' });
+
+      // Step 4: Verify authentication works
+      const authOutput = execSync(`node ${binPath} auth status --format json`, {
+        encoding: 'utf8',
+      });
+      const authData = JSON.parse(authOutput);
+      expect(authData.data.state).toBe('authenticated');
+
+      // Step 5: Create a test issue in the work repository
+      const createOutput = execSync(
+        `node ${binPath} create "E2E Test: GitHub CLI Auth ${Date.now()}" --format json`,
+        { encoding: 'utf8' }
+      );
+      const createData = JSON.parse(createOutput);
+      createdIssueId = createData.data.id;
+      expect(createData.data.title).toContain('E2E Test: GitHub CLI Auth');
+
+      // Step 6: Add Telegram notification target
+      execSync(
+        `node ${binPath} notify target add work-telegram-test --type telegram --bot-token ${botToken} --chat-id ${chatId}`,
+        { stdio: 'pipe' }
+      );
+
+      // Step 7: Send notification about the created issue
+      const notifyOutput = execSync(
+        `node ${binPath} notify send where "title~E2E Test: GitHub CLI Auth" to work-telegram-test`,
+        { encoding: 'utf8' }
+      );
+      expect(notifyOutput).toContain('Notification sent successfully');
+
+      // Step 8: Clean up - close the issue
+      execSync(`node ${binPath} close ${createdIssueId}`, { stdio: 'pipe' });
+
+      // Step 9: Remove the notification target
+      execSync(`node ${binPath} notify target remove work-telegram-test`, {
+        stdio: 'pipe',
+      });
+
+      // Mark as cleaned up
+      createdIssueId = null;
     }
+  );
 
-    // Skip in CI if we don't have CI_GITHUB_TOKEN (write permissions)
-    if (process.env.CI === 'true' && !process.env.CI_GITHUB_TOKEN) {
-      console.log('Skipping test - CI environment without CI_GITHUB_TOKEN');
-      return;
+  it(
+    'should complete token-based auth workflow with work repository',
+    { timeout: 60000 },
+    async () => {
+      // Skip if we don't have required environment variables
+      const hasRequiredEnvVars =
+        process.env.CI_GITHUB_TOKEN &&
+        process.env.TELEGRAM_BOT_TOKEN &&
+        process.env.TELEGRAM_CHAT_ID;
+      if (!hasRequiredEnvVars) {
+        console.log(
+          'Skipping test - missing CI_GITHUB_TOKEN or Telegram credentials'
+        );
+        return;
+      }
+
+      const botToken = process.env.TELEGRAM_BOT_TOKEN!;
+      const chatId = process.env.TELEGRAM_CHAT_ID!;
+
+      // Step 1: Add GitHub context using work repository (consistent access)
+      execSync(
+        `node ${binPath} context add work-repo --tool github --url https://github.com/tbrandenburg/work`,
+        { stdio: 'pipe' }
+      );
+
+      // Step 2: Set the GitHub context as active
+      execSync(`node ${binPath} context set work-repo`, { stdio: 'pipe' });
+
+      // Step 3: Authenticate with token (this will use CI_GITHUB_TOKEN from environment)
+      execSync(`node ${binPath} auth login`, {
+        stdio: 'pipe',
+        env: { ...process.env, CI_GITHUB_TOKEN: process.env.CI_GITHUB_TOKEN },
+      });
+
+      // Step 4: Verify authentication works
+      const authOutput = execSync(`node ${binPath} auth status --format json`, {
+        encoding: 'utf8',
+      });
+      const authData = JSON.parse(authOutput);
+      expect(authData.data.state).toBe('authenticated');
+
+      // Step 5: Create a test issue in the work repository
+      const createOutput = execSync(
+        `node ${binPath} create "E2E Test: Token Auth ${Date.now()}" --labels test --format json`,
+        { encoding: 'utf8' }
+      );
+      const createData = JSON.parse(createOutput);
+      createdIssueId = createData.data.id;
+      expect(createData.data.title).toContain('E2E Test: Token Auth');
+
+      // Step 6: Add Telegram notification target
+      execSync(
+        `node ${binPath} notify target add playground-telegram-test --type telegram --bot-token ${botToken} --chat-id ${chatId}`,
+        { stdio: 'pipe' }
+      );
+
+      // Step 7: Send notification about issues with test label
+      const notifyOutput = execSync(
+        `node ${binPath} notify send where "labels=test" to playground-telegram-test`,
+        { encoding: 'utf8' }
+      );
+      expect(notifyOutput).toContain('Notification sent successfully');
+
+      // Step 8: Clean up - close the issue
+      execSync(`node ${binPath} close ${createdIssueId}`, { stdio: 'pipe' });
+
+      // Step 9: Remove the notification target
+      execSync(
+        `node ${binPath} notify target remove playground-telegram-test`,
+        {
+          stdio: 'pipe',
+        }
+      );
+
+      // Mark as cleaned up
+      createdIssueId = null;
     }
-
-    const botToken = process.env.TELEGRAM_BOT_TOKEN!;
-    const chatId = process.env.TELEGRAM_CHAT_ID!;
-
-    // Step 1: Add GitHub context using current work repository
-    execSync(
-      `node ${binPath} context add work-repo --tool github --url https://github.com/tbrandenburg/work`,
-      { stdio: 'pipe' }
-    );
-
-    // Step 2: Set the GitHub context as active
-    execSync(`node ${binPath} context set work-repo`, { stdio: 'pipe' });
-
-    // Step 3: Authenticate with GitHub CLI (uses tokens from previous gh auth login)
-    execSync(`node ${binPath} auth login`, { stdio: 'pipe' });
-
-    // Step 4: Verify authentication works
-    const authOutput = execSync(`node ${binPath} auth status --format json`, { encoding: 'utf8' });
-    const authData = JSON.parse(authOutput);
-    expect(authData.data.state).toBe('authenticated');
-
-    // Step 5: Create a test issue in the work repository
-    const createOutput = execSync(
-      `node ${binPath} create "E2E Test: GitHub CLI Auth ${Date.now()}" --format json`,
-      { encoding: 'utf8' }
-    );
-    const createData = JSON.parse(createOutput);
-    createdIssueId = createData.data.id;
-    expect(createData.data.title).toContain('E2E Test: GitHub CLI Auth');
-
-    // Step 6: Add Telegram notification target
-    execSync(
-      `node ${binPath} notify target add work-telegram-test --type telegram --bot-token ${botToken} --chat-id ${chatId}`,
-      { stdio: 'pipe' }
-    );
-
-    // Step 7: Send notification about the created issue
-    const notifyOutput = execSync(
-      `node ${binPath} notify send where "title~E2E Test: GitHub CLI Auth" to work-telegram-test`,
-      { encoding: 'utf8' }
-    );
-    expect(notifyOutput).toContain('Notification sent successfully');
-
-    // Step 8: Clean up - close the issue
-    execSync(`node ${binPath} close ${createdIssueId}`, { stdio: 'pipe' });
-
-    // Step 9: Remove the notification target
-    execSync(`node ${binPath} notify target remove work-telegram-test`, { stdio: 'pipe' });
-
-    // Mark as cleaned up
-    createdIssueId = null;
-  });
-
-  it('should complete token-based auth workflow with work repository', async () => {
-    // Skip if we don't have required environment variables
-    const hasRequiredEnvVars = process.env.CI_GITHUB_TOKEN && 
-                              process.env.TELEGRAM_BOT_TOKEN && 
-                              process.env.TELEGRAM_CHAT_ID;
-    if (!hasRequiredEnvVars) {
-      console.log('Skipping test - missing CI_GITHUB_TOKEN or Telegram credentials');
-      return;
-    }
-
-    const botToken = process.env.TELEGRAM_BOT_TOKEN!;
-    const chatId = process.env.TELEGRAM_CHAT_ID!;
-
-    // Step 1: Add GitHub context using work repository (consistent access)
-    execSync(
-      `node ${binPath} context add work-repo --tool github --url https://github.com/tbrandenburg/work`,
-      { stdio: 'pipe' }
-    );
-
-    // Step 2: Set the GitHub context as active
-    execSync(`node ${binPath} context set work-repo`, { stdio: 'pipe' });
-
-    // Step 3: Authenticate with token (this will use CI_GITHUB_TOKEN from environment)
-    execSync(`node ${binPath} auth login`, { 
-      stdio: 'pipe',
-      env: { ...process.env, CI_GITHUB_TOKEN: process.env.CI_GITHUB_TOKEN }
-    });
-
-    // Step 4: Verify authentication works
-    const authOutput = execSync(`node ${binPath} auth status --format json`, { encoding: 'utf8' });
-    const authData = JSON.parse(authOutput);
-    expect(authData.data.state).toBe('authenticated');
-
-    // Step 5: Create a test issue in the work repository
-    const createOutput = execSync(
-      `node ${binPath} create "E2E Test: Token Auth ${Date.now()}" --labels test --format json`,
-      { encoding: 'utf8' }
-    );
-    const createData = JSON.parse(createOutput);
-    createdIssueId = createData.data.id;
-    expect(createData.data.title).toContain('E2E Test: Token Auth');
-
-    // Step 6: Add Telegram notification target
-    execSync(
-      `node ${binPath} notify target add playground-telegram-test --type telegram --bot-token ${botToken} --chat-id ${chatId}`,
-      { stdio: 'pipe' }
-    );
-
-    // Step 7: Send notification about issues with test label
-    const notifyOutput = execSync(
-      `node ${binPath} notify send where "labels=test" to playground-telegram-test`,
-      { encoding: 'utf8' }
-    );
-    expect(notifyOutput).toContain('Notification sent successfully');
-
-    // Step 8: Clean up - close the issue
-    execSync(`node ${binPath} close ${createdIssueId}`, { stdio: 'pipe' });
-
-    // Step 9: Remove the notification target
-    execSync(`node ${binPath} notify target remove playground-telegram-test`, { stdio: 'pipe' });
-
-    // Mark as cleaned up
-    createdIssueId = null;
-  });
+  );
 });
