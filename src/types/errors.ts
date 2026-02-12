@@ -177,3 +177,38 @@ export class WorkflowNotFoundError extends WorkError {
     Object.setPrototypeOf(this, WorkflowNotFoundError.prototype);
   }
 }
+
+export class TeamEditingError extends WorkError {
+  constructor(message: string) {
+    super(`Team editing failed: ${message}`, 'TEAM_EDITING_ERROR', 400);
+    this.name = 'TeamEditingError';
+    Object.setPrototypeOf(this, TeamEditingError.prototype);
+  }
+}
+
+export class DuplicateTeamIdError extends WorkError {
+  constructor(teamId: string) {
+    super(`Team ID already exists: ${teamId}`, 'DUPLICATE_TEAM_ID', 409);
+    this.name = 'DuplicateTeamIdError';
+    Object.setPrototypeOf(this, DuplicateTeamIdError.prototype);
+  }
+}
+
+export class InvalidTeamConfigError extends WorkError {
+  constructor(message: string) {
+    super(`Invalid team configuration: ${message}`, 'INVALID_TEAM_CONFIG', 400);
+    this.name = 'InvalidTeamConfigError';
+    Object.setPrototypeOf(this, InvalidTeamConfigError.prototype);
+  }
+}
+
+export class BackupFailedError extends WorkError {
+  constructor(path: string, reason?: string) {
+    const message = reason
+      ? `Backup failed for ${path}: ${reason}`
+      : `Backup failed for ${path}`;
+    super(message, 'BACKUP_FAILED', 500);
+    this.name = 'BackupFailedError';
+    Object.setPrototypeOf(this, BackupFailedError.prototype);
+  }
+}
