@@ -23,6 +23,12 @@ import {
   Workflow,
   isAgent,
   isHuman,
+  CreateTeamRequest,
+  UpdateTeamRequest,
+  CreateAgentRequest,
+  UpdateAgentRequest,
+  CreateHumanRequest,
+  UpdateHumanRequest,
 } from '../types/teams.js';
 import {
   TeamNotFoundError,
@@ -31,6 +37,9 @@ import {
   MemberNotFoundError,
   TeamValidationError,
   WorkflowNotFoundError,
+  DuplicateTeamIdError,
+  InvalidTeamConfigError,
+  BackupFailedError,
 } from '../types/errors.js';
 
 export class TeamsEngine {
@@ -471,5 +480,492 @@ export class TeamsEngine {
    */
   public isHuman(member: Member): member is Human {
     return isHuman(member);
+  }
+
+  /**
+   * Load teams data (public method for import/export operations)
+   */
+  public async loadTeamsData(): Promise<TeamsData> {
+    return await this.loadTeams();
+  }
+
+  /**
+   * Save teams data (public method for import/export operations)
+   */
+  public async saveTeamsData(data: TeamsData): Promise<void> {
+    await this.saveTeams(data);
+    // Force reload
+    this.teamsLoaded = false;
+    this.teamsData = null;
+  }
+
+  /**
+   * Create a backup copy of teams.xml before destructive operations (public method)
+   */
+  public async createBackup(): Promise<string> {
+    return await this.createBackupInternal();
+  }
+
+  /**
+   * Create a backup copy of teams.xml before destructive operations
+   */
+  private async createBackupInternal(): Promise<string> {
+    try {
+      const teamsPath = this.getTeamsFilePath();
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const backupPath = teamsPath.replace('.xml', `-backup-${timestamp}.xml`);
+
+      try {
+        await fs.access(teamsPath);
+        await fs.copyFile(teamsPath, backupPath);
+      } catch {
+        // If original doesn't exist, no backup needed
+      }
+
+      return backupPath;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      throw new BackupFailedError(this.getTeamsFilePath(), message);
+    }
+  }
+
+  /**
+   * Create a new team
+   */
+  public async createTeam(request: CreateTeamRequest): Promise<Team> {
+    const teamsData = await this.loadTeams();
+
+    // Check for duplicate team ID
+    const existingTeam = teamsData.teams.find(t => t.id === request.id);
+    if (existingTeam) {
+      throw new DuplicateTeamIdError(request.id);
+    }
+
+    // Validate required fields
+    if (
+      !request.id ||
+      !request.name ||
+      !request.title ||
+      !request.description
+    ) {
+      throw new InvalidTeamConfigError(
+        'Missing required fields: id, name, title, description'
+      );
+    }
+
+    // Validate ID format (alphanumeric and hyphens only)
+    if (!/^[a-zA-Z0-9-]+$/.test(request.id)) {
+      throw new InvalidTeamConfigError(
+        'Team ID must contain only alphanumeric characters and hyphens'
+      );
+    }
+
+    // Create backup before modification
+    await this.createBackupInternal();
+
+    const newTeam: Team = {
+      id: request.id,
+      name: request.name,
+      title: request.title,
+      description: request.description,
+      icon: request.icon,
+      agents: [],
+      humans: [],
+    };
+
+    const updatedTeamsData: TeamsData = {
+      ...teamsData,
+      teams: [...teamsData.teams, newTeam],
+    };
+
+    await this.saveTeams(updatedTeamsData);
+    return newTeam;
+  }
+
+  /**
+   * Update an existing team
+   */
+  public async updateTeam(
+    teamId: string,
+    updates: UpdateTeamRequest
+  ): Promise<Team> {
+    const teamsData = await this.loadTeams();
+
+    const teamIndex = teamsData.teams.findIndex(t => t.id === teamId);
+    if (teamIndex === -1) {
+      throw new TeamNotFoundError(teamId);
+    }
+
+    // Create backup before modification
+    await this.createBackupInternal();
+
+    const existingTeam = teamsData.teams[teamIndex]!;
+    const updatedTeam: Team = {
+      id: existingTeam.id,
+      name: updates.name ?? existingTeam.name,
+      title: updates.title ?? existingTeam.title,
+      description: updates.description ?? existingTeam.description,
+      icon: updates.icon !== undefined ? updates.icon : existingTeam.icon,
+      agents: existingTeam.agents,
+      humans: existingTeam.humans,
+    };
+
+    const updatedTeams = [...teamsData.teams];
+    updatedTeams[teamIndex] = updatedTeam;
+
+    const updatedTeamsData: TeamsData = {
+      ...teamsData,
+      teams: updatedTeams,
+    };
+
+    await this.saveTeams(updatedTeamsData);
+    return updatedTeam;
+  }
+
+  /**
+   * Delete an existing team
+   */
+  public async deleteTeam(teamId: string): Promise<void> {
+    const teamsData = await this.loadTeams();
+
+    const teamIndex = teamsData.teams.findIndex(t => t.id === teamId);
+    if (teamIndex === -1) {
+      throw new TeamNotFoundError(teamId);
+    }
+
+    // Create backup before modification
+    await this.createBackupInternal();
+
+    const updatedTeams = teamsData.teams.filter(t => t.id !== teamId);
+    const updatedTeamsData: TeamsData = {
+      ...teamsData,
+      teams: updatedTeams,
+    };
+
+    await this.saveTeams(updatedTeamsData);
+  }
+
+  /**
+   * Add an agent to a team
+   */
+  public async addAgent(
+    teamId: string,
+    request: CreateAgentRequest
+  ): Promise<Agent> {
+    const teamsData = await this.loadTeams();
+
+    const team = teamsData.teams.find(t => t.id === teamId);
+    if (!team) {
+      throw new TeamNotFoundError(teamId);
+    }
+
+    // Check for duplicate member ID within team
+    const existingAgent = team.agents?.find(a => a.id === request.id);
+    const existingHuman = team.humans?.find(h => h.id === request.id);
+    if (existingAgent || existingHuman) {
+      throw new DuplicateTeamIdError(
+        `Member ID ${request.id} already exists in team ${teamId}`
+      );
+    }
+
+    // Validate required fields
+    if (!request.id || !request.name || !request.title || !request.persona) {
+      throw new InvalidTeamConfigError(
+        'Missing required fields: id, name, title, persona'
+      );
+    }
+
+    // Validate ID format (alphanumeric and hyphens only)
+    if (!/^[a-zA-Z0-9-]+$/.test(request.id)) {
+      throw new InvalidTeamConfigError(
+        'Agent ID must contain only alphanumeric characters and hyphens'
+      );
+    }
+
+    // Create backup before modification
+    await this.createBackupInternal();
+
+    const newAgent: Agent = {
+      id: request.id,
+      name: request.name,
+      title: request.title,
+      icon: request.icon,
+      persona: request.persona,
+      commands: request.commands,
+      activation: request.activation,
+      workflows: request.workflows,
+    };
+
+    // Update team with new agent
+    const updatedTeam: Team = {
+      ...team,
+      agents: [...(team.agents || []), newAgent],
+    };
+
+    const updatedTeams = teamsData.teams.map(t =>
+      t.id === teamId ? updatedTeam : t
+    );
+
+    const updatedTeamsData: TeamsData = {
+      ...teamsData,
+      teams: updatedTeams,
+    };
+
+    await this.saveTeams(updatedTeamsData);
+    return newAgent;
+  }
+
+  /**
+   * Update an existing agent
+   */
+  public async updateAgent(
+    teamId: string,
+    agentId: string,
+    updates: UpdateAgentRequest
+  ): Promise<Agent> {
+    const teamsData = await this.loadTeams();
+
+    const team = teamsData.teams.find(t => t.id === teamId);
+    if (!team) {
+      throw new TeamNotFoundError(teamId);
+    }
+
+    const agentIndex = team.agents?.findIndex(a => a.id === agentId) ?? -1;
+    if (agentIndex === -1) {
+      throw new MemberNotFoundError(agentId, teamId);
+    }
+
+    // Create backup before modification
+    await this.createBackupInternal();
+
+    const existingAgent = team.agents![agentIndex]!;
+    const updatedAgent: Agent = {
+      id: existingAgent.id,
+      name: updates.name ?? existingAgent.name,
+      title: updates.title ?? existingAgent.title,
+      icon: updates.icon !== undefined ? updates.icon : existingAgent.icon,
+      persona: updates.persona ?? existingAgent.persona,
+      commands: updates.commands ?? existingAgent.commands,
+      activation: updates.activation ?? existingAgent.activation,
+      workflows: updates.workflows ?? existingAgent.workflows,
+    };
+
+    const updatedAgents = [...team.agents!];
+    updatedAgents[agentIndex] = updatedAgent;
+
+    const updatedTeam: Team = {
+      ...team,
+      agents: updatedAgents,
+    };
+
+    const updatedTeams = teamsData.teams.map(t =>
+      t.id === teamId ? updatedTeam : t
+    );
+
+    const updatedTeamsData: TeamsData = {
+      ...teamsData,
+      teams: updatedTeams,
+    };
+
+    await this.saveTeams(updatedTeamsData);
+    return updatedAgent;
+  }
+
+  /**
+   * Remove an agent from a team
+   */
+  public async removeAgent(teamId: string, agentId: string): Promise<void> {
+    const teamsData = await this.loadTeams();
+
+    const team = teamsData.teams.find(t => t.id === teamId);
+    if (!team) {
+      throw new TeamNotFoundError(teamId);
+    }
+
+    const agentExists = team.agents?.some(a => a.id === agentId) ?? false;
+    if (!agentExists) {
+      throw new MemberNotFoundError(agentId, teamId);
+    }
+
+    // Create backup before modification
+    await this.createBackupInternal();
+
+    const updatedAgents = team.agents?.filter(a => a.id !== agentId) ?? [];
+    const updatedTeam: Team = {
+      ...team,
+      agents: updatedAgents,
+    };
+
+    const updatedTeams = teamsData.teams.map(t =>
+      t.id === teamId ? updatedTeam : t
+    );
+
+    const updatedTeamsData: TeamsData = {
+      ...teamsData,
+      teams: updatedTeams,
+    };
+
+    await this.saveTeams(updatedTeamsData);
+  }
+
+  /**
+   * Add a human to a team
+   */
+  public async addHuman(
+    teamId: string,
+    request: CreateHumanRequest
+  ): Promise<Human> {
+    const teamsData = await this.loadTeams();
+
+    const team = teamsData.teams.find(t => t.id === teamId);
+    if (!team) {
+      throw new TeamNotFoundError(teamId);
+    }
+
+    // Check for duplicate member ID within team
+    const existingAgent = team.agents?.find(a => a.id === request.id);
+    const existingHuman = team.humans?.find(h => h.id === request.id);
+    if (existingAgent || existingHuman) {
+      throw new DuplicateTeamIdError(
+        `Member ID ${request.id} already exists in team ${teamId}`
+      );
+    }
+
+    // Validate required fields
+    if (!request.id || !request.name || !request.title || !request.persona) {
+      throw new InvalidTeamConfigError(
+        'Missing required fields: id, name, title, persona'
+      );
+    }
+
+    // Validate ID format (alphanumeric and hyphens only)
+    if (!/^[a-zA-Z0-9-]+$/.test(request.id)) {
+      throw new InvalidTeamConfigError(
+        'Human ID must contain only alphanumeric characters and hyphens'
+      );
+    }
+
+    // Create backup before modification
+    await this.createBackupInternal();
+
+    const newHuman: Human = {
+      id: request.id,
+      name: request.name,
+      title: request.title,
+      icon: request.icon,
+      persona: request.persona,
+      platforms: request.platforms,
+      contact: request.contact,
+    };
+
+    // Update team with new human
+    const updatedTeam: Team = {
+      ...team,
+      humans: [...(team.humans || []), newHuman],
+    };
+
+    const updatedTeams = teamsData.teams.map(t =>
+      t.id === teamId ? updatedTeam : t
+    );
+
+    const updatedTeamsData: TeamsData = {
+      ...teamsData,
+      teams: updatedTeams,
+    };
+
+    await this.saveTeams(updatedTeamsData);
+    return newHuman;
+  }
+
+  /**
+   * Update an existing human
+   */
+  public async updateHuman(
+    teamId: string,
+    humanId: string,
+    updates: UpdateHumanRequest
+  ): Promise<Human> {
+    const teamsData = await this.loadTeams();
+
+    const team = teamsData.teams.find(t => t.id === teamId);
+    if (!team) {
+      throw new TeamNotFoundError(teamId);
+    }
+
+    const humanIndex = team.humans?.findIndex(h => h.id === humanId) ?? -1;
+    if (humanIndex === -1) {
+      throw new MemberNotFoundError(humanId, teamId);
+    }
+
+    // Create backup before modification
+    await this.createBackupInternal();
+
+    const existingHuman = team.humans![humanIndex]!;
+    const updatedHuman: Human = {
+      id: existingHuman.id,
+      name: updates.name ?? existingHuman.name,
+      title: updates.title ?? existingHuman.title,
+      icon: updates.icon !== undefined ? updates.icon : existingHuman.icon,
+      persona: updates.persona ?? existingHuman.persona,
+      platforms: updates.platforms ?? existingHuman.platforms,
+      contact: updates.contact ?? existingHuman.contact,
+    };
+
+    const updatedHumans = [...team.humans!];
+    updatedHumans[humanIndex] = updatedHuman;
+
+    const updatedTeam: Team = {
+      ...team,
+      humans: updatedHumans,
+    };
+
+    const updatedTeams = teamsData.teams.map(t =>
+      t.id === teamId ? updatedTeam : t
+    );
+
+    const updatedTeamsData: TeamsData = {
+      ...teamsData,
+      teams: updatedTeams,
+    };
+
+    await this.saveTeams(updatedTeamsData);
+    return updatedHuman;
+  }
+
+  /**
+   * Remove a human from a team
+   */
+  public async removeHuman(teamId: string, humanId: string): Promise<void> {
+    const teamsData = await this.loadTeams();
+
+    const team = teamsData.teams.find(t => t.id === teamId);
+    if (!team) {
+      throw new TeamNotFoundError(teamId);
+    }
+
+    const humanExists = team.humans?.some(h => h.id === humanId) ?? false;
+    if (!humanExists) {
+      throw new MemberNotFoundError(humanId, teamId);
+    }
+
+    // Create backup before modification
+    await this.createBackupInternal();
+
+    const updatedHumans = team.humans?.filter(h => h.id !== humanId) ?? [];
+    const updatedTeam: Team = {
+      ...team,
+      humans: updatedHumans,
+    };
+
+    const updatedTeams = teamsData.teams.map(t =>
+      t.id === teamId ? updatedTeam : t
+    );
+
+    const updatedTeamsData: TeamsData = {
+      ...teamsData,
+      teams: updatedTeams,
+    };
+
+    await this.saveTeams(updatedTeamsData);
   }
 }

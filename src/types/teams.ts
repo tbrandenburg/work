@@ -103,3 +103,59 @@ export const isAgent = (member: Member): member is Agent => {
 export const isHuman = (member: Member): member is Human => {
   return 'platforms' in member || 'contact' in member;
 };
+
+// Request types for editing operations
+export interface CreateTeamRequest {
+  readonly id: string;
+  readonly name: string;
+  readonly title: string;
+  readonly description: string;
+  readonly icon?: string | undefined;
+}
+
+export interface UpdateTeamRequest {
+  readonly name?: string | undefined;
+  readonly title?: string | undefined;
+  readonly description?: string | undefined;
+  readonly icon?: string | undefined;
+}
+
+export interface CreateAgentRequest {
+  readonly id: string;
+  readonly name: string;
+  readonly title: string;
+  readonly icon?: string | undefined;
+  readonly persona: Persona;
+  readonly commands?: readonly Command[] | undefined;
+  readonly activation?: Activation | undefined;
+  readonly workflows?: readonly Workflow[] | undefined;
+}
+
+export interface UpdateAgentRequest {
+  readonly name?: string | undefined;
+  readonly title?: string | undefined;
+  readonly icon?: string | undefined;
+  readonly persona?: Persona | undefined;
+  readonly commands?: readonly Command[] | undefined;
+  readonly activation?: Activation | undefined;
+  readonly workflows?: readonly Workflow[] | undefined;
+}
+
+export interface CreateHumanRequest {
+  readonly id: string;
+  readonly name: string;
+  readonly title: string;
+  readonly icon?: string | undefined;
+  readonly persona: HumanPersona;
+  readonly platforms?: PlatformMappings | undefined;
+  readonly contact?: ContactInfo | undefined;
+}
+
+export interface UpdateHumanRequest {
+  readonly name?: string | undefined;
+  readonly title?: string | undefined;
+  readonly icon?: string | undefined;
+  readonly persona?: HumanPersona | undefined;
+  readonly platforms?: PlatformMappings | undefined;
+  readonly contact?: ContactInfo | undefined;
+}
