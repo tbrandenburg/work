@@ -1,6 +1,6 @@
 {
   "name": "@tbrandenburg/work",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "description": "Unified, stateless command-line tool that bridges AI agents and task management systems",
   "main": "dist/index.js",
