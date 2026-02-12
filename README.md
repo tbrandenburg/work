@@ -59,6 +59,7 @@ npm install -g @tbrandenburg/work
 ```
 
 Alternatively with `npx` leveraging the stateless nature of `work`:
+
 ```bash
 npx @tbrandenburg/work
 ```
@@ -171,14 +172,46 @@ The work CLI skill provides comprehensive guidance on:
 
 This enables AI agents to effectively use the work CLI for mixed human-agent team coordination.
 
+## Pre-Installed Teams
+
+The work CLI comes with two ready-to-use team templates that are automatically created on first use:
+
+### Software Development Team (`sw-dev-team`)
+
+- **3 AI Agents**: Technical Lead, Senior Developer, Scrum Master
+- **2 Humans**: Product Owner, QA Engineer
+- **Commands**: `/code-review`, `/technical-planning`, `/mentoring-session`
+
+### Research Team (`research-team`)
+
+- **3 AI Agents**: Senior Researcher, Data Analyst, Research Coordinator
+- **3 Humans**: Lab Manager, Domain Expert, Research Assistant
+- **Commands**: `/design-experiment`, `/literature-review`, `/data-analysis`
+
+```bash
+# Teams are automatically created on first use
+work teams list
+
+# Explore team details
+work teams show sw-dev-team
+work teams agent sw-dev-team/tech-lead
+
+# Use agents in work items
+work create "Code review needed" --assignee tech-lead
+```
+
+For complete team management capabilities, see the [work teams specification](docs/work-teams-specification.md).
+
 ## Upcoming Features
 
 ### Task Management Adapters
+
 - **Linear**: Native Linear API integration for issue tracking
 - **Azure DevOps**: Full Azure DevOps work item management
 - **Jira**: Complete Jira project and issue support
 
 ### Notification Targets
+
 - **Claude Code**: Direct integration with Claude coding assistants
 - **Codex**: OpenAI Codex model notifications
 - **Opencode**: Open-source code generation models
@@ -186,6 +219,7 @@ This enables AI agents to effectively use the work CLI for mixed human-agent tea
 - **A2A**: Agent-to-Agent communication protocols
 
 ### Automation Features
+
 - **Webhook Triggering**: HTTP webhook support for external system integration
 - **Cron Helper**: Built-in scheduling utilities for automated task management
 
