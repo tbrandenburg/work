@@ -120,3 +120,60 @@ export class ACPSessionError extends ACPError {
     Object.setPrototypeOf(this, ACPSessionError.prototype);
   }
 }
+
+// Team-specific error classes
+export class TeamNotFoundError extends WorkError {
+  constructor(name: string) {
+    super(`Team not found: ${name}`, 'TEAM_NOT_FOUND', 404);
+    this.name = 'TeamNotFoundError';
+    Object.setPrototypeOf(this, TeamNotFoundError.prototype);
+  }
+}
+
+export class AgentNotFoundError extends WorkError {
+  constructor(teamName: string, agentName: string) {
+    super(`Agent not found: ${teamName}/${agentName}`, 'AGENT_NOT_FOUND', 404);
+    this.name = 'AgentNotFoundError';
+    Object.setPrototypeOf(this, AgentNotFoundError.prototype);
+  }
+}
+
+export class HumanNotFoundError extends WorkError {
+  constructor(teamName: string, humanName: string) {
+    super(`Human not found: ${teamName}/${humanName}`, 'HUMAN_NOT_FOUND', 404);
+    this.name = 'HumanNotFoundError';
+    Object.setPrototypeOf(this, HumanNotFoundError.prototype);
+  }
+}
+
+export class MemberNotFoundError extends WorkError {
+  constructor(teamName: string, memberName: string) {
+    super(
+      `Member not found: ${teamName}/${memberName}`,
+      'MEMBER_NOT_FOUND',
+      404
+    );
+    this.name = 'MemberNotFoundError';
+    Object.setPrototypeOf(this, MemberNotFoundError.prototype);
+  }
+}
+
+export class TeamValidationError extends WorkError {
+  constructor(message: string) {
+    super(`Team validation failed: ${message}`, 'TEAM_VALIDATION_ERROR', 400);
+    this.name = 'TeamValidationError';
+    Object.setPrototypeOf(this, TeamValidationError.prototype);
+  }
+}
+
+export class WorkflowNotFoundError extends WorkError {
+  constructor(teamName: string, agentName: string, workflowId: string) {
+    super(
+      `Workflow not found: ${teamName}/${agentName}/${workflowId}`,
+      'WORKFLOW_NOT_FOUND',
+      404
+    );
+    this.name = 'WorkflowNotFoundError';
+    Object.setPrototypeOf(this, WorkflowNotFoundError.prototype);
+  }
+}
