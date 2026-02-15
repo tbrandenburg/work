@@ -138,4 +138,22 @@ export interface WorkAdapter {
    * Get available relation types
    */
   getRelationTypes(): Promise<readonly SchemaRelationType[]>;
+
+  /**
+   * Resolve @notation or team-based assignment to adapter-specific username
+   * Optional method - adapters implement based on their capabilities
+   */
+  resolveAssignee?(notation: string): Promise<string>;
+
+  /**
+   * Validate if a username/assignee is valid for this adapter
+   * Optional method - adapters implement validation logic
+   */
+  validateAssignee?(assignee: string): Promise<boolean>;
+
+  /**
+   * Get information about supported assignee patterns for this adapter
+   * Optional method - returns help text for users
+   */
+  getAssigneeHelp?(): Promise<string>;
 }

@@ -278,4 +278,32 @@ export class LocalFsAdapter implements WorkAdapter {
     const schema = await this.getSchema();
     return schema.relationTypes;
   }
+
+  /**
+   * Resolve @notation or team-based assignment to adapter-specific username
+   * Local filesystem: simple passthrough - accepts any assignee string as-is
+   */
+  resolveAssignee(notation: string): Promise<string> {
+    // Local-fs has no user management - all assignees valid, no transformation
+    return Promise.resolve(notation);
+  }
+
+  /**
+   * Validate if a username/assignee is valid for this adapter
+   * Local filesystem: all assignees are valid (no user management system)
+   */
+  validateAssignee(_assignee: string): Promise<boolean> {
+    // Local-fs accepts any assignee string
+    return Promise.resolve(true);
+  }
+
+  /**
+   * Get information about supported assignee patterns for this adapter
+   * Local filesystem: accepts any string, passes through @notation unchanged
+   */
+  getAssigneeHelp(): Promise<string> {
+    return Promise.resolve(
+      'Local filesystem adapter accepts any assignee string. @notation is passed through unchanged.'
+    );
+  }
 }
