@@ -1,5 +1,7 @@
 import { Args, Flags } from '@oclif/core';
 import { WorkEngine } from '../../core/index.js';
+import { TeamsEngine } from '../../core/teams-engine.js';
+import { AssigneeResolver } from '../../core/assignee-resolver.js';
 import { WorkItemKind, Priority } from '../../types/index.js';
 import { BaseCommand } from '../base-command.js';
 import { formatOutput } from '../formatter.js';
@@ -69,11 +71,26 @@ export default class Create extends BaseCommand {
         ? flags.labels.split(',').map(l => l.trim())
         : [];
 
-      // Simple assignee resolution for @me
+      // Resolve assignee using AssigneeResolver if provided
       let resolvedAssignee = flags.assignee;
-      if (flags.assignee === '@me') {
-        resolvedAssignee =
-          process.env['USER'] || process.env['USERNAME'] || flags.assignee;
+      if (flags.assignee) {
+        try {
+          const teamsEngine = new TeamsEngine();
+          const adapter = engine.getAdapter(); // Get current adapter from engine
+          const resolver = new AssigneeResolver(adapter, teamsEngine);
+
+          resolvedAssignee = await resolver.resolveAssignee(flags.assignee, {
+            currentUser: process.env['USER'] || process.env['USERNAME'],
+            defaultTeam: flags.team,
+            validateWithAdapter: true,
+          });
+        } catch (error) {
+          // If resolution fails, show helpful error but continue with original assignee
+          this.warn(`Assignee resolution warning: ${(error as Error).message}`);
+          this.warn(
+            'Using assignee as-is. Use --team flag or check teams.xml configuration.'
+          );
+        }
       }
 
       const workItem = await engine.createWorkItem({
