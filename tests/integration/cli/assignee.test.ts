@@ -4,6 +4,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
 
+const binPath = path.resolve(__dirname, '../../../bin/run.js');
+
 describe('CLI: assignee functionality integration', () => {
   let tempDir: string;
   let originalCwd: string;
@@ -85,7 +87,7 @@ describe('CLI: assignee functionality integration', () => {
     it('should create work item with direct username assignee', () => {
       try {
         const result = execSync(
-          'npx work create "Test task" --assignee "john-doe"',
+          `node ${binPath} create "Test task" --assignee "john-doe"`,
           {
             cwd: tempDir,
             encoding: 'utf8',
@@ -108,7 +110,7 @@ describe('CLI: assignee functionality integration', () => {
     it('should create work item with @me notation', () => {
       try {
         const result = execSync(
-          'npx work create "Personal task" --assignee "@me"',
+          `node ${binPath} create "Personal task" --assignee "@me"`,
           {
             cwd: tempDir,
             encoding: 'utf8',
@@ -130,7 +132,7 @@ describe('CLI: assignee functionality integration', () => {
 
     it('should create work item with @notation passed through', () => {
       const result = execSync(
-        'npx work create "Team task" --assignee "@tech-lead"',
+        `node ${binPath} create "Team task" --assignee "@tech-lead"`,
         {
           cwd: tempDir,
           encoding: 'utf8',
@@ -144,7 +146,7 @@ describe('CLI: assignee functionality integration', () => {
     });
 
     it('should show enhanced help examples with assignee flags', () => {
-      const result = execSync('npx work create --help', {
+      const result = execSync(`node ${binPath} create --help`, {
         cwd: tempDir,
         encoding: 'utf8',
       });
@@ -157,7 +159,7 @@ describe('CLI: assignee functionality integration', () => {
 
     it('should create work item in JSON mode with assignee resolution', () => {
       const result = execSync(
-        'npx work create "JSON task" --assignee "@me" --format json',
+        `node ${binPath} create "JSON task" --assignee "@me" --format json`,
         {
           cwd: tempDir,
           encoding: 'utf8',
@@ -172,7 +174,7 @@ describe('CLI: assignee functionality integration', () => {
 
   describe('teams resolve command', () => {
     it('should resolve @me notation', () => {
-      const result = execSync('npx work teams resolve @me', {
+      const result = execSync(`node ${binPath} teams resolve @me`, {
         cwd: tempDir,
         encoding: 'utf8',
       });
@@ -183,7 +185,7 @@ describe('CLI: assignee functionality integration', () => {
     });
 
     it('should resolve direct username', () => {
-      const result = execSync('npx work teams resolve john-doe', {
+      const result = execSync(`node ${binPath} teams resolve john-doe`, {
         cwd: tempDir,
         encoding: 'utf8',
       });
@@ -195,7 +197,7 @@ describe('CLI: assignee functionality integration', () => {
 
     it('should resolve @notation with team context', () => {
       const result = execSync(
-        'npx work teams resolve @tech-lead --team dev-team',
+        `node ${binPath} teams resolve @tech-lead --team dev-team`,
         {
           cwd: tempDir,
           encoding: 'utf8',
@@ -209,7 +211,7 @@ describe('CLI: assignee functionality integration', () => {
 
     it('should show detailed resolution information', () => {
       const result = execSync(
-        'npx work teams resolve @tech-lead --team dev-team --details',
+        `node ${binPath} teams resolve @tech-lead --team dev-team --details`,
         {
           cwd: tempDir,
           encoding: 'utf8',
@@ -222,10 +224,13 @@ describe('CLI: assignee functionality integration', () => {
     });
 
     it('should output JSON format', () => {
-      const result = execSync('npx work teams resolve @me --format json', {
-        cwd: tempDir,
-        encoding: 'utf8',
-      });
+      const result = execSync(
+        `node ${binPath} teams resolve @me --format json`,
+        {
+          cwd: tempDir,
+          encoding: 'utf8',
+        }
+      );
 
       const output = JSON.parse(result);
       expect(output.data.notation).toBe('@me');
@@ -234,10 +239,13 @@ describe('CLI: assignee functionality integration', () => {
     });
 
     it('should show assignee help', () => {
-      const result = execSync('npx work teams resolve @me --assignee-help', {
-        cwd: tempDir,
-        encoding: 'utf8',
-      });
+      const result = execSync(
+        `node ${binPath} teams resolve @me --assignee-help`,
+        {
+          cwd: tempDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('Assignee Help:');
       expect(result).toContain('Use @notation for team assignments');
@@ -246,7 +254,7 @@ describe('CLI: assignee functionality integration', () => {
     });
 
     it('should show command help', () => {
-      const result = execSync('npx work teams resolve --help', {
+      const result = execSync(`node ${binPath} teams resolve --help`, {
         cwd: tempDir,
         encoding: 'utf8',
       });
@@ -265,7 +273,7 @@ describe('CLI: assignee functionality integration', () => {
       delete process.env['USER'];
       delete process.env['USERNAME'];
 
-      const result = execSync('npx work teams resolve @me', {
+      const result = execSync(`node ${binPath} teams resolve @me`, {
         cwd: tempDir,
         encoding: 'utf8',
       });
@@ -276,7 +284,7 @@ describe('CLI: assignee functionality integration', () => {
 
     it('should handle resolution with missing team context', () => {
       try {
-        execSync('npx work teams resolve @unknown-member', {
+        execSync(`node ${binPath} teams resolve @unknown-member`, {
           cwd: tempDir,
           encoding: 'utf8',
         });
@@ -291,7 +299,7 @@ describe('CLI: assignee functionality integration', () => {
     it('should create and resolve assignee in workflow', () => {
       // Create work item with assignee
       const createResult = execSync(
-        'npx work create "Workflow task" --assignee "@me"',
+        `node ${binPath} create "Workflow task" --assignee "@me"`,
         {
           cwd: tempDir,
           encoding: 'utf8',
@@ -302,7 +310,7 @@ describe('CLI: assignee functionality integration', () => {
       expect(createResult).toContain('Assigned to: test-user');
 
       // Verify assignee can be resolved
-      const resolveResult = execSync('npx work teams resolve @me', {
+      const resolveResult = execSync(`node ${binPath} teams resolve @me`, {
         cwd: tempDir,
         encoding: 'utf8',
       });
@@ -319,7 +327,7 @@ describe('CLI: assignee functionality integration', () => {
 
       assignments.forEach(({ notation, expected }, index) => {
         const result = execSync(
-          `npx work create "Task ${index}" --assignee "${notation}"`,
+          `node ${binPath} create "Task ${index}" --assignee "${notation}"`,
           {
             cwd: tempDir,
             encoding: 'utf8',
@@ -340,7 +348,7 @@ describe('CLI: assignee functionality integration', () => {
 
   describe('edge cases', () => {
     it('should handle empty assignee gracefully', () => {
-      const result = execSync('npx work create "No assignee task"', {
+      const result = execSync(`node ${binPath} create "No assignee task"`, {
         cwd: tempDir,
         encoding: 'utf8',
       });
@@ -352,10 +360,13 @@ describe('CLI: assignee functionality integration', () => {
     });
 
     it('should handle special characters in assignee notation', () => {
-      const result = execSync('npx work teams resolve "user@domain.com"', {
-        cwd: tempDir,
-        encoding: 'utf8',
-      });
+      const result = execSync(
+        `node ${binPath} teams resolve "user@domain.com"`,
+        {
+          cwd: tempDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('Notation: user@domain.com');
       expect(result).toContain('Resolved: user@domain.com');
