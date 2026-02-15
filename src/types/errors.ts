@@ -212,3 +212,35 @@ export class BackupFailedError extends WorkError {
     Object.setPrototypeOf(this, BackupFailedError.prototype);
   }
 }
+
+export class AssigneeNotationError extends WorkError {
+  constructor(notation: string) {
+    super(
+      `Invalid assignee notation: ${notation}`,
+      'INVALID_ASSIGNEE_NOTATION',
+      400
+    );
+    this.name = 'AssigneeNotationError';
+    Object.setPrototypeOf(this, AssigneeNotationError.prototype);
+  }
+}
+
+export class InvalidAssigneeError extends WorkError {
+  constructor(assignee: string) {
+    super(`Invalid assignee: ${assignee}`, 'INVALID_ASSIGNEE', 400);
+    this.name = 'InvalidAssigneeError';
+    Object.setPrototypeOf(this, InvalidAssigneeError.prototype);
+  }
+}
+
+export class AmbiguousMemberError extends WorkError {
+  constructor(memberName: string, teams: string[]) {
+    super(
+      `Member '${memberName}' found in multiple teams: ${teams.join(', ')}. Use @team/member syntax.`,
+      'AMBIGUOUS_MEMBER',
+      400
+    );
+    this.name = 'AmbiguousMemberError';
+    Object.setPrototypeOf(this, AmbiguousMemberError.prototype);
+  }
+}

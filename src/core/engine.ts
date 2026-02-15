@@ -174,7 +174,7 @@ export class WorkEngine {
     await adapter.initialize(context);
 
     this.contexts.set(context.name, context);
-    
+
     // Save contexts to disk
     await this.saveContexts();
   }
@@ -187,7 +187,7 @@ export class WorkEngine {
       throw new ContextNotFoundError(name);
     }
     this.activeContext = name;
-    
+
     // Save contexts to disk
     await this.saveContexts();
   }
@@ -230,7 +230,7 @@ export class WorkEngine {
     }
 
     this.contexts.delete(name);
-    
+
     // Save contexts to disk
     await this.saveContexts();
   }
@@ -245,6 +245,13 @@ export class WorkEngine {
       throw new Error(`Adapter not found: ${context.tool}`);
     }
     return adapter;
+  }
+
+  /**
+   * Get the current adapter (public accessor for CLI commands)
+   */
+  public getAdapter(): WorkAdapter {
+    return this.getActiveAdapter();
   }
 
   /**
@@ -410,17 +417,17 @@ export class WorkEngine {
     await this.ensureDefaultContext();
     const adapter = this.getActiveAdapter();
     const authStatus = await adapter.authenticate(credentials);
-    
+
     // Update context auth state
     const context = this.getActiveContext();
     const updatedContext: Context = {
       ...context,
       authState: authStatus.state,
     };
-    
+
     this.contexts.set(context.name, updatedContext);
     await this.saveContexts();
-    
+
     return authStatus;
   }
 
@@ -431,14 +438,14 @@ export class WorkEngine {
     await this.ensureDefaultContext();
     const adapter = this.getActiveAdapter();
     await adapter.logout();
-    
+
     // Update context auth state
     const context = this.getActiveContext();
     const updatedContext: Context = {
       ...context,
       authState: 'unauthenticated',
     };
-    
+
     this.contexts.set(context.name, updatedContext);
     await this.saveContexts();
   }
@@ -570,15 +577,18 @@ export class WorkEngine {
 
     if (options?.async) {
       // Fire-and-forget: don't await result, but still save sessionId
-      void this.notificationService.sendNotification(workItems, target, options)
-        .catch((error) => {
+      void this.notificationService
+        .sendNotification(workItems, target, options)
+        .catch(error => {
           // Log but don't fail - this is fire-and-forget
-          console.error(`Async notification error: ${error instanceof Error ? error.message : String(error)}`);
+          console.error(
+            `Async notification error: ${error instanceof Error ? error.message : String(error)}`
+          );
         });
-      
+
       // Save contexts to persist sessionId for next invocation
       await this.saveContexts();
-      
+
       // Return immediately without waiting for handler
       return {
         success: true,

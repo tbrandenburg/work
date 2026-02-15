@@ -129,7 +129,12 @@ export class GitHubAdapter implements WorkAdapter {
       throw new WorkItemNotFoundError(id);
     }
 
-    const updates: { title?: string; body?: string; labels?: string[]; assignees?: string[] } = {};
+    const updates: {
+      title?: string;
+      body?: string;
+      labels?: string[];
+      assignees?: string[];
+    } = {};
 
     if (request.title !== undefined) {
       updates.title = request.title;
@@ -144,15 +149,17 @@ export class GitHubAdapter implements WorkAdapter {
       // Fetch current issue to get existing labels
       const currentIssue = await this.apiClient.getIssue(issueNumber);
       const currentLabels = currentIssue.labels.map(l => l.name);
-      
+
       // Remove all agent:* labels
-      const labelsWithoutAgent = currentLabels.filter(name => !name.startsWith('agent:'));
-      
+      const labelsWithoutAgent = currentLabels.filter(
+        name => !name.startsWith('agent:')
+      );
+
       // Add new agent label if provided (clearing if null/undefined)
       if (request.agent) {
         labelsWithoutAgent.push(`agent:${request.agent}`);
       }
-      
+
       updates.labels = labelsWithoutAgent;
     } else if (request.labels !== undefined) {
       updates.labels = [...request.labels];
@@ -359,5 +366,37 @@ export class GitHubAdapter implements WorkAdapter {
   async getRelationTypes(): Promise<readonly SchemaRelationType[]> {
     const schema = await this.getSchema();
     return schema.relationTypes;
+  }
+
+  /**
+   * Resolve @notation or team-based assignment to adapter-specific username
+   * GitHub: passes through the resolved username from teams (assumes it's a GitHub username)
+   */
+  resolveAssignee(notation: string): Promise<string> {
+    // GitHub adapter expects the notation to already be resolved to a GitHub username
+    // by the AssigneeResolver using teams.xml platform mappings
+    return Promise.resolve(notation);
+  }
+
+  /**
+   * Validate if a username/assignee is valid for this adapter
+   * GitHub: uses GitHub API to check if user can be assigned to repository issues
+   */
+  async validateAssignee(assignee: string): Promise<boolean> {
+    if (!this.apiClient || !this.config) {
+      throw new Error('GitHub adapter not initialized');
+    }
+
+    return this.apiClient.checkUserCanBeAssigned(assignee);
+  }
+
+  /**
+   * Get information about supported assignee patterns for this adapter
+   * GitHub: requires valid GitHub usernames that have access to the repository
+   */
+  getAssigneeHelp(): Promise<string> {
+    return Promise.resolve(
+      'GitHub adapter requires valid GitHub usernames that have access to the repository. Use teams.xml platform mappings to map @notation to GitHub usernames.'
+    );
   }
 }

@@ -38,7 +38,9 @@ export class GitHubApiClient {
     });
   }
 
-  async listIssues(options: { maxPages?: number } = {}): Promise<GitHubIssue[]> {
+  async listIssues(
+    options: { maxPages?: number } = {}
+  ): Promise<GitHubIssue[]> {
     const { maxPages = 20 } = options; // Default: up to 2,000 issues
 
     try {
@@ -135,5 +137,28 @@ export class GitHubApiClient {
 
   async closeIssue(issueNumber: number): Promise<GitHubIssue> {
     return this.updateIssue(issueNumber, { state: 'closed' });
+  }
+
+  /**
+   * Check if a username can be assigned to issues in this repository
+   * This checks if the user is a collaborator with triage permissions or higher
+   */
+  async checkUserCanBeAssigned(username: string): Promise<boolean> {
+    try {
+      await this.octokit.rest.repos.checkCollaborator({
+        owner: this.config.owner,
+        repo: this.config.repo,
+        username,
+      });
+      return true;
+    } catch (error: unknown) {
+      const apiError = error as { status?: number };
+      // GitHub API returns 404 for non-collaborators
+      if (apiError.status === 404) {
+        return false;
+      }
+      // Re-throw other errors (authentication issues, etc.)
+      throw error;
+    }
   }
 }

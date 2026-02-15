@@ -1,5 +1,7 @@
 import { Args, Flags } from '@oclif/core';
 import { WorkEngine } from '../../core/index.js';
+import { TeamsEngine } from '../../core/teams-engine.js';
+import { AssigneeResolver } from '../../core/assignee-resolver.js';
 import { WorkItemKind, Priority } from '../../types/index.js';
 import { BaseCommand } from '../base-command.js';
 import { formatOutput } from '../formatter.js';
@@ -17,6 +19,8 @@ export default class Create extends BaseCommand {
   static override examples = [
     '<%= config.bin %> <%= command.id %> "Fix login bug" --kind bug --priority high',
     '<%= config.bin %> <%= command.id %> "Implement user dashboard" --kind task',
+    '<%= config.bin %> <%= command.id %> "Review PR" --assignee @tech-lead',
+    '<%= config.bin %> <%= command.id %> "Deploy feature" --assignee @dev-team/lead',
   ];
 
   static override flags = {
@@ -39,7 +43,8 @@ export default class Create extends BaseCommand {
     }),
     assignee: Flags.string({
       char: 'a',
-      description: 'assignee username',
+      description:
+        'assignee username or @notation (e.g., @tech-lead, @team/member)',
     }),
     agent: Flags.string({
       description: 'agent identifier',
@@ -47,6 +52,10 @@ export default class Create extends BaseCommand {
     labels: Flags.string({
       char: 'l',
       description: 'comma-separated labels',
+    }),
+    team: Flags.string({
+      char: 't',
+      description: 'default team for @notation resolution',
     }),
   };
 
@@ -56,16 +65,40 @@ export default class Create extends BaseCommand {
     const engine = new WorkEngine();
 
     try {
+      await engine.ensureDefaultContext();
+
       const labels = flags.labels
         ? flags.labels.split(',').map(l => l.trim())
         : [];
+
+      // Resolve assignee using AssigneeResolver if provided
+      let resolvedAssignee = flags.assignee;
+      if (flags.assignee) {
+        try {
+          const teamsEngine = new TeamsEngine();
+          const adapter = engine.getAdapter(); // Get current adapter from engine
+          const resolver = new AssigneeResolver(adapter, teamsEngine);
+
+          resolvedAssignee = await resolver.resolveAssignee(flags.assignee, {
+            currentUser: process.env['USER'] || process.env['USERNAME'],
+            defaultTeam: flags.team,
+            validateWithAdapter: true,
+          });
+        } catch (error) {
+          // If resolution fails, show helpful error but continue with original assignee
+          this.warn(`Assignee resolution warning: ${(error as Error).message}`);
+          this.warn(
+            'Using assignee as-is. Use --team flag or check teams.xml configuration.'
+          );
+        }
+      }
 
       const workItem = await engine.createWorkItem({
         title: args.title,
         kind: flags.kind as WorkItemKind,
         priority: flags.priority as Priority,
         description: flags.description,
-        assignee: flags.assignee,
+        assignee: resolvedAssignee,
         agent: flags.agent,
         labels,
       });
@@ -79,6 +112,13 @@ export default class Create extends BaseCommand {
         );
       } else {
         this.log(`Created ${workItem.kind} ${workItem.id}: ${workItem.title}`);
+        if (workItem.assignee && workItem.assignee !== flags.assignee) {
+          this.log(
+            `  Assigned to: ${workItem.assignee} (resolved from ${flags.assignee})`
+          );
+        } else if (workItem.assignee) {
+          this.log(`  Assigned to: ${workItem.assignee}`);
+        }
       }
     } catch (error) {
       this.handleError(
