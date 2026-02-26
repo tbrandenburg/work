@@ -503,9 +503,26 @@ function processAgentToXML(agent: Agent): any {
         };
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         if (cmd.instructions) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          xmlCmd.instructions = { __cdata: cmd.instructions };
+          // Handle both string and already-parsed CDATA objects
+          if (typeof cmd.instructions === 'string') {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            xmlCmd.instructions = { __cdata: cmd.instructions };
+          } else if (
+            cmd.instructions &&
+            typeof cmd.instructions === 'object' &&
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+            (cmd.instructions as any).__cdata
+          ) {
+            // Already a CDATA object from parsing, use as-is
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            xmlCmd.instructions = cmd.instructions;
+          } else {
+            // Fallback for other types - convert to string then wrap
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            xmlCmd.instructions = { __cdata: String(cmd.instructions) };
+          }
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -524,7 +541,15 @@ function processAgentToXML(agent: Agent): any {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     xmlAgent.activation = {
       '@_critical': agent.activation.critical ? 'MANDATORY' : 'false',
-      instructions: { __cdata: agent.activation.instructions },
+      instructions:
+        typeof agent.activation.instructions === 'string'
+          ? { __cdata: agent.activation.instructions }
+          : agent.activation.instructions &&
+              typeof agent.activation.instructions === 'object' &&
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+              (agent.activation.instructions as any).__cdata
+            ? agent.activation.instructions
+            : { __cdata: String(agent.activation.instructions) },
     };
   }
 
@@ -536,11 +561,17 @@ function processAgentToXML(agent: Agent): any {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const xmlWorkflow: any = {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           '@_id': wf.id,
-          main_file: {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-            __cdata: wf.main_file.content,
-          },
+          main_file:
+            typeof wf.main_file.content === 'string'
+              ? { __cdata: wf.main_file.content }
+              : wf.main_file.content &&
+                  typeof wf.main_file.content === 'object' &&
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+                  (wf.main_file.content as any).__cdata
+                ? wf.main_file.content
+                : { __cdata: String(wf.main_file.content) },
         };
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -548,11 +579,18 @@ function processAgentToXML(agent: Agent): any {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           xmlWorkflow.dependencies = {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
             file: wf.dependencies.map((dep: any) => ({
               // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
               '@_path': dep.path,
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-              __cdata: dep.content,
+              ...(typeof dep.content === 'string'
+                ? { __cdata: dep.content }
+                : dep.content &&
+                    typeof dep.content === 'object' &&
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+                    (dep.content as any).__cdata
+                  ? dep.content
+                  : { __cdata: String(dep.content) }),
             })),
           };
         }
