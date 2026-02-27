@@ -107,14 +107,18 @@ export default class TeamsAgent extends BaseCommand {
             ) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
               const instructionsObj = command.instructions as any;
+              // Fix: instructionsObj IS the CDATA object, not a container for it
               // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
               if (instructionsObj.__cdata) {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                 instructionsText = instructionsObj.__cdata;
+              } else {
+                // Handle case where object structure is unexpected
+                instructionsText = '';
               }
             }
 
-            if (instructionsText) {
+            if (instructionsText && typeof instructionsText === 'string') {
               this.log(
                 `    Instructions:     ${instructionsText.trim().substring(0, 80)}...`
               );
